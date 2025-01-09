@@ -1,10 +1,19 @@
 package frc.robot.robot_manager;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.swerve.SwerveState;
+import frc.robot.swerve.SwerveSubsystem;
+import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
 public class RobotManager extends StateMachine<RobotState> {
+  private final SwerveSubsystem swerve;
 
-  public RobotManager() {}
+  public RobotManager(SwerveSubsystem swerve) {
+    super(SubsystemPriority.ROBOT_MANAGER, RobotState.IDLE_NO_GP);
+
+    this.swerve = swerve;
+  }
 
   @Override
   protected RobotState getNextState(RobotState currentState) {
@@ -35,12 +44,29 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L3_PREPARE_TO_SCORE -> true ? RobotState.CORAL_L3_SCORING : currentState;
 
       case CORAL_L4_PREPARE_TO_SCORE -> true ? RobotState.CORAL_L4_SCORING : currentState;
+      default -> currentState;
     };
   }
 
   @Override
   protected void afterTransition(RobotState newState) {
     // TODO: Implement
+    switch (newState) {
+      case SCORE_ASSIST -> {
+        if (DriverStation.isTeleop()) {
+          swerve.setState(SwerveState.SCORE_ASSIST);
+        } else {
+          swerve.setState(SwerveState.SCORE_ASSIST);
+        }
+      }
+      case PURPLE_ALGIN -> {
+        if (DriverStation.isTeleop()) {
+          swerve.setState(SwerveState.PURPLE_ALIGN);
+        } else {
+          swerve.setState(SwerveState.PURPLE_ALIGN);
+        }
+      }
+    }
   }
 
   @Override
@@ -50,32 +76,6 @@ public class RobotManager extends StateMachine<RobotState> {
     // Continuous state actions
     switch (getState()) {
       default -> {}
-    }
-  }
-
-  public void stowRequest() {
-    switch (getState()) {
-        // TODO: Intaking and unjam should not be IDLE_WITH_GP
-      case INTAKING,
-              INTAKE_ASSIST,
-              AMP_PREPARE_TO_SCORE,
-              SPEAKER_PREPARE_TO_SCORE,
-              FEEDING_PREPARE_TO_SHOOT,
-              PASS_PREPARE_TO_SHOOT,
-              AMP_WAITING,
-              SPEAKER_WAITING,
-              FEEDING_WAITING,
-              AMP_SCORING,
-              SPEAKER_SCORING,
-              FEEDING_SHOOTING,
-              PASS_SHOOTING,
-              IDLE_WITH_GP,
-              UNJAM
-          // INTAKING_BACK,
-          // INTAKING_FORWARD_PUSH
-          ->
-          setStateFromRequest(RobotState.IDLE_WITH_GP);
-      default -> setStateFromRequest(RobotState.IDLE_NO_GP);
     }
   }
 
@@ -91,7 +91,7 @@ public class RobotManager extends StateMachine<RobotState> {
     switch (getState()) {
       case CLIMBING_2_HANGING -> setStateFromRequest(RobotState.CLIMBING_1_LINEUP);
       case CLIMBING_1_LINEUP -> {
-        setStateFromRequest(RobotState.IDLE_WITH_GP);
+        setStateFromRequest(RobotState.IDLE_BOTH_GP);
       }
       default -> setStateFromRequest(RobotState.CLIMBING_1_LINEUP);
     }
