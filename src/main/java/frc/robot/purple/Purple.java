@@ -54,7 +54,7 @@ public class Purple {
     return closestScoreSpot;
   }
 
-  public ChassisSpeeds getRobotRelativeScoreAssistSpeeds(
+  public static ChassisSpeeds getRobotRelativeScoreAssistSpeeds(
       double robotHeading, ChassisSpeeds fieldRelativeInputSpeeds) {
 
     double angle =

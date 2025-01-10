@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.autos.trailblazer.Trailblazer;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
+import frc.robot.generated.BuildConstants;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.purple.Purple;
@@ -46,27 +47,27 @@ public class Robot extends TimedRobot {
     DogLog.setPdh(hardware.pdh);
 
     // Record metadata
-    // DogLog.log("Metadata/ProjectName", BuildConstants.MAVEN_NAME);
-    // DogLog.log("Metadata/RoborioSerialNumber", RobotConfig.SERIAL_NUMBER);
-    // DogLog.log("Metadata/RobotName", RobotConfig.get().robotName());
-    // DogLog.log("Metadata/BuildDate", BuildConstants.BUILD_DATE);
-    // DogLog.log("Metadata/GitSHA", BuildConstants.GIT_SHA);
-    // DogLog.log("Metadata/GitDate", BuildConstants.GIT_DATE);
-    // DogLog.log("Metadata/GitBranch", BuildConstants.GIT_BRANCH);
+    DogLog.log("Metadata/ProjectName", BuildConstants.MAVEN_NAME);
+    DogLog.log("Metadata/RoborioSerialNumber", RobotConfig.SERIAL_NUMBER);
+    DogLog.log("Metadata/RobotName", RobotConfig.get().robotName());
+    DogLog.log("Metadata/BuildDate", BuildConstants.BUILD_DATE);
+    DogLog.log("Metadata/GitSHA", BuildConstants.GIT_SHA);
+    DogLog.log("Metadata/GitDate", BuildConstants.GIT_DATE);
+    DogLog.log("Metadata/GitBranch", BuildConstants.GIT_BRANCH);
 
-    // switch (BuildConstants.DIRTY) {
-    //   case 0:
-    //     DogLog.log("Metadata/GitDirty", "All changes committed");
-    //     break;
-    //   case 1:
-    //     DogLog.log("Metadata/GitDirty", "Uncomitted changes");
-    //     break;
-    //   default:
-    //     DogLog.log("Metadata/GitDirty", "Unknown");
-    //     break;
-    // }
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        DogLog.log("Metadata/GitDirty", "All changes committed");
+        break;
+      case 1:
+        DogLog.log("Metadata/GitDirty", "Uncomitted changes");
+        break;
+      default:
+        DogLog.log("Metadata/GitDirty", "Unknown");
+        break;
+    }
 
-    // This must be run before any commands are scheduled
+   // This must be run before any commands are scheduled
     LifecycleSubsystemManager.getInstance().ready();
 
     SmartDashboard.putData(CommandScheduler.getInstance());
