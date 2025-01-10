@@ -1,11 +1,19 @@
 package frc.robot;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.config.RobotConfig;
 
 public class Hardware {
   public final PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
+  public final TalonFX elevatorTop =
+      new TalonFX(
+          RobotConfig.get().elevator().topMotorID(), RobotConfig.get().elevator().canBusname());
+  public final TalonFX elevatorBottom =
+      new TalonFX(
+          RobotConfig.get().elevator().bottomMotorID(), RobotConfig.get().elevator().canBusname());
 
   public final CommandXboxController driverController = new CommandXboxController(0);
   public final CommandXboxController operatorController = new CommandXboxController(1);
