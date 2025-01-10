@@ -12,15 +12,21 @@ import frc.robot.vision.VisionSubsystem;
 public class RobotManager extends StateMachine<RobotState> {
   private final VisionSubsystem vision;
   private final ImuSubsystem imu;
-  private final LocalizationSubsystem localization;
-  private final SwerveSubsystem swerve;
 
-  public RobotManager(VisionSubsystem vision, ImuSubsystem imu, LocalizationSubsystem localization, SwerveSubsystem swerve) {
+  private final SwerveSubsystem swerve;
+  private final LocalizationSubsystem localization;
+
+  public RobotManager(
+      VisionSubsystem vision,
+      ImuSubsystem imu,
+      SwerveSubsystem swerve,
+      LocalizationSubsystem localization) {
     super(SubsystemPriority.ROBOT_MANAGER, RobotState.IDLE_NO_GP);
+
     this.vision = vision;
     this.imu = imu;
-    this.localization = localization;
     this.swerve = swerve;
+    this.localization = localization;
   }
 
   @Override
@@ -29,7 +35,6 @@ public class RobotManager extends StateMachine<RobotState> {
       case IDLE_NO_GP,
               IDLE_ALGAE,
               IDLE_CORAL,
-              IDLE_BOTH_GP,
               PROCESSOR_WAITING,
               NET_WAITING,
               CORAL_L1_WAITING,
@@ -52,6 +57,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L3_PREPARE_TO_SCORE -> true ? RobotState.CORAL_L3_SCORING : currentState;
 
       case CORAL_L4_PREPARE_TO_SCORE -> true ? RobotState.CORAL_L4_SCORING : currentState;
+
       default -> currentState;
     };
   }
@@ -90,42 +96,33 @@ public class RobotManager extends StateMachine<RobotState> {
 
   public void confirmScore() {
     switch (getState()) {
-        case
-        CLIMBING_1_LINEUP,
-        CLIMBING_2_HANGING,
-        INTAKE_ALGAE_FLOOR,
-        INTAKE_ALGAE_L2,
-        INTAKE_ALGAE_L3,
-        DISLODGE_ALGAE_L2,
-        DISLODGE_ALGAE_L3,
-        INTAKE_CORAL_FLOOR_HORIZONTAL,
-        INTAKE_CORAL_FLOOR_UPRIGHT,
-        INTAKE_CORAL_STATION -> {}
 
-        case PROCESSOR_WAITING, IDLE_ALGAE -> setStateFromRequest(RobotState.PROCESSOR_PREPARE_TO_SCORE);
-        case NET_WAITING -> setStateFromRequest(RobotState.NET_PREPARE_TO_SCORE);
+      case CLIMBING_1_LINEUP,
+          CLIMBING_2_HANGING,
+          INTAKE_ALGAE_FLOOR,
+          INTAKE_ALGAE_L2,
+          INTAKE_ALGAE_L3,
+          DISLODGE_ALGAE_L2,
+          DISLODGE_ALGAE_L3,
+          INTAKE_CORAL_FLOOR_HORIZONTAL,
+          INTAKE_CORAL_FLOOR_UPRIGHT,
+          INTAKE_CORAL_STATION -> {}
 
-        case CORAL_L1_WAITING -> setStateFromRequest(RobotState.CORAL_L1_PREPARE_TO_SCORE);
-        case CORAL_L2_WAITING -> setStateFromRequest(RobotState.CORAL_L2_PREPARE_TO_SCORE);
-        case CORAL_L3_WAITING -> setStateFromRequest(RobotState.CORAL_L3_PREPARE_TO_SCORE);
-        case CORAL_L4_WAITING -> setStateFromRequest(RobotState.CORAL_L4_PREPARE_TO_SCORE);
+      case PROCESSOR_WAITING, IDLE_ALGAE ->
+          setStateFromRequest(RobotState.PROCESSOR_PREPARE_TO_SCORE);
+      case NET_WAITING -> setStateFromRequest(RobotState.NET_PREPARE_TO_SCORE);
 
-        //change default coral score level or algea score if needed
-        default -> setStateFromRequest(RobotState.CORAL_L2_PREPARE_TO_SCORE);
-    }
-}
+      case CORAL_L1_WAITING -> setStateFromRequest(RobotState.CORAL_L1_PREPARE_TO_SCORE);
+      case CORAL_L2_WAITING -> setStateFromRequest(RobotState.CORAL_L2_PREPARE_TO_SCORE);
+      case CORAL_L3_WAITING -> setStateFromRequest(RobotState.CORAL_L3_PREPARE_TO_SCORE);
+      case CORAL_L4_WAITING -> setStateFromRequest(RobotState.CORAL_L4_PREPARE_TO_SCORE);
 
-  public void stowRequest() {
-    switch (getState()) {
-        // TODO: Intaking and unjam should not be IDLE_WITH_GP
-      case INTAKE_ALGAE_FLOOR
-          // INTAKING_BACK,
-          // INTAKING_FORWARD_PUSH
-          ->
-          setStateFromRequest(RobotState.IDLE_BOTH_GP);
-      default -> setStateFromRequest(RobotState.IDLE_NO_GP);
+        // change default coral score level or algea score if needed
+      default -> setStateFromRequest(RobotState.CORAL_L2_PREPARE_TO_SCORE);
     }
   }
+
+  public void stowRequest() {}
 
   public void nextClimbStateRequest() {
     switch (getState()) {
@@ -139,7 +136,8 @@ public class RobotManager extends StateMachine<RobotState> {
     switch (getState()) {
       case CLIMBING_2_HANGING -> setStateFromRequest(RobotState.CLIMBING_1_LINEUP);
       case CLIMBING_1_LINEUP -> {
-        setStateFromRequest(RobotState.IDLE_BOTH_GP);
+
+        setStateFromRequest(RobotState.IDLE_NO_GP);
       }
       default -> setStateFromRequest(RobotState.CLIMBING_1_LINEUP);
     }
