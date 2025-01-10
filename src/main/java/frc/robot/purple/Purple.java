@@ -17,29 +17,32 @@ public class Purple {
   private static final double MAX_ANGLE_CHANGE = -35.0;
   private static final double MIN_ANGLE_CHANGE = 35.0;
 
-  private final LocalizationSubsystem localization;
+  private static LocalizationSubsystem localization;
 
-  private Pose2d closestScoreSpot;
+  private static Pose2d closestScoreSpot;
 
   public Purple(LocalizationSubsystem localization) {
 
     this.localization = localization;
   }
+  private static Pose2d getPose(LocalizationSubsystem localization){
+    return localization.getPose();
+  }
 
   /// tune angle change
-  private double distanceFromScoreSpot(Pose2d robotPose, Pose2d scorePose) {
+  private static double distanceFromScoreSpot(Pose2d robotPose, Pose2d scorePose) {
     return Math.sqrt(
         Math.pow((robotPose.getX() - scorePose.getX()), 2)
             + Math.pow((robotPose.getY() - scorePose.getY()), 2));
   }
 
-  private Pose2d getScoreSpot() {
+  private static Pose2d getScoreSpot() {
 
     closestScoreSpot = ReefPipe.PIPE_A.getPose();
 
     for (ReefPipe pipe : ReefPipe.values()) {
-      if (distanceFromScoreSpot(localization.getPose(), closestScoreSpot)
-          > distanceFromScoreSpot(localization.getPose(), pipe.getPose())) {
+      if (distanceFromScoreSpot(getPose(localization), closestScoreSpot)
+          > distanceFromScoreSpot(getPose(localization), pipe.getPose())) {
         closestScoreSpot = pipe.getPose();
     }}
 

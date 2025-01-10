@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
   private final Purple purple = new Purple();
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
-  private final RobotManager robotManager = new RobotManager(swerve);
 
   private final RobotManager robotManager = new RobotManager(vision, imu, localization, swerve);
 

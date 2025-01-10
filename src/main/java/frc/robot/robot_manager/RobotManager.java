@@ -1,17 +1,25 @@
 package frc.robot.robot_manager;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.imu.ImuSubsystem;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveState;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
+import frc.robot.vision.VisionSubsystem;
 
 public class RobotManager extends StateMachine<RobotState> {
+  private final VisionSubsystem vision;
+  private final ImuSubsystem imu;
+  private final LocalizationSubsystem localization;
   private final SwerveSubsystem swerve;
 
-  public RobotManager(SwerveSubsystem swerve) {
+  public RobotManager(VisionSubsystem vision, ImuSubsystem imu, LocalizationSubsystem localization, SwerveSubsystem swerve) {
     super(SubsystemPriority.ROBOT_MANAGER, RobotState.IDLE_NO_GP);
-
+    this.vision = vision;
+    this.imu = imu;
+    this.localization = localization;
     this.swerve = swerve;
   }
 
@@ -82,11 +90,11 @@ public class RobotManager extends StateMachine<RobotState> {
 
   public void confirmScore() {
     switch (getState()) {
-        case 
-        CLIMBING_1_LINEUP, 
-        CLIMBING_2_HANGING, 
-        INTAKE_ALGAE_FLOOR, 
-        INTAKE_ALGAE_L2, 
+        case
+        CLIMBING_1_LINEUP,
+        CLIMBING_2_HANGING,
+        INTAKE_ALGAE_FLOOR,
+        INTAKE_ALGAE_L2,
         INTAKE_ALGAE_L3,
         DISLODGE_ALGAE_L2,
         DISLODGE_ALGAE_L3,
@@ -101,7 +109,7 @@ public class RobotManager extends StateMachine<RobotState> {
         case CORAL_L2_WAITING -> setStateFromRequest(RobotState.CORAL_L2_PREPARE_TO_SCORE);
         case CORAL_L3_WAITING -> setStateFromRequest(RobotState.CORAL_L3_PREPARE_TO_SCORE);
         case CORAL_L4_WAITING -> setStateFromRequest(RobotState.CORAL_L4_PREPARE_TO_SCORE);
-        
+
         //change default coral score level or algea score if needed
         default -> setStateFromRequest(RobotState.CORAL_L2_PREPARE_TO_SCORE);
     }
@@ -110,25 +118,11 @@ public class RobotManager extends StateMachine<RobotState> {
   public void stowRequest() {
     switch (getState()) {
         // TODO: Intaking and unjam should not be IDLE_WITH_GP
-      case INTAKING,
-              INTAKE_ASSIST,
-              AMP_PREPARE_TO_SCORE,
-              SPEAKER_PREPARE_TO_SCORE,
-              FEEDING_PREPARE_TO_SHOOT,
-              PASS_PREPARE_TO_SHOOT,
-              AMP_WAITING,
-              SPEAKER_WAITING,
-              FEEDING_WAITING,
-              AMP_SCORING,
-              SPEAKER_SCORING,
-              FEEDING_SHOOTING,
-              PASS_SHOOTING,
-              IDLE_WITH_GP,
-              UNJAM
+      case INTAKE_ALGAE_FLOOR
           // INTAKING_BACK,
           // INTAKING_FORWARD_PUSH
           ->
-          setStateFromRequest(RobotState.IDLE_WITH_GP);
+          setStateFromRequest(RobotState.IDLE_BOTH_GP);
       default -> setStateFromRequest(RobotState.IDLE_NO_GP);
     }
   }
