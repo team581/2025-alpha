@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import frc.robot.FieldUtil;
+import frc.robot.ReefPipe;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.vision.LimelightHelpers;
 
@@ -33,14 +34,22 @@ public class Purple {
   }
 
   private Pose2d getScoreSpot() {
-    closestScoreSpot = FieldUtil.getReefSpot1();
-    for (int i = 0; i <= 12; ) {
+
+    closestScoreSpot = ReefPipe.PIPE_A.getPose();
+
+    for (ReefPipe pipe : ReefPipe.values()) {
       if (distanceFromScoreSpot(localization.getPose(), closestScoreSpot)
-          > distanceFromScoreSpot(localization.getPose(), FieldUtil.getReefSpot(i))) {
-        closestScoreSpot = FieldUtil.getReefSpot(i);
-      }
-      i++;
-    }
+          > distanceFromScoreSpot(localization.getPose(), pipe.getPose())) {
+        closestScoreSpot = pipe.getPose();
+    }}
+
+    // for (int i = 0; i <= 12; ) {
+    //   if (distanceFromScoreSpot(localization.getPose(), closestScoreSpot)
+    //       > distanceFromScoreSpot(localization.getPose(), ReefPipe.getReefPipePose(ReefPipe.))) {
+    //     closestScoreSpot = FieldUtil.getReefSpot(i);
+    //   }
+    //   i++;
+    // }
 
     return closestScoreSpot;
   }
