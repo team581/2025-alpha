@@ -17,8 +17,8 @@ public class WristSubsystem extends StateMachine<WristState> {
 
   private final MotionMagicVoltage motionMagicRequest =
       new MotionMagicVoltage(0).withEnableFOC(false).withOverrideBrakeDurNeutral(true);
-  private final PositionVoltage pidRequest =
-      new PositionVoltage(0).withEnableFOC(false).withOverrideBrakeDurNeutral(true);
+  //private final PositionVoltage pidRequest =
+    //  new PositionVoltage(0).withEnableFOC(false).withOverrideBrakeDurNeutral(true);
 
   public WristSubsystem(TalonFX motor) {
     super(SubsystemPriority.WRIST, WristState.PRE_MATCH_HOMING);
@@ -36,19 +36,19 @@ public class WristSubsystem extends StateMachine<WristState> {
 
   public boolean atGoal() {
     return switch (getState()) {
-      case ALGAE_BACKWARD_NET -> MathUtil.isNear(WristAngle.ALGAE_BACKWARD_NET, motorAngle, 1);
-      case ALGAE_FORWARD_NET -> MathUtil.isNear(WristAngle.ALGAE_FORWARD_NET, motorAngle, 1);
-      case ALGAE_PROCESSOR -> MathUtil.isNear(WristAngle.ALGAE_PROCESSOR, motorAngle, 1);
-      case CORAL_SCORE_LV1 -> MathUtil.isNear(WristAngle.CORAL_SCORE_LV1, motorAngle, 1);
-      case CORAL_SCORE_LV2 -> MathUtil.isNear(WristAngle.CORAL_SCORE_LV2, motorAngle, 1);
-      case CORAL_SCORE_LV3 -> MathUtil.isNear(WristAngle.CORAL_SCORE_LV3, motorAngle, 1);
-      case CORAL_SCORE_LV4 -> MathUtil.isNear(WristAngle.CORAL_SCORE_LV4, motorAngle, 1);
-      case GROUND_ALGAE_INTAKE -> MathUtil.isNear(WristAngle.GROUND_ALGAE_INTAKE, motorAngle, 1);
-      case GROUND_CORAL_INTAKE -> MathUtil.isNear(WristAngle.GROUND_CORAL_INTAKE, motorAngle, 1);
-      case IDLE -> MathUtil.isNear(WristAngle.IDLE, motorAngle, 1);
+      case ALGAE_BACKWARD_NET -> MathUtil.isNear(WristState.ALGAE_BACKWARD_NET.getAngle(), motorAngle, 1);
+      case ALGAE_FORWARD_NET -> MathUtil.isNear(WristState.ALGAE_FORWARD_NET.getAngle(), motorAngle, 1);
+      case ALGAE_PROCESSOR -> MathUtil.isNear(WristState.ALGAE_PROCESSOR.getAngle(), motorAngle, 1);
+      case CORAL_SCORE_LV1 -> MathUtil.isNear(WristState.CORAL_SCORE_LV1.getAngle(), motorAngle, 1);
+      case CORAL_SCORE_LV2 -> MathUtil.isNear(WristState.CORAL_SCORE_LV2.getAngle(), motorAngle, 1);
+      case CORAL_SCORE_LV3 -> MathUtil.isNear(WristState.CORAL_SCORE_LV3.getAngle(), motorAngle, 1);
+      case CORAL_SCORE_LV4 -> MathUtil.isNear(WristState.CORAL_SCORE_LV4.getAngle(), motorAngle, 1);
+      case GROUND_ALGAE_INTAKE -> MathUtil.isNear(WristState.GROUND_ALGAE_INTAKE.getAngle(), motorAngle, 1);
+      case GROUND_CORAL_INTAKE -> MathUtil.isNear(WristState.GROUND_CORAL_INTAKE.getAngle(), motorAngle, 1);
+      case IDLE -> MathUtil.isNear(WristState.IDLE.getAngle(), motorAngle, 1);
       case PRE_MATCH_HOMING -> true;
-      case SOURCE_INTAKE -> MathUtil.isNear(WristAngle.SOURCE_INTAKE, motorAngle, 1);
-      case UNJAM -> MathUtil.isNear(WristAngle.UNJAM, motorAngle, 1);
+      case SOURCE_INTAKE -> MathUtil.isNear(WristState.SOURCE_INTAKE.getAngle(), motorAngle, 1);
+      case UNJAM -> MathUtil.isNear(WristState.UNJAM.getAngle(), motorAngle, 1);
       default -> false;
     };
   }
@@ -67,61 +67,61 @@ public class WristSubsystem extends StateMachine<WristState> {
       case ALGAE_BACKWARD_NET -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.ALGAE_BACKWARD_NET))));
+                Units.degreesToRotations(clamp(WristState.ALGAE_BACKWARD_NET.getAngle()))));
       }
 
       case ALGAE_FORWARD_NET -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.ALGAE_FORWARD_NET))));
+                Units.degreesToRotations(clamp(WristState.ALGAE_FORWARD_NET.getAngle()))));
       }
       case ALGAE_PROCESSOR -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.ALGAE_PROCESSOR))));
+                Units.degreesToRotations(clamp(WristState.ALGAE_PROCESSOR.getAngle()))));
       }
       case CORAL_SCORE_LV1 -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.CORAL_SCORE_LV1))));
+                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LV1.getAngle()))));
       }
       case CORAL_SCORE_LV2 -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.CORAL_SCORE_LV2))));
+                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LV2.getAngle()))));
       }
       case CORAL_SCORE_LV3 -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.CORAL_SCORE_LV3))));
+                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LV3.getAngle()))));
       }
       case CORAL_SCORE_LV4 -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.CORAL_SCORE_LV4))));
+                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LV4.getAngle()))));
       }
       case GROUND_ALGAE_INTAKE -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.GROUND_ALGAE_INTAKE))));
+                Units.degreesToRotations(clamp(WristState.GROUND_ALGAE_INTAKE.getAngle()))));
       }
       case GROUND_CORAL_INTAKE -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.GROUND_CORAL_INTAKE))));
+                Units.degreesToRotations(clamp(WristState.GROUND_CORAL_INTAKE.getAngle()))));
       }
       case IDLE -> {
         motor.setControl(
-            motionMagicRequest.withPosition(Units.degreesToRotations(clamp(WristAngle.IDLE))));
+            motionMagicRequest.withPosition(Units.degreesToRotations(clamp(WristState.IDLE.getAngle()))));
       }
       case SOURCE_INTAKE -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristAngle.SOURCE_INTAKE))));
+                Units.degreesToRotations(clamp(WristState.SOURCE_INTAKE.getAngle()))));
       }
       case UNJAM -> {
         motor.setControl(
-            motionMagicRequest.withPosition(Units.degreesToRotations(clamp(WristAngle.UNJAM))));
+            motionMagicRequest.withPosition(Units.degreesToRotations(clamp(WristState.UNJAM.getAngle()))));
       }
       default -> {}
     }
@@ -131,9 +131,7 @@ public class WristSubsystem extends StateMachine<WristState> {
   public void robotPeriodic() {
     super.robotPeriodic();
 
-    switch (getState()) {
-      default -> {}
-    }
+
     if (DriverStation.isEnabled() && getState() == WristState.PRE_MATCH_HOMING) {
       // We are enabled and still in pre match homing
       // Reset the motor positions, and then transition to idle state
