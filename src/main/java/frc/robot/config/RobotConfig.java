@@ -58,9 +58,9 @@ public record RobotConfig(
   public record PivotConfig(
       String canBusName,
       int motorID,
-    TalonFXConfiguration motorConfig,
-    double homingVelocityThreshold,
-    double homingPosition) {}
+      TalonFXConfiguration motorConfig,
+      double homingVelocityThreshold,
+      double homingPosition) {}
 
   // TODO: Change this to false during events
   public static final boolean IS_DEVELOPMENT = true;

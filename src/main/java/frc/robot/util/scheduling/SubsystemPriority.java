@@ -26,12 +26,11 @@ public enum SubsystemPriority {
   // Robot manager runs last so that all sensor data is fresh before processing state transitions
   AUTOS(0);
 
-
   final int value;
 
   private SubsystemPriority(int priority) {
     this.value = priority;
   }
 
-  //TODO: Tweak subsystem priority values when more of the subsystems are added
+  // TODO: Tweak subsystem priority values when more of the subsystems are added
 }
