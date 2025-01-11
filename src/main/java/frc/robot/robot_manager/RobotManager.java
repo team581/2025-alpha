@@ -1,6 +1,7 @@
 package frc.robot.robot_manager;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.elevator.ElevatorState;
 import frc.robot.auto_align.AutoAlign;
 import frc.robot.elevator.ElevatorState;
 import frc.robot.elevator.ElevatorSubsystem;
@@ -702,14 +703,16 @@ public class RobotManager extends StateMachine<RobotState> {
   private void moveSuperstructure(ElevatorState elevatorGoal, WristState wristGoal) {
     var maybeIntermediaryPosition =
         CollisionAvoidance.plan(
-            elevator.getHeight(), wrist.getAngle(), elevatorGoal.height, wristGoal.angle);
+            elevator.getHeight(), wrist.getAngle(), elevatorGoal.value, wristGoal.angle);
 
     if (maybeIntermediaryPosition.isPresent()) {
+      var intermediaryPosition = maybeIntermediaryPosition.get();
+
       // A collision was detected, so we need to go to an intermediary point
-      elevator.setCollisionAvoidanceGoal(maybeIntermediaryPosition.get().elevatorHeight());
+      elevator.setCollisionAvoidanceGoal(intermediaryPosition.elevatorHeight());
       elevator.setState(ElevatorState.COLLISION_AVOIDANCE);
 
-      wrist.setCollisionAvoidanceGoal(maybeIntermediaryPosition.get().wristAngle());
+      wrist.setCollisionAvoidanceGoal(intermediaryPosition.wristAngle());
       wrist.setState(WristState.COLLISION_AVOIDANCE);
     } else {
       // No collision, go straight to goal state
