@@ -16,7 +16,8 @@ public enum ElevatorState {
   CORAL_L2(999),
   CORAL_L3(999),
   CORAL_L4(999);
-  final double value;
+
+  public final double value;
 
   private ElevatorState(double position) {
     this.value = position;
