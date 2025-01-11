@@ -59,7 +59,7 @@ public record RobotConfig(
       String canBusName,
       int motorID,
       TalonFXConfiguration motorConfig,
-      double homingVelocityThreshold,
+      double homingCurrentThreshold,
       double homingPosition) {}
 
   // TODO: Change this to false during events

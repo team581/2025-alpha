@@ -12,7 +12,7 @@ import frc.robot.util.state_machines.StateMachine;
 public class PivotSubsystem extends StateMachine<PivotState> {
   private final TalonFX motor;
   private double motorAngle;
-  private double motorVelocity;
+  private double motorCurrent;
 
   private final IntakeSubsystem intake;
 
@@ -32,6 +32,7 @@ public class PivotSubsystem extends StateMachine<PivotState> {
   protected void afterTransition(PivotState newState) {
     switch (newState) {
       case HOMING -> {
+        // TODO: Set homing voltage to like 2ish
         motor.setVoltage(0);
       }
       case STOWED -> {
@@ -40,7 +41,7 @@ public class PivotSubsystem extends StateMachine<PivotState> {
       }
       case CORAL_SCORE -> {
         motor.setControl(
-            motionMagicRequest.withPosition(Units.degreesToRotations(getScoreDirection().angle)));
+            motionMagicRequest.withPosition(Units.degreesToRotations(getScoreDirection())));
       }
       default -> {}
     }
@@ -49,7 +50,7 @@ public class PivotSubsystem extends StateMachine<PivotState> {
   @Override
   protected PivotState getNextState(PivotState currentState) {
     if (currentState == PivotState.HOMING
-        && motorVelocity < RobotConfig.get().pivot().homingVelocityThreshold()) {
+        && motorCurrent > RobotConfig.get().pivot().homingCurrentThreshold()) {
       motor.setPosition(RobotConfig.get().pivot().homingPosition());
       return PivotState.STOWED;
     }
@@ -61,20 +62,19 @@ public class PivotSubsystem extends StateMachine<PivotState> {
   @Override
   protected void collectInputs() {
     motorAngle = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
-    motorVelocity = Units.rotationsToDegrees(motor.getVelocity().getValueAsDouble());
+    motorCurrent = motor.getStatorCurrent().getValueAsDouble();
   }
 
-  private PivotState getScoreDirection() {
+  private double getScoreDirection() {
     if (!intake.getRightSensor()) {
-      return PivotState.CORAL_LEFT;
+      return 90;
     }
 
-    return PivotState.CORAL_RIGHT;
+    return -90;
   }
 
   public void setState(PivotState newState) {
     if (getState() != PivotState.HOMING) {
-
       setStateFromRequest(newState);
     }
   }
@@ -82,6 +82,7 @@ public class PivotSubsystem extends StateMachine<PivotState> {
   public boolean atGoal() {
     return switch (getState()) {
       case HOMING -> false;
+      case CORAL_SCORE -> MathUtil.isNear(getScoreDirection(), motorAngle, 1);
       default -> MathUtil.isNear(getState().angle, motorAngle, 1);
     };
   }
