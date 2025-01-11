@@ -9,7 +9,7 @@ public record RobotConfig(
   public record ElevatorConfig(
       int topMotorID,
       int bottomMotorID,
-      String canBusname,
+      String canBusName,
       TalonFXConfiguration topMotorConfig,
       TalonFXConfiguration bottomMotorConfig,
       double homingEndPosition,
