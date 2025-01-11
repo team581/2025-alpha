@@ -1,10 +1,7 @@
 package frc.robot.elevator;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.pathplanner.lib.path.GoalEndState;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
@@ -15,7 +12,7 @@ import frc.robot.util.state_machines.StateMachine;
 
 public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private static final double TOLERANCE = RobotConfig.get().elevator().tolerance();
-  
+
   private static double rotationsToInches(double rotations) {
     return Units.degreesToRotations(rotations)
         * (RobotConfig.get().elevator().rotationsToDistance());
@@ -33,7 +30,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private final TalonFX topMotor;
   private final TalonFX bottomMotor;
 
-  private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(ElevatorState.STOWED.value);
+  private final MotionMagicVoltage positionRequest =
+      new MotionMagicVoltage(ElevatorState.STOWED.value);
 
   // Homing
   private double lowestSeenHeight = 0.0;
@@ -44,14 +42,13 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
     this.topMotor = topMotor;
     this.bottomMotor = bottomMotor;
   }
+
   public void setState(ElevatorState newState) {
     if (getState() != ElevatorState.PRE_MATCH_HOMING) {
 
       setStateFromRequest(newState);
     }
   }
-  
-
 
   @Override
   public void disabledPeriodic() {
@@ -61,7 +58,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       lowestSeenHeight = currentHeight;
     }
   }
-  
+
   @Override
   protected void collectInputs() {
     // Calculate average height of the two motors
@@ -71,58 +68,50 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
                     Units.rotationsToDegrees(bottomMotor.getPosition().getValueAsDouble())))
             / 2.0;
   }
-  
-  
+
   @Override
   protected void afterTransition(ElevatorState newState) {
     switch (newState) {
       case NET -> {
-        topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.NET.value)));
-        bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.NET.value)));
+        topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.NET.value)));
+        bottomMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.NET.value)));
       }
       case PROCESSOR -> {
-        topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.PROCESSOR.value)));
+        topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.PROCESSOR.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.PROCESSOR.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.PROCESSOR.value)));
       }
       case CORAL_L1 -> {
-        topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L1.value)));
+        topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L1.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L1.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L1.value)));
       }
       case CORAL_L2 -> {
-        topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L2.value)));
+        topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L2.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L2.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L2.value)));
       }
       case CORAL_L3 -> {
-        topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L3.value)));
+        topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L3.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L3.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L3.value)));
       }
       case CORAL_L4 -> {
-        topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L4.value)));
+        topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L4.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L4.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.CORAL_L4.value)));
       }
       case GROUND_ALGAE_INTAKE -> {
         topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.GROUND_ALGAE_INTAKE.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.GROUND_ALGAE_INTAKE.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.GROUND_ALGAE_INTAKE.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.GROUND_ALGAE_INTAKE.value)));
       }
       case GROUND_CORAL_INTAKE -> {
         topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.GROUND_CORAL_INTAKE.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.GROUND_CORAL_INTAKE.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.GROUND_CORAL_INTAKE.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.GROUND_CORAL_INTAKE.value)));
       }
       case STOWED -> {
         topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.STOWED.value)));
@@ -130,9 +119,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       }
       case INTAKE_CORAL_STATION -> {
         topMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.INTAKE_CORAL_STATION.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.INTAKE_CORAL_STATION.value)));
         bottomMotor.setPosition(
-                Units.degreesToRotations(clampHeight(ElevatorState.INTAKE_CORAL_STATION.value)));
+            Units.degreesToRotations(clampHeight(ElevatorState.INTAKE_CORAL_STATION.value)));
       }
       case UNJAM -> {
         topMotor.setPosition(Units.degreesToRotations(clampHeight(ElevatorState.UNJAM.value)));
@@ -141,12 +130,10 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       default -> {}
     }
   }
-  
 
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-
 
     if (DriverStation.isEnabled() && getState() == ElevatorState.PRE_MATCH_HOMING) {
       // We are enabled and still in pre match homing
@@ -157,22 +144,14 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       bottomMotor.setPosition(Units.degreesToRotations(inchesToRotations(homedPosition)));
 
       setStateFromRequest(ElevatorState.STOWED);
-      
     }
-       DogLog.log("Elevator/Height", height);
-    }
+    DogLog.log("Elevator/Height", height);
+  }
 
-   
-
-
-  
-  public boolean atGoal(ElevatorState elevatorState) { return switch (getState()) {
-    case PRE_MATCH_HOMING, UNJAM -> true;
-    default ->  MathUtil.isNear(height, elevatorState.value, TOLERANCE);
-  };
-  
-  
-
+  public boolean atGoal(ElevatorState elevatorState) {
+    return switch (getState()) {
+      case PRE_MATCH_HOMING, UNJAM -> true;
+      default -> MathUtil.isNear(height, elevatorState.value, TOLERANCE);
+    };
   }
 }
-
