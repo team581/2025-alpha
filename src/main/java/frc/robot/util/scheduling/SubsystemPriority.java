@@ -17,6 +17,7 @@ public enum SubsystemPriority {
   ELEVATOR(10),
   INTAKE(10),
   WRIST(10),
+  CLIMBER(10),
 
   // 0-9 is for manager subsystems
   ROBOT_MANAGER(9),

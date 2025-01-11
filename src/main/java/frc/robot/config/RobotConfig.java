@@ -41,6 +41,13 @@ public record RobotConfig(
       TalonFXConfiguration driveMotorConfig,
       TalonFXConfiguration steerMotorConfig) {}
 
+  public record ClimberConfig(
+    String canBusName,
+    int motorID,
+    double maxHeight,
+    double minHeight,
+    TalonFXConfiguration motorConfig) {}
+
   public record VisionConfig(
       int translationHistoryArraySize,
       double xyStdDev,
