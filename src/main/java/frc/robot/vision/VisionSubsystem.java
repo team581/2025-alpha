@@ -1,20 +1,19 @@
 package frc.robot.vision;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dev.doglog.DogLog;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.limelight.Limelight;
 import frc.robot.vision.results.TagResult;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VisionSubsystem extends StateMachine<VisionState> {
   private final ImuSubsystem imu;
-  private final Limelight topLimelight;
-  private final Limelight bottomLimelight;
-  private final Limelight backLimelight;
+  private final Limelight topPurpleLimelight;
+  private final Limelight bottomCoralLimelight;
+  private final Limelight backwardsTagLimelight;
   private final List<TagResult> interpolatedVisionResult = new ArrayList<>();
   private double robotHeading;
   private double pitch;
@@ -25,14 +24,14 @@ public class VisionSubsystem extends StateMachine<VisionState> {
 
   public VisionSubsystem(
       ImuSubsystem imu,
-      Limelight topLimelight,
-      Limelight bottomLimelight,
-      Limelight backLimelight) {
+      Limelight topPurpleLimelight,
+      Limelight bottomCoralLimelight,
+      Limelight backwardsTagLimelight) {
     super(SubsystemPriority.VISION, VisionState.DEFAULT_STATE);
     this.imu = imu;
-    this.topLimelight = topLimelight;
-    this.bottomLimelight = bottomLimelight;
-    this.backLimelight = backLimelight;
+    this.topPurpleLimelight = topPurpleLimelight;
+    this.bottomCoralLimelight = bottomCoralLimelight;
+    this.backwardsTagLimelight = backwardsTagLimelight;
   }
 
   @Override
@@ -46,21 +45,21 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     rollRate = imu.getRollRate();
 
     interpolatedVisionResult.clear();
-      var maybeTopResult = topLimelight.getInterpolatedVisionResult();
-      var maybeBottomResult = bottomLimelight.getInterpolatedVisionResult();
-      var maybeBackResult = backLimelight.getInterpolatedVisionResult();
-     
-      if (maybeTopResult.isPresent()) {
-        interpolatedVisionResult.add(maybeTopResult.get());
-      }
+    var maybeTopResult = topPurpleLimelight.getInterpolatedTagResult();
+    var maybeBottomResult = bottomCoralLimelight.getInterpolatedTagResult();
+    var maybeBackResult = backwardsTagLimelight.getInterpolatedTagResult();
 
-      if (maybeBottomResult.isPresent()) {
-        interpolatedVisionResult.add(maybeBottomResult.get());
-      }
-    
-      if (maybeBackResult.isPresent()) {
-        interpolatedVisionResult.add(maybeBackResult.get());
-      }
+    if (maybeTopResult.isPresent()) {
+      interpolatedVisionResult.add(maybeTopResult.get());
+    }
+
+    if (maybeBottomResult.isPresent()) {
+      interpolatedVisionResult.add(maybeBottomResult.get());
+    }
+
+    if (maybeBackResult.isPresent()) {
+      interpolatedVisionResult.add(maybeBackResult.get());
+    }
   }
 
   public List<TagResult> getInterpolatedVisionResult() {
@@ -70,55 +69,57 @@ public class VisionSubsystem extends StateMachine<VisionState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-    topLimelight.sendImuData(robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
-    bottomLimelight.sendImuData(robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
-    backLimelight.sendImuData(robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
+    topPurpleLimelight.sendImuData(robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
+    bottomCoralLimelight.sendImuData(
+        robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
+    backwardsTagLimelight.sendImuData(
+        robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
 
     DogLog.log("Vision/visionIsEmpty", getInterpolatedVisionResult().isEmpty());
     DogLog.log("Vision/CombinedVisionState", getVisionState());
-    DogLog.log("Vision/Left/VisionState", topLimelight.getCameraStatus());
-    DogLog.log("Vision/Right/VisionState", bottomLimelight.getCameraStatus());
-    DogLog.log("Vision/Back/VisionState", backLimelight.getCameraStatus());
+    DogLog.log("Vision/Left/VisionState", topPurpleLimelight.getCameraHealth());
+    DogLog.log("Vision/Right/VisionState", bottomCoralLimelight.getCameraHealth());
+    DogLog.log("Vision/Back/VisionState", backwardsTagLimelight.getCameraHealth());
   }
 
-  public CameraStatus getVisionState() {
-    var topStatus = topLimelight.getCameraStatus();
-    var bottomStatus = bottomLimelight.getCameraStatus();
-    var backStatus = backLimelight.getCameraStatus();
+  public CameraHealth getVisionState() {
+    var topStatus = topPurpleLimelight.getCameraHealth();
+    var bottomStatus = bottomCoralLimelight.getCameraHealth();
+    var backStatus = backwardsTagLimelight.getCameraHealth();
 
-    if (topStatus == CameraStatus.OFFLINE
-        && bottomStatus == CameraStatus.OFFLINE
-        && backStatus == CameraStatus.OFFLINE) {
-      return CameraStatus.OFFLINE;
+    if (topStatus == CameraHealth.OFFLINE
+        && bottomStatus == CameraHealth.OFFLINE
+        && backStatus == CameraHealth.OFFLINE) {
+      return CameraHealth.OFFLINE;
     }
 
-    if (topStatus == CameraStatus.GOOD
-        || bottomStatus == CameraStatus.GOOD
-        || backStatus == CameraStatus.GOOD) {
-      return CameraStatus.GOOD;
+    if (topStatus == CameraHealth.GOOD
+        || bottomStatus == CameraHealth.GOOD
+        || backStatus == CameraHealth.GOOD) {
+      return CameraHealth.GOOD;
     }
 
-    return CameraStatus.NO_TARGETS;
+    return CameraHealth.NO_TARGETS;
   }
 
   /** Same as the regular vision state but returns OFFLINE if any camera is offline. */
-  public CameraStatus getPessemisticVisionState() {
-    var topStatus = topLimelight.getCameraStatus();
-    var bottomStatus = bottomLimelight.getCameraStatus();
-    var backStatus = backLimelight.getCameraStatus();
+  public CameraHealth getPessemisticVisionState() {
+    var topStatus = topPurpleLimelight.getCameraHealth();
+    var bottomStatus = bottomCoralLimelight.getCameraHealth();
+    var backStatus = backwardsTagLimelight.getCameraHealth();
 
-    if (topStatus == CameraStatus.OFFLINE
-        || bottomStatus == CameraStatus.OFFLINE
-        || backStatus == CameraStatus.OFFLINE) {
-      return CameraStatus.OFFLINE;
+    if (topStatus == CameraHealth.OFFLINE
+        || bottomStatus == CameraHealth.OFFLINE
+        || backStatus == CameraHealth.OFFLINE) {
+      return CameraHealth.OFFLINE;
     }
 
-    if (topStatus == CameraStatus.GOOD
-        || bottomStatus == CameraStatus.GOOD
-        || backStatus == CameraStatus.GOOD) {
-      return CameraStatus.GOOD;
+    if (topStatus == CameraHealth.GOOD
+        || bottomStatus == CameraHealth.GOOD
+        || backStatus == CameraHealth.GOOD) {
+      return CameraHealth.GOOD;
     }
 
-    return CameraStatus.NO_TARGETS;
+    return CameraHealth.NO_TARGETS;
   }
 }

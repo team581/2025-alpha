@@ -14,8 +14,10 @@ public enum SubsystemPriority {
   FMS(20),
 
   // 10-19 is for actuator subsystems
+  // Intake must run before pivot so that it has fresh sensor data
+  INTAKE(11),
   PIVOT(10),
-  INTAKE(10),
+  ELEVATOR(10),
   WRIST(10),
 
   // 0-9 is for manager subsystems

@@ -7,13 +7,26 @@ import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
 public record RobotConfig(
     String robotName,
+    ElevatorConfig elevator,
     IntakeConfig intake,
     SwerveConfig swerve,
     VisionConfig vision,
     WristConfig wrist,
     PivotConfig pivot) {
+  public record ElevatorConfig(
+      int topMotorID,
+      int bottomMotorID,
+      String canBusName,
+      TalonFXConfiguration topMotorConfig,
+      TalonFXConfiguration bottomMotorConfig,
+      double homingEndPosition,
+      double minHeight,
+      double maxHeight,
+      double rotationsToDistance,
+      double tolerance) {}
 
   public record IntakeConfig(
+      String canBusName,
       int motorID,
       int leftSensorID,
       int rightSensorID,
