@@ -2,10 +2,16 @@ package frc.robot.config;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
 public record RobotConfig(
-    String robotName, ElevatorConfig elevator, SwerveConfig swerve, VisionConfig vision) {
+    String robotName,
+    ElevatorConfig elevator,
+    IntakeConfig intake,
+    SwerveConfig swerve,
+    VisionConfig vision,
+    WristConfig wrist) {
   public record ElevatorConfig(
       int topMotorID,
       int bottomMotorID,
@@ -17,6 +23,14 @@ public record RobotConfig(
       double maxHeight,
       double rotationsToDistance,
       double tolerance) {}
+
+  public record IntakeConfig(
+      int motorID,
+      int leftSensorID,
+      int rightSensorID,
+      Debouncer leftDebouncer,
+      Debouncer rightDebouncer,
+      TalonFXConfiguration motorConfig) {}
 
   public record SwerveConfig(
       PhoenixPIDController snapController,
@@ -31,6 +45,13 @@ public record RobotConfig(
       double xyStdDev,
       double thetaStdDev,
       InterpolatedVisionDataset interpolatedVisionSet) {}
+
+  public record WristConfig(
+      String canBusName,
+      int motorID,
+      TalonFXConfiguration motorConfig,
+      double minAngle,
+      double maxAngle) {}
 
   // TODO: Change this to false during events
   public static final boolean IS_DEVELOPMENT = true;

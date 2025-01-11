@@ -15,10 +15,13 @@ public enum SubsystemPriority {
 
   // 10-19 is for actuator subsystems
   ELEVATOR(10),
+  INTAKE(10),
+  WRIST(10),
+
   // 0-9 is for manager subsystems
+  ROBOT_MANAGER(9),
 
   // Robot manager runs last so that all sensor data is fresh before processing state transitions
-  ROBOT_MANAGER(1),
   AUTOS(0);
 
   final int value;

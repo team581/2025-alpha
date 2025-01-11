@@ -13,13 +13,17 @@ import frc.robot.elevator.ElevatorSubsystem;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.BuildConstants;
 import frc.robot.imu.ImuSubsystem;
+import frc.robot.intake.IntakeSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
+import frc.robot.purple.Purple;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.Stopwatch;
 import frc.robot.util.scheduling.LifecycleSubsystemManager;
-import frc.robot.vision.Limelight;
 import frc.robot.vision.VisionSubsystem;
+import frc.robot.vision.limelight.Limelight;
+import frc.robot.vision.limelight.LimelightState;
+import frc.robot.wrist.WristSubsystem;
 
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
@@ -29,16 +33,32 @@ public class Robot extends TimedRobot {
       new ElevatorSubsystem(hardware.elevatorTop, hardware.elevatorBottom);
   private final SwerveSubsystem swerve = new SwerveSubsystem();
   private final ImuSubsystem imu = new ImuSubsystem(swerve.drivetrainPigeon);
-  private final Limelight leftLimelight =
-      new Limelight("left", RobotConfig.get().vision().interpolatedVisionSet().leftSet);
-  private final Limelight rightLimelight =
-      new Limelight("right", RobotConfig.get().vision().interpolatedVisionSet().rightSet);
+  private final Limelight topLimelight = new Limelight("top", LimelightState.PURPLE, RobotConfig.get().vision().interpolatedVisionSet().topSet);
+  private final Limelight bottomLimelight = new Limelight("bottom",  LimelightState.TAGS, RobotConfig.get().vision().interpolatedVisionSet().bottomSet);
+  private final Limelight backLimelight = new Limelight("back", LimelightState.TAGS, RobotConfig.get().vision().interpolatedVisionSet().backSet);
 
-  private final VisionSubsystem vision = new VisionSubsystem(imu, leftLimelight, rightLimelight);
+  private final VisionSubsystem vision =
+      new VisionSubsystem(imu, topLimelight, bottomLimelight, backLimelight);
   private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
+  private final Purple purple = new Purple(localization);
+
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
 
-  private final RobotManager robotManager = new RobotManager(vision, imu, localization, swerve);
+  private final IntakeSubsystem intake =
+      new IntakeSubsystem(
+          hardware.intakeMotor, hardware.intakeLeftSensor, hardware.intakeRightSensor);
+  private final WristSubsystem wrist = new WristSubsystem(hardware.wristMotor);
+  private final RobotManager robotManager =
+      new RobotManager(
+          intake,
+          wrist,
+          vision,
+          imu,
+          swerve,
+          localization,
+          topLimelight,
+          bottomLimelight,
+          backLimelight);
 
   public Robot() {
     System.out.println("roboRIO serial number: " + RobotConfig.SERIAL_NUMBER);

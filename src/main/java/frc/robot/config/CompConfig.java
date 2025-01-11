@@ -9,8 +9,12 @@ import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.config.RobotConfig.ElevatorConfig;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import frc.robot.config.RobotConfig.IntakeConfig;
 import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
+import frc.robot.config.RobotConfig.WristConfig;
 import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
 class CompConfig {
@@ -43,6 +47,14 @@ class CompConfig {
               999,
               999,
               999),
+          new IntakeConfig(
+              0,
+              0,
+              0,
+              new Debouncer(0.0, DebounceType.kBoth),
+              new Debouncer(0.0, DebounceType.kBoth),
+              new TalonFXConfiguration()
+                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(0))),
           new SwerveConfig(
               new PhoenixPIDController(10, 0, 1),
               true,
@@ -79,7 +91,8 @@ class CompConfig {
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
-          new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN));
+          new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN),
+          new WristConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 0, 180));
 
   private CompConfig() {}
 }

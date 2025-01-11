@@ -1,4 +1,4 @@
-package frc.robot.vision;
+package frc.robot.vision.limelight;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
