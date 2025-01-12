@@ -45,7 +45,7 @@ public class RobotManager extends StateMachine<RobotState> {
               CLIMBING_2_HANGING ->
           currentState;
 
-        //   TODO: add check for PREPARE_TO_SCORE transitions
+      //   TODO: add check for PREPARE_TO_SCORE transitions
       case PROCESSOR_PREPARE_TO_SCORE -> true ? RobotState.PROCESSOR_SCORING : currentState;
 
       case NET_PREPARE_TO_SCORE -> true ? RobotState.NET_SCORING : currentState;
@@ -93,10 +93,8 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-
   public void confirmScore() {
     switch (getState()) {
-
       case CLIMBING_1_LINEUP,
           CLIMBING_2_HANGING,
           INTAKE_ALGAE_FLOOR,
@@ -117,7 +115,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L3_WAITING -> setStateFromRequest(RobotState.CORAL_L3_PREPARE_TO_SCORE);
       case CORAL_L4_WAITING -> setStateFromRequest(RobotState.CORAL_L4_PREPARE_TO_SCORE);
 
-        // change default coral score level or algea score if needed
+      // change default coral score level or algea score if needed
       default -> setStateFromRequest(RobotState.CORAL_L2_PREPARE_TO_SCORE);
     }
   }
@@ -136,7 +134,6 @@ public class RobotManager extends StateMachine<RobotState> {
     switch (getState()) {
       case CLIMBING_2_HANGING -> setStateFromRequest(RobotState.CLIMBING_1_LINEUP);
       case CLIMBING_1_LINEUP -> {
-
         setStateFromRequest(RobotState.IDLE_NO_GP);
       }
       default -> setStateFromRequest(RobotState.CLIMBING_1_LINEUP);

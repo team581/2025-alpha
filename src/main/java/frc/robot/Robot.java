@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
         break;
     }
 
-   // This must be run before any commands are scheduled
+    // This must be run before any commands are scheduled
     LifecycleSubsystemManager.getInstance().ready();
 
     SmartDashboard.putData(CommandScheduler.getInstance());

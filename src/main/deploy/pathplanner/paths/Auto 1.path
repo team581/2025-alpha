@@ -40,8 +40,8 @@
         "y": 1.445029054752065
       },
       "nextControl": {
-        "x": 14.05300673506327,
-        "y": 1.141810768905826
+        "x": 14.053006735063278,
+        "y": 1.1418107689058203
       },
       "isLocked": false,
       "linkedName": null
@@ -142,7 +142,7 @@
     "rotation": 123.42656303131331
   },
   "reversed": false,
-  "folder": "Potential Routines",
+  "folder": "Auto Intake Paths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

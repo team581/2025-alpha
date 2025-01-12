@@ -1,11 +1,6 @@
 {
-  "robotWidth": 0.9,
-  "robotLength": 0.9,
-  "holonomicMode": true,
-  "pathFolders": [
-    "Auto Intake Paths",
-    "Potential Routines"
-  ],
+  "maxDriveSpeed": 5.45,
+  "defaultMaxAngAccel": 720,
   "autoFolders": [],
   "robotFeatures": [],
   "bumperOffsetX": 0,
@@ -31,7 +26,10 @@
   "defaultMaxAccel": 3,
   "robotLength": 0.9,
   "driveMotorType": "krakenX60",
-  "pathFolders": ["Auto Intake Paths"],
+  "pathFolders": [
+    "Auto Intake Paths",
+    "Potential Routines"
+  ],
   "defaultMaxVel": 3,
   "driveWheelRadius": 0.048
 }
