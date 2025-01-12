@@ -9,6 +9,7 @@ import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeState;
 import frc.robot.intake.IntakeSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
+import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
 import frc.robot.pivot.PivotState;
 import frc.robot.pivot.PivotSubsystem;
 import frc.robot.swerve.SnapUtil;

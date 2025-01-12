@@ -1,45 +1,27 @@
-package frc.robot.robot_manager;
+package frc.robot.robot_manager.collision_avoidance;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
+import frc.robot.robot_manager.SuperstructurePosition;
 
-public class CollisionAvoidance {
-  private static final double wristLength = 0.0;
-  private static final Pose2d safePoint1 = new Pose2d();
-  private static final Pose2d safePoint2 = new Pose2d();
-  private static final Pose2d[] outOfBounds = new Pose2d[]{new Pose2d(-1,1,Rotation2d.fromDegrees(0)),new Pose2d(1,2,Rotation2d.fromDegrees(0))}; // TOP RIGHT CORNER IS 0 and TOP RIGHT CORNER IS 1
+public class CollisionAvoidanceUtils {
+  private static final double wristLength = 1.0;
+  static final Pose2d safePoint1 = new Pose2d();
+  static final Pose2d safePoint2 = new Pose2d();
+
+  private static final Pose2d[] corners = new Pose2d[]{new Pose2d(-1,1,Rotation2d.fromDegrees(0)),new Pose2d(1,2,Rotation2d.fromDegrees(0))}; // TOP RIGHT CORNER IS 0 and TOP RIGHT CORNER IS 1
   private static ArrayList<Pose2d> possibleGoalPoints = new ArrayList<Pose2d>();
   private static double closestDistance;
   private static ArrayList<Pose2d> availablePoints = new ArrayList<Pose2d>();
   private static Pose2d goalPose = new Pose2d();
+      public static boolean collides(Pose2d currentPose, Pose2d goalPose){
 
-
-    public static Optional<SuperstructurePosition> plan(
-        double elevatorHeight, double wristAngle, double elevatorGoal, double wristGoal) {
-          possibleGoalPoints.set(0,angleHeightToPose(wristGoal,elevatorGoal));
-          possibleGoalPoints.set(1,safePoint1);
-          possibleGoalPoints.set(2,safePoint2);
-        //  getGoalPoint(possibleGoalPoints, angleHeightToPose(wristAngle, elevatorHeight))
-
-            return Optional.of(poseToSuperstructurePosition(getGoalPoint(possibleGoalPoints, angleHeightToPose(wristAngle, elevatorHeight))));
-          }
-
-          private CollisionAvoidance() {
-
-
-          }
-
-          private static boolean collides(Pose2d currentPose, Pose2d goalPose){
-
-            double x1 = outOfBounds[0].getX();
-            double y1 = outOfBounds[0].getY();
-            double y2 = outOfBounds[1].getY();
-            double x2 = outOfBounds[1].getX();
+            double x1 = corners[0].getX();
+            double y1 = corners[0].getY();
+            double y2 = corners[1].getY();
+            double x2 = corners[1].getX();
 
         double currentPoseX = currentPose.getX();
         double currentPoseY = currentPose.getY();
@@ -67,7 +49,7 @@ public class CollisionAvoidance {
 
 
           }
-          private static Pose2d angleHeightToPose(double wristAngle, double elevatorHeight){
+          static Pose2d angleHeightToPose(double wristAngle, double elevatorHeight){
     return new Pose2d(Math.cos(wristAngle)*wristLength,elevatorHeight+Math.sin(wristAngle)*wristLength,Rotation2d.fromDegrees(0.0));
 
   }
@@ -79,7 +61,7 @@ public class CollisionAvoidance {
 
   }
 
-  private static Pose2d getGoalPoint(ArrayList<Pose2d> possibleGoalPoints, Pose2d currentPose){
+  static Pose2d getGoalPoint(ArrayList<Pose2d> possibleGoalPoints, Pose2d currentPose){
     for(int i=0;i<possibleGoalPoints.size();){
       if(!collides(currentPose, possibleGoalPoints.get(i))){
         availablePoints.set(i,possibleGoalPoints.get(i));
@@ -99,3 +81,4 @@ public class CollisionAvoidance {
   }
 
 }
+
