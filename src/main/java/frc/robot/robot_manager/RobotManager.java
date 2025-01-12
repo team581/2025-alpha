@@ -702,26 +702,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-  private void moveSuperstructure(ElevatorState elevatorGoal, WristState wristGoal) {
-    var maybeIntermediaryPosition =
-        CollisionAvoidance.plan(
-            elevator.getHeight(), wrist.getAngle(), elevatorGoal.value, wristGoal.angle);
 
-    if (maybeIntermediaryPosition.isPresent()) {
-      var intermediaryPosition = maybeIntermediaryPosition.get();
-
-      // A collision was detected, so we need to go to an intermediary point
-      elevator.setCollisionAvoidanceGoal(intermediaryPosition.elevatorHeight());
-      elevator.setState(ElevatorState.COLLISION_AVOIDANCE);
-
-      wrist.setCollisionAvoidanceGoal(intermediaryPosition.wristAngle());
-      wrist.setState(WristState.COLLISION_AVOIDANCE);
-    } else {
-      // No collision, go straight to goal state
-      elevator.setState(elevatorGoal);
-      wrist.setState(wristGoal);
-    }
-  }
 
   private void moveSuperstructure(ElevatorState elevatorGoal, WristState wristGoal) {
     var maybeIntermediaryPosition =
