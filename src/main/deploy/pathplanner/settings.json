@@ -28,7 +28,7 @@
   "driveMotorType": "krakenX60",
   "pathFolders": [
     "Auto Intake Paths",
-    "Potential Routines"
+    "Auto Path Coords"
   ],
   "defaultMaxVel": 3,
   "driveWheelRadius": 0.048

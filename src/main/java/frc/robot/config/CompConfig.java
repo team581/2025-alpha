@@ -6,17 +6,21 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
-import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import frc.robot.config.RobotConfig.ElevatorConfig;
 import frc.robot.config.RobotConfig.IntakeConfig;
+import frc.robot.config.RobotConfig.PivotConfig;
 import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
+import frc.robot.config.RobotConfig.WristConfig;
+import frc.robot.generated.TunerConstants;
 import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
 class CompConfig {
-  private static final String CANIVORE_NAME = "581CANivore";
+  private static final String CANIVORE_NAME = TunerConstants.kCANBus.getName();
   private static final String RIO_CAN_NAME = "rio";
 
   private static final ClosedLoopRampsConfigs CLOSED_LOOP_RAMP =
@@ -33,7 +37,20 @@ class CompConfig {
   public static final RobotConfig competitionBot =
       new RobotConfig(
           "competition",
+          new ElevatorConfig(
+              // TODO: Get actual Values
+              999,
+              999,
+              CANIVORE_NAME,
+              new TalonFXConfiguration(),
+              new TalonFXConfiguration(),
+              999,
+              999,
+              999,
+              999,
+              999),
           new IntakeConfig(
+              CANIVORE_NAME,
               0,
               0,
               0,
@@ -53,7 +70,7 @@ class CompConfig {
                           .withStatorCurrentLimit(75)
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(55)
-                          .withSupplyTimeThreshold(0.25))
+                          .withSupplyCurrentLowerTime(0.25))
                   .withOpenLoopRamps(
                       new OpenLoopRampsConfigs()
                           .withDutyCycleOpenLoopRampPeriod(0.25)
@@ -72,12 +89,14 @@ class CompConfig {
                           .withStatorCurrentLimit(80)
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(60)
-                          .withSupplyTimeThreshold(0.2))
+                          .withSupplyCurrentLowerTime(0.2))
                   .withVoltage(
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
-          new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN));
+          new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN),
+          new WristConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 0, 180),
+          new PivotConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 999, 999));
 
   private CompConfig() {}
 }

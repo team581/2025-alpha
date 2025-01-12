@@ -18,8 +18,8 @@ import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.DistanceAngle;
-import frc.robot.vision.VisionResult;
 import frc.robot.vision.VisionSubsystem;
+import frc.robot.vision.results.TagResult;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final TimeInterpolatableBuffer<Pose2d> poseHistory =
       TimeInterpolatableBuffer.createBuffer(1.5);
   private double lastAddedVisionTimestamp = 0;
-  private List<VisionResult> latestResult = new ArrayList<>();
+  private List<TagResult> latestResult = new ArrayList<>();
 
   public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve) {
     super(SubsystemPriority.LOCALIZATION, LocalizationState.DEFAULT_STATE);
@@ -83,7 +83,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
 
   public void resetPose(Pose2d estimatedPose) {
     imu.setAngle(estimatedPose.getRotation().getDegrees());
-    swerve.drivetrain.seedFieldRelative(estimatedPose);
+    swerve.drivetrain.resetPose(estimatedPose);
   }
 
   public Command getZeroCommand() {
