@@ -6,6 +6,7 @@ import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeState;
 import frc.robot.intake.IntakeSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
+import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
 import frc.robot.swerve.SwerveState;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
