@@ -8,6 +8,8 @@ import frc.robot.elevator.ElevatorSubsystem;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeState;
 import frc.robot.intake.IntakeSubsystem;
+import frc.robot.lights.LightsState;
+import frc.robot.lights.LightsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.pivot.PivotState;
 import frc.robot.pivot.PivotSubsystem;
@@ -39,6 +41,8 @@ public class RobotManager extends StateMachine<RobotState> {
   private final Limelight bottomCoralLimelight;
   private final Limelight backwardsTagLimelight;
 
+  private final LightsSubsystem lights;
+
   private GamePieceMode gamePieceMode;
 
   public RobotManager(
@@ -52,7 +56,8 @@ public class RobotManager extends StateMachine<RobotState> {
       LocalizationSubsystem localization,
       Limelight topPurpleLimelight,
       Limelight bottomCoralLimelight,
-      Limelight backwardsTagLimelight) {
+      Limelight backwardsTagLimelight,
+      LightsSubsystem lights) {
     super(SubsystemPriority.ROBOT_MANAGER, RobotState.IDLE_NO_GP);
     this.intake = intake;
     this.wrist = wrist;
@@ -66,6 +71,7 @@ public class RobotManager extends StateMachine<RobotState> {
     this.bottomCoralLimelight = bottomCoralLimelight;
     this.backwardsTagLimelight = backwardsTagLimelight;
     backwardsTagLimelight.setState(LimelightState.TAGS);
+    this.lights = lights;
   }
 
   private double reefSnapAngle = 0.0;
@@ -179,6 +185,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.CORAL);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case IDLE_ALGAE -> {
         intake.setState(IntakeState.IDLE_W_ALGAE);
@@ -188,6 +195,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.STOWED);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         topPurpleLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case IDLE_CORAL -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -197,6 +205,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.STOWED);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         topPurpleLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case INTAKE_ALGAE_FLOOR -> {
         intake.setState(IntakeState.INTAKING_ALGAE);
@@ -206,6 +215,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.STOWED);
         bottomCoralLimelight.setState(LimelightState.CORAL);
         topPurpleLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case INTAKE_ALGAE_L2 -> {
         intake.setState(IntakeState.INTAKING_ALGAE);
@@ -215,6 +225,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.STOWED);
         bottomCoralLimelight.setState(LimelightState.CORAL);
         topPurpleLimelight.setState(LimelightState.PURPLE);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case INTAKE_ALGAE_L3 -> {
         intake.setState(IntakeState.INTAKING_ALGAE);
@@ -224,6 +235,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.STOWED);
         bottomCoralLimelight.setState(LimelightState.CORAL);
         topPurpleLimelight.setState(LimelightState.PURPLE);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case INTAKE_CORAL_STATION -> {
         intake.setState(IntakeState.INTAKING_CORAL);
@@ -231,6 +243,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.STOWED);
         bottomCoralLimelight.setState(LimelightState.CORAL);
         topPurpleLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case INTAKE_CORAL_FLOOR_UPRIGHT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
@@ -240,6 +253,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.STOWED);
         bottomCoralLimelight.setState(LimelightState.CORAL);
         topPurpleLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case INTAKE_CORAL_FLOOR_HORIZONTAL -> {
         intake.setState(IntakeState.INTAKING_CORAL);
@@ -249,6 +263,7 @@ public class RobotManager extends StateMachine<RobotState> {
         pivot.setState(PivotState.INTAKING_CORAL_HORIZONTAL);
         bottomCoralLimelight.setState(LimelightState.CORAL);
         topPurpleLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case DISLODGE_ALGAE_L2_WAIT -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -259,6 +274,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case DISLODGE_ALGAE_L2_PUSHING -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -269,6 +285,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case DISLODGE_ALGAE_L3_WAIT -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -279,6 +296,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case DISLODGE_ALGAE_L3_PUSHING -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -289,6 +307,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L1_1_APPROACH, CORAL_L2_1_APPROACH, CORAL_L3_1_APPROACH, CORAL_L4_1_APPROACH -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -299,6 +318,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L1_2_LINEUP -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -309,6 +329,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L1_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -319,6 +340,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L1_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
@@ -329,6 +351,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L2_2_LINEUP -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -339,6 +362,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L2_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -349,6 +373,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L2_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
@@ -359,6 +384,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L3_2_LINEUP -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -369,6 +395,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L3_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -379,6 +406,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L3_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
@@ -389,6 +417,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L4_2_LINEUP -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -399,6 +428,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L4_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
@@ -409,6 +439,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CORAL_L4_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
@@ -419,6 +450,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.PURPLE);
         bottomCoralLimelight.setState(LimelightState.REEF_TAGS);
         backwardsTagLimelight.setState(LimelightState.REEF_TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case NET_BACK_WAITING, NET_BACK_PREPARE_TO_SCORE -> {
         intake.setState(IntakeState.IDLE_W_ALGAE);
@@ -429,6 +461,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case NET_BACK_SCORING -> {
         intake.setState(IntakeState.SCORE_ALGEA_NET);
@@ -439,6 +472,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case NET_FORWARD_WAITING, NET_FORWARD_PREPARE_TO_SCORE -> {
         intake.setState(IntakeState.IDLE_W_ALGAE);
@@ -449,6 +483,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case NET_FORWARD_SCORING -> {
         intake.setState(IntakeState.SCORE_ALGEA_NET);
@@ -459,6 +494,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case PROCESSOR_WAITING, PROCESSOR_PREPARE_TO_SCORE -> {
         intake.setState(IntakeState.IDLE_W_ALGAE);
@@ -469,6 +505,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case PROCESSOR_SCORING -> {
         intake.setState(IntakeState.SCORE_ALGEA_PROCESSOR);
@@ -479,6 +516,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CLIMBING_1_LINEUP -> {
         intake.setState(IntakeState.IDLE_NO_GP);
@@ -489,6 +527,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case CLIMBING_2_HANGING -> {
         intake.setState(IntakeState.IDLE_NO_GP);
@@ -499,6 +538,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
       case UNJAM -> {
         wrist.setState(WristState.UNJAM);
@@ -510,6 +550,7 @@ public class RobotManager extends StateMachine<RobotState> {
         topPurpleLimelight.setState(LimelightState.TAGS);
         bottomCoralLimelight.setState(LimelightState.TAGS);
         backwardsTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.PLACEHOLDER);
       }
     }
   }
