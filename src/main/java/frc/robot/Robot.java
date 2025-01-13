@@ -1,13 +1,17 @@
 package frc.robot;
 
+import java.util.ArrayList;
+
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.FieldConstants.ReefHeight;
 import frc.robot.autos.trailblazer.Autos;
 import frc.robot.autos.trailblazer.Trailblazer;
 import frc.robot.config.RobotConfig;
@@ -88,6 +92,7 @@ public class Robot extends TimedRobot {
   private final Autos autos = new Autos(robotManager, trailblazer);
 
   public Robot() {
+    var bp = FieldConstants.Reef.branchPositions;
     System.out.println("roboRIO serial number: " + RobotConfig.SERIAL_NUMBER);
 
     DogLog.setOptions(
@@ -102,6 +107,16 @@ public class Robot extends TimedRobot {
     DogLog.log("Metadata/GitSHA", BuildConstants.GIT_SHA);
     DogLog.log("Metadata/GitDate", BuildConstants.GIT_DATE);
     DogLog.log("Metadata/GitBranch", BuildConstants.GIT_BRANCH);
+
+    var poleList = new ArrayList<Pose2d>();
+    for (var heightToPose3d : bp) {
+     var reefPolePose3d =   heightToPose3d.get(ReefHeight.L4);
+     var asd = reefPolePose3d.toPose2d();
+      poleList.add(asd);
+    }
+
+    // convert lsit to array, log it
+    DogLog.log("Debug/POLE POSES!!!!!!!!!!", poleList.toArray(Pose2d[]::new));
 
     switch (BuildConstants.DIRTY) {
       case 0:

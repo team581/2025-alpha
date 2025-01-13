@@ -28,14 +28,15 @@ public class CollisionAvoidance {
 
   public static Optional<SuperstructurePosition> plan(
       double elevatorHeight, double wristAngle, double elevatorGoal, double wristGoal) {
-    possibleGoalPoints.set(0, new SuperstructurePosition(elevatorGoal, wristGoal));
-    possibleGoalPoints.set(1, safePoint1);
-    possibleGoalPoints.set(2, safePoint2);
-    //  getGoalPoint(possibleGoalPoints, angleHeightToPose(wristAngle, elevatorHeight))
+        return Optional.empty();
+    // possibleGoalPoints.set(0, new SuperstructurePosition(elevatorGoal, wristGoal));
+    // possibleGoalPoints.set(1, safePoint1);
+    // possibleGoalPoints.set(2, safePoint2);
+    // //  getGoalPoint(possibleGoalPoints, angleHeightToPose(wristAngle, elevatorHeight))
 
-    return Optional.of(
-        poseToSuperstructurePosition(
-            getGoalPoint(possibleGoalPoints, angleHeightToPose(wristAngle, elevatorHeight))));
+    // return Optional.of(
+    //     poseToSuperstructurePosition(
+    //         getGoalPoint(possibleGoalPoints, angleHeightToPose(wristAngle, elevatorHeight))));
   }
 
   private CollisionAvoidance() {}
