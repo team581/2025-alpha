@@ -175,7 +175,7 @@ public class Limelight extends StateMachine<LimelightState> {
     var newHeartbeat = LimelightHelpers.getLimelightNTDouble(limelightTableName, "hb");
 
     if (limelightHeartbeat != newHeartbeat) {
-      DogLog.logFault(limelightTableName + " is offline", null);
+      DogLog.clearFault(limelightTableName + " is offline");
       limelightTimer.restart();
     }
     limelightHeartbeat = newHeartbeat;
