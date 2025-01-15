@@ -84,18 +84,18 @@ public class VisionSubsystem extends StateMachine<VisionState> {
   }
 
   public boolean isAnyTagLimelightOnline() {
-    if ((bottomCoralLimelight.getState() == LimelightState.TAGS
-            || bottomCoralLimelight.getState() == LimelightState.REEF_TAGS)
-        && bottomCoralLimelight.getCameraHealth() == CameraHealth.GOOD) {
-      return true;
+    if ((bottomCoralLimelight.getState() != LimelightState.TAGS
+            || bottomCoralLimelight.getState() != LimelightState.REEF_TAGS)
+        || bottomCoralLimelight.getCameraHealth() == CameraHealth.OFFLINE) {
+      return false;
     }
-    if ((backwardsTagLimelight.getState() == LimelightState.TAGS
-            || backwardsTagLimelight.getState() == LimelightState.REEF_TAGS)
-        && backwardsTagLimelight.getCameraHealth() == CameraHealth.GOOD) {
-      return true;
+    if ((backwardsTagLimelight.getState() != LimelightState.TAGS
+            || backwardsTagLimelight.getState() != LimelightState.REEF_TAGS)
+        || backwardsTagLimelight.getCameraHealth() == CameraHealth.OFFLINE) {
+      return false;
     }
 
-    return false;
+    return true;
   }
 
   public CameraHealth getVisionState() {
