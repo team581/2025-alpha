@@ -11,10 +11,10 @@ public class FieldUtil {
 
   public static Pose2d fieldFlip(Pose2d flipPose) {
     return new Pose2d(
-      getFieldDims().getX() - flipPose.getX(),
-      getFieldDims().getY() - flipPose.getY(),
-      flipPose.getRotation().plus(Rotation2d.fromRotations(0.5)));
-    }
+        getFieldDims().getX() - flipPose.getX(),
+        getFieldDims().getY() - flipPose.getY(),
+        flipPose.getRotation().plus(Rotation2d.fromRotations(0.5)));
+  }
 
   public static Pose2d getReefSpot1() {
     return new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0));
