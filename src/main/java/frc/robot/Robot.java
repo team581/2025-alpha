@@ -1,13 +1,19 @@
 package frc.robot;
 
+import java.util.List;
+import java.util.Map;
+
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.FieldConstants.Reef;
+import frc.robot.FieldConstants.ReefHeight;
 import frc.robot.autos.trailblazer.Autos;
 import frc.robot.autos.trailblazer.Trailblazer;
 import frc.robot.config.RobotConfig;
@@ -87,12 +93,18 @@ public class Robot extends TimedRobot {
 
   private final Autos autos = new Autos(robotManager, trailblazer);
 
+  final FieldConstants fc = new FieldConstants();
+  final Reef reef = new Reef();
+  final List<Map<ReefHeight, Pose3d>> bp = new List<Map<ReefHeight, Pose3d>>();
+
   public Robot() {
     System.out.println("roboRIO serial number: " + RobotConfig.SERIAL_NUMBER);
 
     DogLog.setOptions(
         new DogLogOptions().withCaptureNt(false).withNtPublish(RobotConfig.IS_DEVELOPMENT));
     DogLog.setPdh(hardware.pdh);
+
+    DogLog.log("Debug/pipe", FieldConstants.Reef.branchPositions.get(0).get(ReefHeight.L1));
 
     // Record metadata
     DogLog.log("Metadata/ProjectName", BuildConstants.MAVEN_NAME);
