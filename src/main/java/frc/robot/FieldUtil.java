@@ -4,6 +4,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class FieldUtil {
+
+  public static Pose2d getFieldDims() {
+    return new Pose2d(17.5482504, 8.0518, new Rotation2d());
+  }
+
+  public static Pose2d fieldFlip(Pose2d flipPose) {
+    return new Pose2d(
+      getFieldDims().getX() - flipPose.getX(),
+      getFieldDims().getY() - flipPose.getY(),
+      flipPose.getRotation().plus(Rotation2d.fromRotations(0.5)));
+    }
+
   public static Pose2d getReefSpot1() {
     return new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0));
   }
