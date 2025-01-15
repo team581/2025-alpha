@@ -175,7 +175,6 @@ public class Limelight extends StateMachine<LimelightState> {
     var newHeartbeat = LimelightHelpers.getLimelightNTDouble(limelightTableName, "hb");
 
     if (limelightHeartbeat != newHeartbeat) {
-      DogLog.clearFault(limelightTableName + " is offline");
       limelightTimer.restart();
     }
     limelightHeartbeat = newHeartbeat;
@@ -184,6 +183,8 @@ public class Limelight extends StateMachine<LimelightState> {
       cameraHealth = CameraHealth.OFFLINE;
       DogLog.logFault(limelightTableName + " is offline", AlertType.kError);
       return;
+    } else {
+      DogLog.clearFault(limelightTableName + " is offline");
     }
 
     if (!result.isEmpty()) {
