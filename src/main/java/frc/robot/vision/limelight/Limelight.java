@@ -1,7 +1,6 @@
 package frc.robot.vision.limelight;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.fms.FmsSubsystem;
@@ -27,7 +26,7 @@ public class Limelight extends StateMachine<LimelightState> {
   private double limelightHeartbeat = -1;
   private final Timer limelightTimer = new Timer();
 
-  private Pose2d interpolatedPose = new Pose2d();
+  private Optional<TagResult> interpolatedResult = Optional.empty();
 
   public Limelight(String name, LimelightState initialState, CameraDataset cameraDataset) {
     super(SubsystemPriority.VISION, initialState);
@@ -56,13 +55,20 @@ public class Limelight extends StateMachine<LimelightState> {
   }
 
   public Optional<TagResult> getInterpolatedTagResult() {
+    return interpolatedResult;
+  }
+
+  private Optional<TagResult> getCalculatedInterpolatedTagResult() {
     var rawTagResult = getRawTagResult();
 
     if (rawTagResult.isEmpty()) {
       return Optional.empty();
     }
 
-    return Optional.of(new TagResult(interpolatedPose, rawTagResult.get().timestamp()));
+    return Optional.of(
+        new TagResult(
+            InterpolatedVision.interpolatePose(rawTagResult.get().pose(), cameraDataset),
+            rawTagResult.get().timestamp()));
   }
 
   private Optional<TagResult> getRawTagResult() {
@@ -150,11 +156,7 @@ public class Limelight extends StateMachine<LimelightState> {
     coralResult = getRawCoralResult();
     purpleResult = getRawPurpleResult();
     if (getState() == LimelightState.TAGS || getState() == LimelightState.REEF_TAGS) {
-      var maybeRawPose = getRawTagResult();
-      if (maybeRawPose.isPresent()) {
-        interpolatedPose =
-            InterpolatedVision.interpolatePose(maybeRawPose.get().pose(), cameraDataset);
-      }
+      interpolatedResult = getCalculatedInterpolatedTagResult();
     }
   }
 
