@@ -11,8 +11,10 @@ public class ReefPipeTest {
   private static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.4893, 4.0259);
   private static final Translation2d RED_REEF_CENTER = new Translation2d(13.0589504, 4.0259);
 
-  private static final double BLUE_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE = Units.inchesToMeters(145.6);
-  private static final double RED_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE = Units.inchesToMeters(544.305848);
+  private static final double BLUE_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE =
+      Units.inchesToMeters(145.6);
+  private static final double RED_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE =
+      Units.inchesToMeters(544.305848);
 
   private static double round(double value) {
     // Round to centimeter precision
@@ -44,6 +46,7 @@ public class ReefPipeTest {
   @Test
   void checkBlueReefPipeADistanceToWall() {
     // 1cm of fudge factor because the numbers in code are slightly off from the field CAD
+    // TODO: Fix 1cm of error
     assertEquals(
         round(BLUE_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE + 0.01),
         round(ReefPipe.PIPE_A.bluePose.getX()));
@@ -51,10 +54,10 @@ public class ReefPipeTest {
 
   @Test
   void checkRedReefPipeADistanceToWall() {
+    // 1cm of fudge factor because the numbers in code are slightly off from the field CAD
+    // TODO: Fix 1cm of error
     assertEquals(
         round(RED_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE + 0.01),
         round(ReefPipe.PIPE_A.redPose.getX()));
   }
-
-  // TODO: it is one centimeter off
 }
