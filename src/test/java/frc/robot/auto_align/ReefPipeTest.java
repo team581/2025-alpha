@@ -11,7 +11,8 @@ public class ReefPipeTest {
   private static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.4893, 4.0259);
   private static final Translation2d RED_REEF_CENTER = new Translation2d(13.0589504, 4.0259);
 
-  private static final double BLUE_PIPE_A_TO_ALLIANCE_WALL_DISTANCE = Units.inchesToMeters(145.6);
+  private static final double BLUE_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE = Units.inchesToMeters(145.6);
+  private static final double RED_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE = Units.inchesToMeters(544.305848);
 
   private static double round(double value) {
     // Round to centimeter precision
@@ -30,16 +31,30 @@ public class ReefPipeTest {
   }
 
   @Test
-  void checkRedReefPipeDistancesToCenter() {}
+  void checkRedReefPipeDistancesToCenter() {
+    var wantedDistance =
+        round(ReefPipe.PIPE_A.redPose.getTranslation().getDistance(RED_REEF_CENTER));
+
+    for (var pipe : ReefPipe.values()) {
+      var distance = pipe.redPose.getTranslation().getDistance(RED_REEF_CENTER);
+      assertEquals(wantedDistance, round(distance));
+    }
+  }
 
   @Test
   void checkBlueReefPipeADistanceToWall() {
     // 1cm of fudge factor because the numbers in code are slightly off from the field CAD
     assertEquals(
-        round(BLUE_PIPE_A_TO_ALLIANCE_WALL_DISTANCE + 0.01),
+        round(BLUE_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE + 0.01),
         round(ReefPipe.PIPE_A.bluePose.getX()));
   }
 
   @Test
-  void checkRedReefPipeADistanceToWall() {}
+  void checkRedReefPipeADistanceToWall() {
+    assertEquals(
+        round(RED_PIPE_A_TO_BLUE_ALLIANCE_WALL_DISTANCE + 0.01),
+        round(ReefPipe.PIPE_A.redPose.getX()));
+  }
+
+  // TODO: it is one centimeter off
 }
