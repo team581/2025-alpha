@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class FieldUtil {
 
@@ -14,6 +15,10 @@ public class FieldUtil {
         getFieldDims().getX() - flipPose.getX(),
         getFieldDims().getY() - flipPose.getY(),
         flipPose.getRotation().plus(Rotation2d.fromRotations(0.5)));
+  }
+
+  public static Translation2d getCenterOfReef(boolean isRed) {
+    return new Translation2d(isRed ? 13.0589504 : 4.4893, 4.0259);
   }
 
   public static Pose2d getReefSpot1() {
