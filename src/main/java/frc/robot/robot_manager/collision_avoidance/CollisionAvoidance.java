@@ -28,7 +28,7 @@ public class CollisionAvoidance {
 
   public static Optional<SuperstructurePosition> plan(
       double elevatorHeight, double wristAngle, double elevatorGoal, double wristGoal) {
-        return Optional.empty();
+    return Optional.empty();
     // possibleGoalPoints.set(0, new SuperstructurePosition(elevatorGoal, wristGoal));
     // possibleGoalPoints.set(1, safePoint1);
     // possibleGoalPoints.set(2, safePoint2);

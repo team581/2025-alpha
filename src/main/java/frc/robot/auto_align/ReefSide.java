@@ -34,7 +34,7 @@ public enum ReefSide {
     this.redPose = redPose;
   }
 
-    public Pose2d getPose() {
-      return FmsSubsystem.isRedAlliance() ? redPose : bluePose;
-    }
+  public Pose2d getPose() {
+    return FmsSubsystem.isRedAlliance() ? redPose : bluePose;
+  }
 }

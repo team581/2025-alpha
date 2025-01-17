@@ -51,6 +51,7 @@ public enum ReefPipe {
   }
 
   public Pose2d getPose() {
-    return (FmsSubsystem.isRedAlliance() ? redPose : bluePose).rotateBy(Rotation2d.fromRotations(0.5));
+    return (FmsSubsystem.isRedAlliance() ? redPose : bluePose)
+        .rotateBy(Rotation2d.fromRotations(0.5));
   }
 }
