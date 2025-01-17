@@ -29,12 +29,12 @@ public enum ReefSide {
   public final Pose2d bluePose;
   public final Pose2d redPose;
 
-  public Pose2d getPose() {
-    return FmsSubsystem.isRedAlliance() ? redPose : bluePose;
-  }
-
   private ReefSide(Pose2d bluePose, Pose2d redPose) {
     this.bluePose = bluePose;
     this.redPose = redPose;
   }
+
+    public Pose2d getPose() {
+      return FmsSubsystem.isRedAlliance() ? redPose : bluePose;
+    }
 }
