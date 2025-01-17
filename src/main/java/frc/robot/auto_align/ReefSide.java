@@ -2,8 +2,6 @@ package frc.robot.auto_align;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.FieldUtil;
 import frc.robot.fms.FmsSubsystem;
 
 public enum ReefSide {
@@ -38,9 +36,5 @@ public enum ReefSide {
 
   public Pose2d getPose() {
     return FmsSubsystem.isRedAlliance() ? redPose : bluePose;
-  }
-
-  public static Translation2d getCenterOfReef() {
-    return FieldUtil.getCenterOfReef(FmsSubsystem.isRedAlliance());
   }
 }
