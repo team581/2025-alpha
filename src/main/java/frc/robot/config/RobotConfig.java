@@ -67,7 +67,7 @@ public record RobotConfig(
       double homingPosition) {}
 
     public record LightsConfig(
-        String canBusname,
+        String canBusName,
         int candleID) {}
 
   // TODO: Change this to false during events
