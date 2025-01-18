@@ -7,9 +7,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.autos.trailblazer.Autos;
-import frc.robot.autos.trailblazer.Trailblazer;
+import frc.robot.autos.Autos;
+import frc.robot.autos.Trailblazer;
 import frc.robot.config.RobotConfig;
 import frc.robot.elevator.ElevatorSubsystem;
 import frc.robot.fms.FmsSubsystem;
@@ -83,7 +82,7 @@ public class Robot extends TimedRobot {
           bottomCoralLimelight,
           backwardsTagLimelight);
 
-  private final RobotCommands robotCommands = new RobotCommands(robotManager, trailblazer);
+  private final RobotCommands robotCommands = new RobotCommands(robotManager);
 
   private final Autos autos = new Autos(robotManager, trailblazer);
 
@@ -144,8 +143,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // TODO: Add autos class
-    autonomousCommand = Commands.none();
+    autonomousCommand = autos.getAutoCommand();
 
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
@@ -212,7 +210,7 @@ public class Robot extends TimedRobot {
         .driverController
         .povRight()
         .onTrue(robotCommands.setGamepieceModeCommand(GamePieceMode.ALGAE));
-    hardware.driverController.start().onTrue(robotCommands.unjamCommand());
+    hardware.driverController.start().onTrue(robotCommands.reHomeCommand());
     hardware.driverController.back().onTrue(localization.getZeroCommand());
   }
 }
