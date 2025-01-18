@@ -1,6 +1,5 @@
 package frc.robot.config;
 
-import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -66,9 +65,7 @@ public record RobotConfig(
       double homingCurrentThreshold,
       double homingPosition) {}
 
-    public record LightsConfig(
-        String canBusName,
-        int candleID) {}
+  public record LightsConfig(String canBusName, int candleID) {}
 
   // TODO: Change this to false during events
   public static final boolean IS_DEVELOPMENT = true;

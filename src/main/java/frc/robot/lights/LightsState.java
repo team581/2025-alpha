@@ -7,7 +7,7 @@ public enum LightsState {
   ERROR(Color.kRed, BlinkPattern.BLINK_FAST),
   READY(Color.kGreen, BlinkPattern.BLINK_FAST),
   IN_PROGRESS(Color.kYellow, BlinkPattern.BLINK_SLOW),
-  
+
   PLACEHOLDER(Color.kBlack, BlinkPattern.SOLID);
 
   public final BlinkPattern pattern;

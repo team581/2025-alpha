@@ -35,5 +35,6 @@ public class Hardware {
   public final TalonFX pivotMotor =
       new TalonFX(RobotConfig.get().pivot().motorID(), RobotConfig.get().pivot().canBusName());
 
-  public final CANdle candle = new CANdle(RobotConfig.get().lights().candleID(), RobotConfig.get().lights().canBusName());
+  public final CANdle candle =
+      new CANdle(RobotConfig.get().lights().candleID(), RobotConfig.get().lights().canBusName());
 }

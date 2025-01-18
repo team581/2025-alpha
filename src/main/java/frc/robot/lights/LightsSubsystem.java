@@ -1,26 +1,24 @@
 package frc.robot.lights;
 
-import edu.wpi.first.wpilibj.Timer;
-
 import com.ctre.phoenix.led.CANdle;
-
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
 public class LightsSubsystem extends StateMachine<LightsState> {
   private final CANdle candle;
-  
+
   private Timer blinkTimer = new Timer();
-  
+
   public LightsSubsystem(CANdle candle) {
-      super(SubsystemPriority.LIGHTS, LightsState.READY);
+    super(SubsystemPriority.LIGHTS, LightsState.READY);
 
     this.candle = candle;
     blinkTimer.start();
   }
-  
+
   public void setState(LightsState newState) {
     setStateFromRequest(newState);
   }
@@ -28,7 +26,7 @@ public class LightsSubsystem extends StateMachine<LightsState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-    
+
     Color8Bit color8Bit = new Color8Bit(getState().color);
 
     if (getState().pattern == BlinkPattern.SOLID) {
@@ -54,7 +52,6 @@ public class LightsSubsystem extends StateMachine<LightsState> {
       }
     }
 
-    
     DogLog.log("Lights/Color", getState().color.toString());
     DogLog.log("Lights/Pattern", getState().pattern);
   }
