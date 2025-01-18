@@ -1,5 +1,6 @@
 package frc.robot.config;
 
+import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -12,7 +13,8 @@ public record RobotConfig(
     SwerveConfig swerve,
     VisionConfig vision,
     WristConfig wrist,
-    PivotConfig pivot) {
+    PivotConfig pivot,
+    LightsConfig lights) {
   public record ElevatorConfig(
       String canBusName,
       int leftMotorID,
@@ -63,6 +65,10 @@ public record RobotConfig(
       TalonFXConfiguration motorConfig,
       double homingCurrentThreshold,
       double homingPosition) {}
+
+    public record LightsConfig(
+        String canBusname,
+        int candleID) {}
 
   // TODO: Change this to false during events
   public static final boolean IS_DEVELOPMENT = true;
