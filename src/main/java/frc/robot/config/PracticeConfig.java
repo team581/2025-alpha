@@ -17,7 +17,7 @@ import frc.robot.config.RobotConfig.VisionConfig;
 import frc.robot.config.RobotConfig.WristConfig;
 import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
-class CompConfig {
+class PracticeConfig {
   private static final String CANIVORE_NAME = "581CANivore";
   private static final String RIO_CAN_NAME = "rio";
 
@@ -32,7 +32,7 @@ class CompConfig {
           .withTorqueOpenLoopRampPeriod(0.04)
           .withVoltageOpenLoopRampPeriod(0.04);
 
-  public static final RobotConfig competitionBot =
+  public static final RobotConfig practiceBot =
       new RobotConfig(
           "competition",
           new ElevatorConfig(
@@ -93,7 +93,7 @@ class CompConfig {
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
           new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN),
-          new WristConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 0, 180));
+          new WristConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 0, 180), null, null, null);
 
-  private CompConfig() {}
+  private PracticeConfig() {}
 }
