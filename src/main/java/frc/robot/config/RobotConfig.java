@@ -60,14 +60,9 @@ public record RobotConfig(
   public record ClimberConfig(
       String canBusName,
       int motorID,
-      int CANcoderID,
-      double minHeight,
-      double maxHeight,
-      double homingCurrentThreshold,
-      double homingPosition,
-      double rotationsToInches,
+      int cancoderID,
       TalonFXConfiguration motorConfig,
-      CANcoderConfiguration CANcoderConfig) {}
+      CANcoderConfiguration cancoderConfig) {}
 
   public record PivotConfig(
       String canBusName,
