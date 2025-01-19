@@ -63,8 +63,8 @@ public record RobotConfig(
       int CANcoderID,
       double minHeight,
       double maxHeight,
-      double homingVelocityThreshold,
-      double homingVoltage,
+      double homingCurrentThreshold,
+      double homingPosition,
       double rotationsToInches,
       TalonFXConfiguration motorConfig,
       CANcoderConfiguration CANcoderConfig) {}

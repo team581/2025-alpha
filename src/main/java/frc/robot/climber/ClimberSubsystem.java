@@ -12,7 +12,6 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   private final TalonFX motor;
   private final CANcoder encoder;
   // all in inches
-  private final double tolerance = 1.0;
 
   public ClimberSubsystem(TalonFX motor, CANcoder encoder) {
     super(SubsystemPriority.CLIMBER, ClimberState.UNHOMED);
@@ -26,50 +25,42 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
 
   @Override
   protected ClimberState getNextState(ClimberState currentState) {
-    return switch (currentState) {
-      case UNHOMED, STOWED, LINEUP, HANGING -> currentState;
-      case HOMING ->
-          encoder.getVelocity().getValueAsDouble() < CONFIG.homingVelocityThreshold()
-                  && timeout(0.1)
-              ? ClimberState.STOWED
-              : currentState;
-    };
+    if (currentState == ClimberState.HOMING && motor.getStatorCurrent().getValueAsDouble() > RobotConfig.get().climber().homingCurrentThreshold()) {
+      motor.setPosition(RobotConfig.get().climber().homingPosition());
+      return ClimberState.STOWED;
+    }
+
+    // Do nothing
+    return currentState;
   }
 
   @Override
-  protected void afterTransition(ClimberState newState) {
-    switch (newState) {
-      case UNHOMED -> motor.disable();
-      case HOMING -> motor.setVoltage(CONFIG.homingVoltage());
+  public void robotPeriodic() {
+    super.robotPeriodic();
+
+    switch (getState()) {
+      case UNHOMED -> {
+        motor.disable();
+      }
+      case HOMING -> {
+        //TODO: Set homing voltage to like 2ish
+        motor.setVoltage(0);
+      }
       case STOWED -> {
-        if (atGoal()) {
           motor.disable();
-        } else {
-          motor.setVoltage(0.0);
-        }
       }
-      case LINEUP -> {
-        if (atGoal()) {
-          motor.disable();
+      case LINEUP, HANGING -> {
+        if (currentPositionLessThanGoal()) {
+          motor.setVoltage(0.1);
         } else {
-          motor.setVoltage(0.0);
-        }
-      }
-      case HANGING -> {
-        if (atGoal()) {
-          motor.disable();
-        } else {
-          motor.setVoltage(0.0);
+          motor.setVoltage(-0.1);
         }
       }
     }
   }
 
-  public boolean atGoal() {
-    return switch (getState()) {
-      case UNHOMED, HOMING -> true;
-      case STOWED, LINEUP, HANGING -> Math.abs(getPosition() - getState().height) < tolerance;
-    };
+  public boolean currentPositionLessThanGoal() {
+    return getPosition() < getState().height;
   }
 
   public double getPosition() {
