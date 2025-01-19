@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.autos.Autos;
 import frc.robot.autos.Trailblazer;
+import frc.robot.climber.ClimberSubsystem;
 import frc.robot.config.RobotConfig;
+import frc.robot.controller.RumbleControllerSubsystem;
 import frc.robot.elevator.ElevatorSubsystem;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.BuildConstants;
@@ -60,6 +62,8 @@ public class Robot extends TimedRobot {
   private final Purple purple = new Purple(localization);
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
+  private final RumbleControllerSubsystem rumbleController =
+      new RumbleControllerSubsystem(hardware.driverController, false);
 
   private final IntakeSubsystem intake =
       new IntakeSubsystem(
@@ -70,6 +74,8 @@ public class Robot extends TimedRobot {
   private final WristSubsystem wrist = new WristSubsystem(hardware.wristMotor);
   private final PivotSubsystem pivot = new PivotSubsystem(hardware.pivotMotor, intake);
   private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
+  private final ClimberSubsystem climber =
+      new ClimberSubsystem(hardware.climberMotor, hardware.climberCANcoder);
   private final RobotManager robotManager =
       new RobotManager(
           intake,
@@ -83,7 +89,8 @@ public class Robot extends TimedRobot {
           topPurpleLimelight,
           bottomCoralLimelight,
           backwardsTagLimelight,
-          lights);
+          lights,
+          climber);
 
   private final RobotCommands robotCommands = new RobotCommands(robotManager);
 
