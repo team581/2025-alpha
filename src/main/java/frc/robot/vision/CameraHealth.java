@@ -6,8 +6,8 @@ public enum CameraHealth {
   NO_TARGETS;
 
   public static CameraHealth combine(CameraHealth a, CameraHealth b) {
-    if (a == CameraHealth.OFFLINE && b == CameraHealth.OFFLINE) {
-      return CameraHealth.OFFLINE;
+    if (a == b) {
+      return a;
     }
     if (a == CameraHealth.GOOD || b == CameraHealth.GOOD) {
       return CameraHealth.GOOD;

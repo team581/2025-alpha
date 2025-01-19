@@ -4,18 +4,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.purple.PurpleState;
 import frc.robot.vision.CameraHealth;
-import frc.robot.vision.limelight.Limelight;
 import frc.robot.vision.results.TagResult;
 import java.util.List;
 import java.util.Optional;
 
 public class AutoAlign {
   private static final List<ReefSide> ALL_REEF_SIDES = List.of(ReefSide.values());
-  private final Limelight camera;
-
-  public AutoAlign(Limelight camera) {
-    this.camera = camera;
-  }
 
   public static Pose2d getClosestReefSide(Pose2d robotPose) {
     var reefSide =
