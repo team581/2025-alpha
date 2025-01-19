@@ -1,7 +1,9 @@
 package frc.robot.config;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -122,7 +124,13 @@ class PracticeConfig {
                           .withSupplyCurrentLimit(10)),
               0,
               0),
-              new ClimberConfig(CANIVORE_NAME, 0, 0, null, null),
+          new ClimberConfig(
+              CANIVORE_NAME,
+              24,
+              25,
+              new TalonFXConfiguration(),
+              new CANcoderConfiguration()
+                  .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private PracticeConfig() {}
