@@ -5,10 +5,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.config.RobotConfig;
@@ -32,8 +30,6 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final ImuSubsystem imu;
   private final VisionSubsystem vision;
   private final SwerveSubsystem swerve;
-  private final TimeInterpolatableBuffer<Pose2d> poseHistory =
-      TimeInterpolatableBuffer.createBuffer(1.5);
   private double lastAddedVisionTimestamp = 0;
   private List<TagResult> latestResult = new ArrayList<>();
 
@@ -53,6 +49,10 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     return swerve.getDrivetrainState().Pose;
   }
 
+  public Pose2d getPose(double timestamp) {
+    return swerve.drivetrain.samplePoseAt(timestamp).orElse(getPose());
+  }
+
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
@@ -68,8 +68,6 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
         swerve.drivetrain.addVisionMeasurement(visionPose, visionTimestamp, VISION_STD_DEVS);
         lastAddedVisionTimestamp = visionTimestamp;
       }
-
-      poseHistory.addSample(Timer.getFPGATimestamp(), getPose());
     }
 
     DogLog.log("Localization/EstimatedPose", getPose());
@@ -83,7 +81,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
 
   public void resetPose(Pose2d estimatedPose) {
     imu.setAngle(estimatedPose.getRotation().getDegrees());
-    swerve.drivetrain.seedFieldRelative(estimatedPose);
+    swerve.drivetrain.resetPose(estimatedPose);
   }
 
   public Command getZeroCommand() {

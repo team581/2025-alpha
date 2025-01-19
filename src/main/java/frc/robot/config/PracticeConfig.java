@@ -1,61 +1,72 @@
 package frc.robot.config;
 
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
-import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import frc.robot.config.RobotConfig.ClimberConfig;
 import frc.robot.config.RobotConfig.ElevatorConfig;
 import frc.robot.config.RobotConfig.IntakeConfig;
+import frc.robot.config.RobotConfig.LightsConfig;
+import frc.robot.config.RobotConfig.PivotConfig;
 import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
 import frc.robot.config.RobotConfig.WristConfig;
+import frc.robot.generated.TunerConstants;
 import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
 class PracticeConfig {
-  private static final String CANIVORE_NAME = "581CANivore";
+  private static final String CANIVORE_NAME = TunerConstants.kCANBus.getName();
   private static final String RIO_CAN_NAME = "rio";
-
-  private static final ClosedLoopRampsConfigs CLOSED_LOOP_RAMP =
-      new ClosedLoopRampsConfigs()
-          .withDutyCycleClosedLoopRampPeriod(0.04)
-          .withTorqueClosedLoopRampPeriod(0.04)
-          .withVoltageClosedLoopRampPeriod(0.04);
-  private static final OpenLoopRampsConfigs OPEN_LOOP_RAMP =
-      new OpenLoopRampsConfigs()
-          .withDutyCycleOpenLoopRampPeriod(0.04)
-          .withTorqueOpenLoopRampPeriod(0.04)
-          .withVoltageOpenLoopRampPeriod(0.04);
 
   public static final RobotConfig practiceBot =
       new RobotConfig(
           "competition",
           new ElevatorConfig(
               // TODO: Get actual Values
-              999,
-              999,
               CANIVORE_NAME,
-              new TalonFXConfiguration(),
-              new TalonFXConfiguration(),
-              999,
-              999,
-              999,
-              999,
-              999),
+              15,
+              16,
+              // TODO: Sensor to mechanism ratio should be gear ratio multiplied by the sprocket
+              // circumfrence
+              new TalonFXConfiguration()
+                  .withSlot0(new Slot0Configs().withKP(0.0).withKV(0))
+                  .withFeedback(
+                      new FeedbackConfigs().withSensorToMechanismRatio(999 * (Math.PI * 999))),
+              new TalonFXConfiguration()
+                  .withSlot0(new Slot0Configs().withKP(0.0).withKV(0))
+                  .withFeedback(
+                      new FeedbackConfigs().withSensorToMechanismRatio(999 * (Math.PI * 999))),
+              0,
+              0,
+              68,
+              0,
+              0.25),
           new IntakeConfig(
-              CANIVORE_NAME,
-              0,
-              0,
-              0,
+              RIO_CAN_NAME,
+              20,
+              21,
+              17,
+              19,
               new Debouncer(0.0, DebounceType.kBoth),
               new Debouncer(0.0, DebounceType.kBoth),
               new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(0))),
+                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(0))
+                  .withMotorOutput(
+                      new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)),
+              new TalonFXConfiguration()
+                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(0))
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.CounterClockwise_Positive))),
           new SwerveConfig(
               new PhoenixPIDController(10, 0, 1),
               true,
@@ -65,14 +76,14 @@ class PracticeConfig {
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
-                          .withStatorCurrentLimit(75)
+                          .withStatorCurrentLimit(80)
                           .withSupplyCurrentLimitEnable(true)
-                          .withSupplyCurrentLimit(55)
-                          .withSupplyTimeThreshold(0.25))
+                          .withSupplyCurrentLimit(80))
                   .withOpenLoopRamps(
                       new OpenLoopRampsConfigs()
-                          .withDutyCycleOpenLoopRampPeriod(0.25)
-                          .withVoltageOpenLoopRampPeriod(0.25))
+                          .withDutyCycleOpenLoopRampPeriod(0.01)
+                          .withVoltageOpenLoopRampPeriod(0.01)
+                          .withTorqueOpenLoopRampPeriod(0.01))
                   .withVoltage(
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
@@ -84,19 +95,35 @@ class PracticeConfig {
                           // relatively low stator current limit to help avoid brownouts without
                           // impacting performance.
                           .withStatorCurrentLimitEnable(true)
-                          .withStatorCurrentLimit(80)
+                          .withStatorCurrentLimit(50)
                           .withSupplyCurrentLimitEnable(true)
-                          .withSupplyCurrentLimit(60)
-                          .withSupplyTimeThreshold(0.2))
+                          .withSupplyCurrentLimit(80))
                   .withVoltage(
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
           new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN),
-          new WristConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 0, 180),
-          null,
-          null,
-          null);
+          new WristConfig(
+              RIO_CAN_NAME,
+              22,
+              new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(0.0).withKV(0)),
+              0,
+              180),
+          new PivotConfig(
+              RIO_CAN_NAME,
+              23,
+              new TalonFXConfiguration()
+                  .withSlot0(new Slot0Configs().withKP(0.0).withKV(0))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimitEnable(true)
+                          .withStatorCurrentLimit(10)
+                          .withSupplyCurrentLimitEnable(true)
+                          .withSupplyCurrentLimit(10)),
+              0,
+              0),
+              new ClimberConfig(CANIVORE_NAME, 0, 0, null, null),
+          new LightsConfig(RIO_CAN_NAME, 18));
 
   private PracticeConfig() {}
 }

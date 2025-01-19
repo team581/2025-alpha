@@ -2,20 +2,26 @@ package frc.robot;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.autos.trailblazer.Trailblazer;
+import frc.robot.autos.Autos;
+import frc.robot.autos.Trailblazer;
 import frc.robot.config.RobotConfig;
+import frc.robot.controller.RumbleControllerSubsystem;
 import frc.robot.elevator.ElevatorSubsystem;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.BuildConstants;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeSubsystem;
+import frc.robot.lights.LightsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
+import frc.robot.pivot.PivotSubsystem;
 import frc.robot.purple.Purple;
+import frc.robot.robot_manager.GamePieceMode;
+import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.Stopwatch;
@@ -30,7 +36,7 @@ public class Robot extends TimedRobot {
   private final FmsSubsystem fms = new FmsSubsystem();
   private final Hardware hardware = new Hardware();
   private final ElevatorSubsystem elevator =
-      new ElevatorSubsystem(hardware.elevatorTop, hardware.elevatorBottom);
+      new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor);
   private final SwerveSubsystem swerve = new SwerveSubsystem();
   private final ImuSubsystem imu = new ImuSubsystem(swerve.drivetrainPigeon);
   private final Limelight topPurpleLimelight =
@@ -55,23 +61,36 @@ public class Robot extends TimedRobot {
   private final Purple purple = new Purple(localization);
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
+  private final RumbleControllerSubsystem rumbleController =
+      new RumbleControllerSubsystem(hardware.driverController, false);
 
   private final IntakeSubsystem intake =
       new IntakeSubsystem(
-          hardware.intakeMotor, hardware.intakeLeftSensor, hardware.intakeRightSensor);
+          hardware.intakeLeftMotor,
+          hardware.intakeRightMotor,
+          hardware.intakeLeftSensor,
+          hardware.intakeRightSensor);
   private final WristSubsystem wrist = new WristSubsystem(hardware.wristMotor);
+  private final PivotSubsystem pivot = new PivotSubsystem(hardware.pivotMotor, intake);
+  private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
   private final RobotManager robotManager =
       new RobotManager(
           intake,
           wrist,
           elevator,
+          pivot,
           vision,
           imu,
           swerve,
           localization,
           topPurpleLimelight,
           bottomCoralLimelight,
-          backwardsTagLimelight);
+          backwardsTagLimelight,
+          lights);
+
+  private final RobotCommands robotCommands = new RobotCommands(robotManager);
+
+  private final Autos autos = new Autos(robotManager, trailblazer);
 
   public Robot() {
     System.out.println("roboRIO serial number: " + RobotConfig.SERIAL_NUMBER);
@@ -130,8 +149,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // TODO: Add autos class
-    autonomousCommand = Commands.none();
+    autonomousCommand = autos.getAutoCommand();
 
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
@@ -168,5 +186,37 @@ public class Robot extends TimedRobot {
   @Override
   public void testExit() {}
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    swerve.setDefaultCommand(
+        swerve.run(
+            () -> {
+              if (DriverStation.isTeleop()) {
+                swerve.driveTeleop(
+                    hardware.driverController.getLeftX(),
+                    hardware.driverController.getLeftY(),
+                    hardware.driverController.getRightX());
+              }
+            }));
+
+    hardware.driverController.rightTrigger().onTrue(robotCommands.confirmScoreCommand());
+    hardware.driverController.leftTrigger().onTrue(robotCommands.floorIntakeCommand());
+    hardware.driverController.rightBumper().onTrue(robotCommands.stowCommand());
+    hardware.driverController.leftBumper().onTrue(robotCommands.intakeStationCommand());
+    hardware.driverController.y().onTrue(robotCommands.highLineupCommand());
+    hardware.driverController.x().onTrue(robotCommands.l3LineupCommand());
+    hardware.driverController.b().onTrue(robotCommands.l2LineupCommand());
+    hardware.driverController.a().onTrue(robotCommands.lowLineupCommand());
+    hardware.driverController.povUp().onTrue(robotCommands.climbUpCommand());
+    hardware.driverController.povDown().onTrue(robotCommands.climbDownCommand());
+    hardware
+        .driverController
+        .povLeft()
+        .onTrue(robotCommands.setGamepieceModeCommand(GamePieceMode.CORAL));
+    hardware
+        .driverController
+        .povRight()
+        .onTrue(robotCommands.setGamepieceModeCommand(GamePieceMode.ALGAE));
+    hardware.driverController.start().onTrue(robotCommands.reHomeCommand());
+    hardware.driverController.back().onTrue(localization.getZeroCommand());
+  }
 }

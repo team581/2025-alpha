@@ -1,57 +1,38 @@
 package frc.robot.swerve;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.fms.FmsSubsystem;
-import frc.robot.imu.ImuSubsystem;
-import java.util.List;
 
 public class SnapUtil {
 
-  public static double getAmpAngle() {
-    return FmsSubsystem.isRedAlliance() ? 90 : (90.0);
+  public static double getProcessorAngle() {
+    return FmsSubsystem.isRedAlliance() ? 270 : 90.0;
   }
 
-  public static double getPodiumAngle() {
-    // return whatever the amp angle is
-    return FmsSubsystem.isRedAlliance() ? 0 : (180.0);
+  public static double getForwardNetDirection() {
+    return FmsSubsystem.isRedAlliance() ? 0 : 180;
   }
 
-  public static double getSubwooferAngle() {
-    // return whatever the amp angle is
-    return FmsSubsystem.isRedAlliance() ? 0 : (180.0);
+  public static double getBackwardNetDirection() {
+    return FmsSubsystem.isRedAlliance() ? 180 : 0;
   }
 
-  private static final List<Double> RED_STAGE_ANGLES = List.of(0.0, 120.0, -120.0);
-  private static final List<Double> BLUE_STAGE_ANGLES =
-      List.of(0.0 + 180.0, 120.0 - 180.0, -120 + 180.0);
-
-  public static double getClimbingAngle(ImuSubsystem imu) {
-    var usedAngles = FmsSubsystem.isRedAlliance() ? RED_STAGE_ANGLES : BLUE_STAGE_ANGLES;
-    if (FmsSubsystem.isRedAlliance()) {
-      var currentAngle = imu.getRobotHeading();
-
-      var closestAngle = RED_STAGE_ANGLES.get(0);
-      var smallestDifference = Double.POSITIVE_INFINITY;
-      for (var angle : usedAngles) {
-        if (Math.abs(angle - currentAngle) < smallestDifference) {
-          closestAngle = angle;
-          smallestDifference = Math.abs(angle - currentAngle);
-        }
+  public static double getCoralStationAngle(Pose2d robotPose) {
+    if (robotPose.getY() > 4.025) {
+      if (FmsSubsystem.isRedAlliance()) {
+        // Coral station red, processor side
+        return 234.0;
       }
 
-      return closestAngle;
+      // Coral station blue, non processor side
+      return 306.0;
     } else {
-      var currentAngle = imu.getRobotHeading();
-
-      var closestAngle = BLUE_STAGE_ANGLES.get(0);
-      var smallestDifference = Double.POSITIVE_INFINITY;
-      for (var angle : usedAngles) {
-        if (Math.abs(angle - currentAngle) < smallestDifference) {
-          closestAngle = angle;
-          smallestDifference = Math.abs(angle - currentAngle);
-        }
+      if (FmsSubsystem.isRedAlliance()) {
+        // Coral station red, non processor side
+        return 126.0;
       }
-
-      return closestAngle;
+      // Coral station blue, processor side
+      return 54.0;
     }
   }
 

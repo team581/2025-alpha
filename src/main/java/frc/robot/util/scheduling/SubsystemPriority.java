@@ -14,14 +14,17 @@ public enum SubsystemPriority {
   FMS(20),
 
   // 10-19 is for actuator subsystems
+  // Intake must run before pivot so that it has fresh sensor data
+  INTAKE(11),
+  PIVOT(10),
   ELEVATOR(10),
-  INTAKE(10),
   WRIST(10),
   CLIMBER(10),
   LIGHTS(10),
 
   // 0-9 is for manager subsystems
   ROBOT_MANAGER(9),
+  RUMBLE_CONTROLLER(8),
 
   // Robot manager runs last so that all sensor data is fresh before processing state transitions
   AUTOS(0);
@@ -31,4 +34,6 @@ public enum SubsystemPriority {
   private SubsystemPriority(int priority) {
     this.value = priority;
   }
+
+  // TODO: Tweak subsystem priority values when more of the subsystems are added
 }

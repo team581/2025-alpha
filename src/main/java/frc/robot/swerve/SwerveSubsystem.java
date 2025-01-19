@@ -1,16 +1,10 @@
 package frc.robot.swerve;
 
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest.NativeSwerveRequest;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,17 +17,13 @@ import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.TunerConstants;
+import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.purple.Purple;
 import frc.robot.util.ControllerHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
-import java.security.InvalidParameterException;
 
 public class SwerveSubsystem extends StateMachine<SwerveState> {
-  /** Max speed allowed to make a speaker shot and feeding. */
-  private static final double MAX_SPEED_SHOOTING = Units.feetToMeters(0.5);
-
-  private static final double MAX_FLOOR_SPEED_SHOOTING = Units.feetToMeters(1.0);
 
   public static final double MaxSpeed = 4.75;
   private static final double MaxAngularRate = Units.rotationsToRadians(4);
@@ -45,18 +35,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
 
-  private static SwerveModuleConstants constantsForModuleNumber(int moduleNumber) {
-    return switch (moduleNumber) {
-      case 0 -> TunerConstants.FrontLeft;
-      case 1 -> TunerConstants.FrontRight;
-      case 2 -> TunerConstants.BackLeft;
-      case 3 -> TunerConstants.BackRight;
-      default -> throw new InvalidParameterException("Expected an ID from [0, 3]");
-    };
-  }
-
-  public final SwerveDrivetrain drivetrain =
-      new SwerveDrivetrain(
+  public final TunerSwerveDrivetrain drivetrain =
+      new TunerSwerveDrivetrain(
           TunerConstants.DrivetrainConstants,
           TunerConstants.FrontLeft,
           TunerConstants.FrontRight,
@@ -65,30 +45,24 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public final Pigeon2 drivetrainPigeon = drivetrain.getPigeon2();
 
-  private final SwerveRequest.FieldCentric drive =
-      new SwerveRequest.FieldCentric()
+  private final NativeSwerveRequest.FieldCentric drive =
+      new NativeSwerveRequest.FieldCentric()
           // I want field-centric driving in open loop
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
           .withDeadband(MaxSpeed * 0.03)
           .withRotationalDeadband(MaxAngularRate * 0.03);
 
-  private final SwerveRequest.FieldCentricFacingAngle driveToAngle =
-      new SwerveRequest.FieldCentricFacingAngle()
+  private final NativeSwerveRequest.FieldCentricFacingAngle driveToAngle =
+      new NativeSwerveRequest.FieldCentricFacingAngle()
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
           .withDeadband(MaxSpeed * 0.03);
-  private final SwerveModule frontLeft = drivetrain.getModule(0);
-  private final SwerveModule frontRight = drivetrain.getModule(1);
-  private final SwerveModule backLeft = drivetrain.getModule(2);
-  private final SwerveModule backRight = drivetrain.getModule(3);
 
   private double lastSimTime;
   private Notifier simNotifier = null;
 
-  private boolean slowEnoughToShoot = false;
   private SwerveDriveState drivetrainState = new SwerveDriveState();
   private ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds();
   private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
-  private boolean slowEnoughToFeed;
   private double goalSnapAngle = 0;
 
   /** The latest requested teleop speeds. */
@@ -102,14 +76,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public ChassisSpeeds getFieldRelativeSpeeds() {
     return fieldRelativeSpeeds;
-  }
-
-  public boolean isSlowEnoughToShoot() {
-    return slowEnoughToShoot;
-  }
-
-  public boolean isSlowEnoughToFeed() {
-    return slowEnoughToFeed;
   }
 
   public SwerveDriveState getDrivetrainState() {
@@ -133,44 +99,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     super(SubsystemPriority.SWERVE, SwerveState.TELEOP);
     driveToAngle.HeadingController = RobotConfig.get().swerve().snapController();
     driveToAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
-    driveToAngle.HeadingController.setTolerance(0.02);
-
-    // The CTR SwerveModule class will overwrite your torque current limits and the stator current
-    // limit with the configured slip current. This logic allows us to exercise more precise control
-    // over what current limits are used for each control mode.
-    // See https://github.com/CrossTheRoadElec/Phoenix-Releases/issues/81
-    for (int i = 0; i < 4; i++) {
-      var module = drivetrain.getModule(i);
-      var driveMotorConfigurator = module.getDriveMotor().getConfigurator();
-      var steerMotorConfigurator = module.getSteerMotor().getConfigurator();
-      var usedConstants = constantsForModuleNumber(i);
-
-      driveMotorConfigurator.apply(RobotConfig.get().swerve().driveMotorConfig().CurrentLimits);
-      driveMotorConfigurator.apply(RobotConfig.get().swerve().driveMotorConfig().Voltage);
-      driveMotorConfigurator.apply(RobotConfig.get().swerve().driveMotorConfig().OpenLoopRamps);
-      driveMotorConfigurator.apply(
-          new TorqueCurrentConfigs()
-              .withPeakForwardTorqueCurrent(80)
-              .withPeakReverseTorqueCurrent(80));
-
-      MotorOutputConfigs driveMotorOutput =
-          RobotConfig.get().swerve().driveMotorConfig().MotorOutput;
-      driveMotorOutput.Inverted =
-          usedConstants.DriveMotorInverted
-              ? InvertedValue.Clockwise_Positive
-              : InvertedValue.CounterClockwise_Positive;
-      driveMotorConfigurator.apply(driveMotorOutput);
-
-      steerMotorConfigurator.apply(RobotConfig.get().swerve().steerMotorConfig().CurrentLimits);
-      steerMotorConfigurator.apply(RobotConfig.get().swerve().steerMotorConfig().Voltage);
-      MotorOutputConfigs steerMotorOutput =
-          RobotConfig.get().swerve().steerMotorConfig().MotorOutput;
-      steerMotorOutput.Inverted =
-          usedConstants.SteerMotorInverted
-              ? InvertedValue.Clockwise_Positive
-              : InvertedValue.CounterClockwise_Positive;
-      steerMotorConfigurator.apply(steerMotorOutput);
-    }
 
     if (Utils.isSimulation()) {
       startSimThread();
@@ -248,29 +176,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   @Override
   protected void collectInputs() {
     drivetrainState = drivetrain.getState();
-    robotRelativeSpeeds = drivetrainState.speeds;
+    robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
-    slowEnoughToShoot = calculateMovingSlowEnoughForSpeakerShot(robotRelativeSpeeds);
-    slowEnoughToFeed = calculateMovingSlowEnoughForFloorShot(robotRelativeSpeeds);
   }
 
   private ChassisSpeeds calculateFieldRelativeSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(
         robotRelativeSpeeds, drivetrainState.Pose.getRotation());
-  }
-
-  private static boolean calculateMovingSlowEnoughForSpeakerShot(ChassisSpeeds speeds) {
-    double linearSpeed =
-        Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
-
-    return linearSpeed < MAX_SPEED_SHOOTING;
-  }
-
-  private boolean calculateMovingSlowEnoughForFloorShot(ChassisSpeeds speeds) {
-    double linearSpeed =
-        Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
-
-    return linearSpeed < MAX_FLOOR_SPEED_SHOOTING;
   }
 
   private void sendSwerveRequest() {
@@ -318,7 +230,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       case SCORE_ASSIST -> {
         var scoreAssist =
             Purple.getRobotRelativeScoreAssistSpeeds(
-                MathUtil.inputModulus(drivetrainPigeon.getYaw().getValue(), -180, 180),
+                MathUtil.inputModulus(drivetrainPigeon.getYaw().getValueAsDouble(), -180, 180),
                 teleopSpeeds);
 
         drivetrain.setControl(
@@ -361,7 +273,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/SnapAngle", goalSnapAngle);
     DogLog.log("Swerve/ModuleStates", drivetrainState.ModuleStates);
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
-    DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.speeds);
+    DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
   }
 
   private void startSimThread() {
