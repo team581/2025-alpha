@@ -93,7 +93,10 @@ class PracticeConfig {
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
           new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN),
-          new WristConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 0, 180), null, null, null);
+          new WristConfig(CANIVORE_NAME, 999, new TalonFXConfiguration(), 0, 180),
+          null,
+          null,
+          null);
 
   private PracticeConfig() {}
 }

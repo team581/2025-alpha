@@ -44,6 +44,7 @@ public record RobotConfig(
       boolean invertY,
       TalonFXConfiguration driveMotorConfig,
       TalonFXConfiguration steerMotorConfig) {}
+
   public record VisionConfig(
       int translationHistoryArraySize,
       double xyStdDev,
