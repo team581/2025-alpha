@@ -63,7 +63,7 @@ public class AutoAlignTest {
 
     var robotPose = new Pose2d(3.658, 4.026, Rotation2d.fromRadians(0.0));
 
-    var result = AutoAlign.getClosestReefSide(robotPose);
+    var result = AutoAlign.getClosestReefSide(robotPose, false);
 
     Assertions.assertEquals(ReefSide.SIDE_AB.bluePose, result);
   }
@@ -79,11 +79,10 @@ public class AutoAlignTest {
 
   @Test
   void scoreSideCDBlue() {
-    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
 
     var robotPose = new Pose2d(4.073, 4.746, Rotation2d.fromRadians(-1.0472));
 
-    var result = AutoAlign.getClosestReefSide(robotPose);
+    var result = AutoAlign.getClosestReefSide(robotPose, false);
 
     Assertions.assertEquals(ReefSide.SIDE_CD.bluePose, result);
   }
@@ -99,11 +98,9 @@ public class AutoAlignTest {
 
   @Test
   void scoreSideEFBlue() {
-    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
-
     var robotPose = new Pose2d(4.905, 4.746, Rotation2d.fromRadians(-2.0944));
 
-    var result = AutoAlign.getClosestReefSide(robotPose);
+    var result = AutoAlign.getClosestReefSide(robotPose, false);
 
     Assertions.assertEquals(ReefSide.SIDE_EF.bluePose, result);
   }
@@ -121,7 +118,7 @@ public class AutoAlignTest {
   void scoreSideGHBlue() {
     var robotPose = new Pose2d(5.321, 4.026, Rotation2d.fromRadians(Math.PI));
 
-    var result = AutoAlign.getClosestReefSide(robotPose);
+    var result = AutoAlign.getClosestReefSide(robotPose, false);
 
     Assertions.assertEquals(ReefSide.SIDE_GH.bluePose, result);
   }
@@ -139,7 +136,7 @@ public class AutoAlignTest {
   void scoreSideIJBlue() {
     var robotPose = new Pose2d(4.905, 3.306, Rotation2d.fromRadians(2.0944));
 
-    var result = AutoAlign.getClosestReefSide(robotPose);
+    var result = AutoAlign.getClosestReefSide(robotPose, false);
 
     Assertions.assertEquals(ReefSide.SIDE_IJ.bluePose, result);
   }
@@ -157,7 +154,7 @@ public class AutoAlignTest {
   void scoreSideKLBlue() {
     var robotPose = new Pose2d(4.074, 3.306, Rotation2d.fromRadians(1.0472));
 
-    var result = AutoAlign.getClosestReefSide(robotPose);
+    var result = AutoAlign.getClosestReefSide(robotPose, false);
 
     Assertions.assertEquals(ReefSide.SIDE_KL.bluePose, result);
   }
