@@ -77,7 +77,7 @@ public class WristSubsystem extends StateMachine<WristState> {
           MathUtil.isNear(WristState.GROUND_ALGAE_INTAKE.angle, motorAngle, 1);
       case GROUND_CORAL_INTAKE ->
           MathUtil.isNear(WristState.GROUND_CORAL_INTAKE.angle, motorAngle, 1);
-      case IDLE -> MathUtil.isNear(WristState.IDLE.angle, motorAngle, 1);
+      case STOWED -> MathUtil.isNear(WristState.STOWED.angle, motorAngle, 1);
 
       case PRE_MATCH_HOMING -> true;
       case INTAKING_CORAL_STATION ->
@@ -165,10 +165,10 @@ public class WristSubsystem extends StateMachine<WristState> {
             motionMagicRequest.withPosition(
                 Units.degreesToRotations(clamp(WristState.GROUND_CORAL_INTAKE.angle))));
       }
-      case IDLE -> {
+      case STOWED -> {
         motor.setControl(
             motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.IDLE.angle))));
+                Units.degreesToRotations(clamp(WristState.STOWED.angle))));
       }
       case INTAKING_CORAL_STATION -> {
         motor.setControl(
@@ -204,7 +204,7 @@ public class WristSubsystem extends StateMachine<WristState> {
                     Units.degreesToRotations(
                         RobotConfig.get().wrist().minAngle() + (motorAngle - lowestSeenAngle))));
 
-            setStateFromRequest(WristState.IDLE);
+            setStateFromRequest(WristState.STOWED);
           } else {
             motor.setControl(brakeNeutralRequest);
           }

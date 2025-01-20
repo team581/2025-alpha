@@ -28,6 +28,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private double averageMeasuredHeight;
   private double collisionAvoidanceGoal;
 
+  // Mid-match homing
+  private double highestMotorCurrent;
+
   public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.PRE_MATCH_HOMING);
     this.leftMotor = leftMotor;
@@ -58,6 +61,12 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
     averageMeasuredHeight =
         (leftMotor.getPosition().getValueAsDouble() + rightMotor.getPosition().getValueAsDouble())
             / 2.0;
+
+    if (leftMotor.getStatorCurrent().getValueAsDouble() > rightMotor.getStatorCurrent().getValueAsDouble()) {
+      highestMotorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
+    } else {
+      highestMotorCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+    }
   }
 
   @Override
@@ -72,100 +81,19 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   @Override
   protected void afterTransition(ElevatorState newState) {
     switch (newState) {
-      case CLIMBING -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CLIMBING.height)));
+      case MID_MATCH_HOMING -> {
+        // TODO: Set homing voltage to like 2ish
+        leftMotor.setVoltage(0);
+        rightMotor.setVoltage(0);
+      }
+      case COLLISION_AVOIDANCE -> {
+        // Will be set in robotPeriodic()
+      }
+      default -> {
+        leftMotor.setControl(positionRequest.withPosition(clampHeight(getState().height)));
         rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CLIMBING.height)));
+            positionRequest.withPosition(clampHeight(getState().height)));
       }
-      case NET -> {
-        leftMotor.setControl(positionRequest.withPosition(clampHeight(ElevatorState.NET.height)));
-        rightMotor.setControl(positionRequest.withPosition(clampHeight(ElevatorState.NET.height)));
-      }
-      case PROCESSOR -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.PROCESSOR.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.PROCESSOR.height)));
-      }
-      case ALGAE_DISLODGE_L2 -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_DISLODGE_L2.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_DISLODGE_L2.height)));
-      }
-      case ALGAE_DISLODGE_L3 -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_DISLODGE_L3.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_DISLODGE_L3.height)));
-      }
-      case ALGAE_INTAKE_L2 -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_INTAKE_L2.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_INTAKE_L2.height)));
-      }
-      case ALGAE_INTAKE_L3 -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_INTAKE_L3.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.ALGAE_INTAKE_L3.height)));
-      }
-      case CORAL_L1_PLACE -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L1_PLACE.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L1_PLACE.height)));
-      }
-      case CORAL_L2_PLACE -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L2_PLACE.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L2_PLACE.height)));
-      }
-      case CORAL_L3_PLACE -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L3_PLACE.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L3_PLACE.height)));
-      }
-      case CORAL_L4_PLACE -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L4_PLACE.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.CORAL_L4_PLACE.height)));
-      }
-      case GROUND_ALGAE_INTAKE -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.GROUND_ALGAE_INTAKE.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.GROUND_ALGAE_INTAKE.height)));
-      }
-      case GROUND_CORAL_INTAKE -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.GROUND_CORAL_INTAKE.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.GROUND_CORAL_INTAKE.height)));
-      }
-      case STOWED -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.STOWED.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.STOWED.height)));
-      }
-      case INTAKING_CORAL_STATION -> {
-        leftMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.INTAKING_CORAL_STATION.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.INTAKING_CORAL_STATION.height)));
-      }
-      case UNJAM -> {
-        leftMotor.setControl(positionRequest.withPosition(clampHeight(ElevatorState.UNJAM.height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(ElevatorState.UNJAM.height)));
-      }
-      default -> {}
     }
   }
 
@@ -201,9 +129,22 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
     }
   }
 
+  @Override
+  protected ElevatorState getNextState(ElevatorState currentState) {
+    if (currentState == ElevatorState.MID_MATCH_HOMING
+        && highestMotorCurrent > RobotConfig.get().elevator().homingCurrentThreshold()) {
+      leftMotor.setPosition(RobotConfig.get().elevator().homingEndHeight());
+      rightMotor.setPosition(RobotConfig.get().elevator().homingEndHeight());
+      return ElevatorState.STOWED;
+    }
+
+    // Don't do anything
+    return currentState;
+  }
+
   public boolean atGoal() {
     return switch (getState()) {
-      case PRE_MATCH_HOMING, UNJAM -> true;
+      case PRE_MATCH_HOMING, MID_MATCH_HOMING, UNJAM -> true;
       case COLLISION_AVOIDANCE ->
           MathUtil.isNear(collisionAvoidanceGoal, averageMeasuredHeight, TOLERANCE);
       default -> MathUtil.isNear(getState().height, averageMeasuredHeight, TOLERANCE);

@@ -220,7 +220,11 @@ public class Robot extends TimedRobot {
         .driverController
         .povRight()
         .onTrue(robotCommands.setGamepieceModeCommand(GamePieceMode.ALGAE));
-    hardware.driverController.start().onTrue(robotCommands.reHomeCommand());
     hardware.driverController.back().onTrue(localization.getZeroCommand());
+
+    hardware.operatorController.a().onTrue(robotCommands.reHomeElevatorCommand());
+    hardware.operatorController.b().onTrue(robotCommands.reHomeWristCommand());
+    hardware.operatorController.y().onTrue(robotCommands.reHomePivotCommand());
+    hardware.operatorController.x().onTrue(robotCommands.unjamCommand());
   }
 }

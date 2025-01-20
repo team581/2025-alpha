@@ -23,6 +23,7 @@ public record RobotConfig(
       TalonFXConfiguration leftMotorConfig,
       TalonFXConfiguration rightMotorConfig,
       double homingEndHeight,
+      double homingCurrentThreshold,
       double minHeight,
       double maxHeight,
       double rotationsToDistance,

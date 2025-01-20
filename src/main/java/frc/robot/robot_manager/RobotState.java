@@ -54,5 +54,8 @@ public enum RobotState {
   CLIMBING_2_HANGING,
 
   UNJAM,
-  REHOME;
+
+  REHOME_ELEVATOR,
+  REHOME_WRIST,
+  REHOME_PIVOT;
 }
