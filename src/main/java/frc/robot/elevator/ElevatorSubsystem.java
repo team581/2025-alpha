@@ -62,7 +62,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
         (leftMotor.getPosition().getValueAsDouble() + rightMotor.getPosition().getValueAsDouble())
             / 2.0;
 
-    if (leftMotor.getStatorCurrent().getValueAsDouble() > rightMotor.getStatorCurrent().getValueAsDouble()) {
+    if (leftMotor.getStatorCurrent().getValueAsDouble()
+        > rightMotor.getStatorCurrent().getValueAsDouble()) {
       highestMotorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
     } else {
       highestMotorCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
@@ -91,8 +92,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       }
       default -> {
         leftMotor.setControl(positionRequest.withPosition(clampHeight(getState().height)));
-        rightMotor.setControl(
-            positionRequest.withPosition(clampHeight(getState().height)));
+        rightMotor.setControl(positionRequest.withPosition(clampHeight(getState().height)));
       }
     }
   }

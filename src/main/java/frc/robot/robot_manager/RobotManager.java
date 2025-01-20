@@ -105,17 +105,11 @@ public class RobotManager extends StateMachine<RobotState> {
           currentState;
 
       case REHOME_ELEVATOR ->
-           elevator.getState() == ElevatorState.STOWED
-              ? RobotState.IDLE_NO_GP
-              : currentState;
+          elevator.getState() == ElevatorState.STOWED ? RobotState.IDLE_NO_GP : currentState;
       case REHOME_WRIST ->
-          wrist.getState() == WristState.STOWED
-              ? RobotState.IDLE_NO_GP
-              : currentState;
+          wrist.getState() == WristState.STOWED ? RobotState.IDLE_NO_GP : currentState;
       case REHOME_PIVOT ->
-          pivot.getState() == PivotState.STOWED
-              ? RobotState.IDLE_NO_GP
-              : currentState;
+          pivot.getState() == PivotState.STOWED ? RobotState.IDLE_NO_GP : currentState;
       case PROCESSOR_PREPARE_TO_SCORE ->
           wrist.atGoal() && elevator.atGoal() && pivot.atGoal()
               ? RobotState.PROCESSOR_SCORING
@@ -833,7 +827,7 @@ public class RobotManager extends StateMachine<RobotState> {
   public void l1CoralLineupRequest() {
     gamePieceMode = GamePieceMode.CORAL;
     switch (getState()) {
-      case  CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_PIVOT, REHOME_WRIST -> {}
+      case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_PIVOT, REHOME_WRIST -> {}
       default -> setStateFromRequest(RobotState.CORAL_L1_1_APPROACH);
     }
   }
