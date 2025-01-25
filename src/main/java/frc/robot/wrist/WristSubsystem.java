@@ -81,16 +81,16 @@ public class WristSubsystem extends StateMachine<WristState> {
       }
       case COLLISION_AVOIDANCE -> {
         motor.setControl(
-          motionMagicRequest.withPosition(
-            Units.degreesToRotations(clamp(collisionAvoidanceGoal))));
-          }
-          case PRE_MATCH_HOMING -> {
-            motor.setControl(coastNeutralRequest);
-          }
-          default -> {
-            motor.setControl(
-                motionMagicRequest.withPosition(Units.degreesToRotations(clamp(newState.angle))));
-          }
+            motionMagicRequest.withPosition(
+                Units.degreesToRotations(clamp(collisionAvoidanceGoal))));
+      }
+      case PRE_MATCH_HOMING -> {
+        motor.setControl(coastNeutralRequest);
+      }
+      default -> {
+        motor.setControl(
+            motionMagicRequest.withPosition(Units.degreesToRotations(clamp(newState.angle))));
+      }
     }
   }
 
@@ -133,8 +133,6 @@ public class WristSubsystem extends StateMachine<WristState> {
       default -> {}
     }
   }
-  
-
 
   @Override
   protected WristState getNextState(WristState currentState) {
