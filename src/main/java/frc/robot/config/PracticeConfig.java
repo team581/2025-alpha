@@ -83,7 +83,7 @@ class PracticeConfig {
                                       * (2.0 / 1.0)
                                       * (Math.PI * 1.274)))),
               0,
-              0,
+              20,
               0,
               58,
               0.25),
@@ -173,8 +173,8 @@ class PracticeConfig {
                           .withStatorCurrentLimit(40.0)),
               -85.0,
               200,
-              0,
-              0),
+              18,
+              -85),
           new RollConfig(
               RIO_CAN_NAME,
               23,

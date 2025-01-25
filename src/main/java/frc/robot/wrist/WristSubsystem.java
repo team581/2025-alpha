@@ -38,7 +38,7 @@ public class WristSubsystem extends StateMachine<WristState> {
   }
 
   public void setState(WristState newState) {
-    if (getState() != WristState.PRE_MATCH_HOMING) {
+    if (getState() != WristState.PRE_MATCH_HOMING || newState == WristState.MID_MATCH_HOMING) {
 
       setStateFromRequest(newState);
     }
@@ -77,7 +77,7 @@ public class WristSubsystem extends StateMachine<WristState> {
     switch (newState) {
       case MID_MATCH_HOMING -> {
         // TODO: Set homing voltage to like 2ish
-        motor.setVoltage(0);
+        motor.setVoltage(-0.5);
       }
       case COLLISION_AVOIDANCE -> {
         motor.setControl(
@@ -140,7 +140,7 @@ public class WristSubsystem extends StateMachine<WristState> {
   protected WristState getNextState(WristState currentState) {
     if (currentState == WristState.MID_MATCH_HOMING
         && motorCurrent > RobotConfig.get().wrist().homingCurrentThreshold()) {
-      motor.setPosition(RobotConfig.get().wrist().homingPosition());
+      motor.setPosition(Units.degreesToRotations(RobotConfig.get().wrist().homingPosition()));
       return WristState.STOWED;
     }
 

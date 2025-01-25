@@ -41,7 +41,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   }
 
   public void setState(ElevatorState newState) {
-    if (getState() != ElevatorState.PRE_MATCH_HOMING) {
+    if (getState() != ElevatorState.PRE_MATCH_HOMING || newState == ElevatorState.MID_MATCH_HOMING) {
       setStateFromRequest(newState);
     }
   }
@@ -103,8 +103,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       }
       case MID_MATCH_HOMING -> {
         // TODO: Set homing voltage to like 2ish
-        leftMotor.setVoltage(0);
-        rightMotor.setVoltage(0);
+        leftMotor.setVoltage(-0.5);
+        rightMotor.setVoltage(-0.5);
       }
       default -> {}
     }
