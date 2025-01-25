@@ -230,7 +230,7 @@ public class Robot extends TimedRobot {
 
     hardware.operatorController.a().onTrue(robotCommands.rehomeElevatorCommand());
     hardware.operatorController.b().onTrue(robotCommands.rehomeWristCommand());
-    hardware.operatorController.y().onTrue(robotCommands.rehomePivotCommand());
+    hardware.operatorController.y().onTrue(robotCommands.rehomeRollCommand());
     hardware.operatorController.x().onTrue(robotCommands.unjamCommand());
   }
 }

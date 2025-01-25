@@ -80,7 +80,7 @@ public class RobotCommands {
     return Commands.runOnce(robot::rehomeWristRequest, requirements);
   }
 
-  public Command rehomePivotCommand() {
-    return Commands.runOnce(robot::rehomePivotRequest, requirements);
+  public Command rehomeRollCommand() {
+    return Commands.runOnce(robot::rehomeRollRequest, requirements);
   }
 }

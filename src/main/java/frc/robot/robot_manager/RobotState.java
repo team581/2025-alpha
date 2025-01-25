@@ -57,5 +57,5 @@ public enum RobotState {
 
   REHOME_ELEVATOR,
   REHOME_WRIST,
-  REHOME_PIVOT;
+  REHOME_ROLL;
 }
