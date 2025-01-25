@@ -19,11 +19,11 @@ import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeSubsystem;
 import frc.robot.lights.LightsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
-import frc.robot.pivot.PivotSubsystem;
 import frc.robot.purple.Purple;
 import frc.robot.robot_manager.GamePieceMode;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
+import frc.robot.roll.RollSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.Stopwatch;
 import frc.robot.util.scheduling.LifecycleSubsystemManager;
@@ -40,39 +40,36 @@ public class Robot extends TimedRobot {
       new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor);
   private final SwerveSubsystem swerve = new SwerveSubsystem();
   private final ImuSubsystem imu = new ImuSubsystem(swerve.drivetrainPigeon);
-  private final Limelight topPurpleLimelight =
+  private final Limelight elevatorPurpleLimelight =
       new Limelight(
-          "top",
+          "elev",
           LimelightState.PURPLE,
-          RobotConfig.get().vision().interpolatedVisionSet().topPurpleSet);
-  private final Limelight bottomCoralLimelight =
+          RobotConfig.get().vision().interpolatedVisionSet().elevatorPurpleSet);
+  private final Limelight frontCoralLimelight =
       new Limelight(
-          "bottom",
+          "front",
           LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().bottomCoralSet);
-  private final Limelight backwardsTagLimelight =
+          RobotConfig.get().vision().interpolatedVisionSet().frontCoralSet);
+  private final Limelight backTagLimelight =
       new Limelight(
           "back",
           LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().backwardsTagSet);
+          RobotConfig.get().vision().interpolatedVisionSet().backTagSet);
 
   private final VisionSubsystem vision =
-      new VisionSubsystem(imu, topPurpleLimelight, bottomCoralLimelight, backwardsTagLimelight);
+      new VisionSubsystem(imu, elevatorPurpleLimelight, frontCoralLimelight, backTagLimelight);
   private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
-  private final Purple purple = new Purple(localization);
+  private final Purple purple = new Purple(elevatorPurpleLimelight);
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
   private final RumbleControllerSubsystem rumbleController =
       new RumbleControllerSubsystem(hardware.driverController, false);
 
   private final IntakeSubsystem intake =
-      new IntakeSubsystem(
-          hardware.intakeLeftMotor,
-          hardware.intakeRightMotor,
-          hardware.intakeLeftSensor,
-          hardware.intakeRightSensor);
+      new IntakeSubsystem(hardware.intakeTopMotor, hardware.intakeBottomMotor);
+
   private final WristSubsystem wrist = new WristSubsystem(hardware.wristMotor);
-  private final PivotSubsystem pivot = new PivotSubsystem(hardware.pivotMotor, intake);
+  private final RollSubsystem roll = new RollSubsystem(hardware.rollMotor, intake);
   private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
   private final ClimberSubsystem climber =
       new ClimberSubsystem(hardware.climberMotor, hardware.climberCANcoder);
@@ -81,15 +78,16 @@ public class Robot extends TimedRobot {
           intake,
           wrist,
           elevator,
-          pivot,
+          roll,
           vision,
           imu,
           swerve,
           localization,
-          topPurpleLimelight,
-          bottomCoralLimelight,
-          backwardsTagLimelight,
+          elevatorPurpleLimelight,
+          frontCoralLimelight,
+          backTagLimelight,
           lights,
+          purple,
           climber);
 
   private final RobotCommands robotCommands = new RobotCommands(robotManager);
@@ -101,7 +99,7 @@ public class Robot extends TimedRobot {
 
     DogLog.setOptions(
         new DogLogOptions().withCaptureNt(false).withNtPublish(RobotConfig.IS_DEVELOPMENT));
-    DogLog.setPdh(hardware.pdh);
+    // DogLog.setPdh(hardware.pdh);
 
     // Record metadata
     DogLog.log("Metadata/ProjectName", BuildConstants.MAVEN_NAME);
@@ -140,6 +138,14 @@ public class Robot extends TimedRobot {
     Stopwatch.getInstance().start("Scheduler/CommandSchedulerPeriodic");
     CommandScheduler.getInstance().run();
     Stopwatch.getInstance().stop("Scheduler/CommandSchedulerPeriodic");
+
+    // Memory logging
+    DogLog.log("Debug/Memory/Total", Runtime.getRuntime().totalMemory());
+    DogLog.log("Debug/Memory/Free", Runtime.getRuntime().freeMemory());
+    DogLog.log("Debug/Memory/Max", Runtime.getRuntime().maxMemory());
+    DogLog.log(
+        "Debug/Memory/Used",
+        Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
   }
 
   @Override

@@ -1,10 +1,10 @@
 package frc.robot.vision.limelight;
 
 public enum LimelightState {
-  CORAL(2),
   TAGS(1),
+  CORAL(2),
   PURPLE(3),
-  REEF_TAGS(4);
+  REEF_TAGS(1);
 
   final int pipelineIndex;
 

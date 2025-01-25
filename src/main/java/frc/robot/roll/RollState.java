@@ -1,6 +1,7 @@
-package frc.robot.pivot;
+package frc.robot.roll;
 
-public enum PivotState {
+public enum RollState {
+  UNHOMED(0.0),
   HOMING(0.0),
   INTAKING_CORAL_HORIZONTAL(0.0),
   STOWED(0.0),
@@ -8,7 +9,7 @@ public enum PivotState {
 
   public final double angle;
 
-  PivotState(double angle) {
+  RollState(double angle) {
     this.angle = angle;
   }
 }

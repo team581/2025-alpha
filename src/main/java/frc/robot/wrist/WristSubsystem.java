@@ -1,14 +1,15 @@
 package frc.robot.wrist;
 
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.config.RobotConfig;
-import frc.robot.pivot.PivotState;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
@@ -19,11 +20,12 @@ public class WristSubsystem extends StateMachine<WristState> {
   private double lowestSeenAngle = Double.MAX_VALUE;
   private double highestSeenAngle = Double.MIN_VALUE;
   private double collisionAvoidanceGoal;
-  private static final double MINIMUM_EXPECTED_HOMING_ANGLE_CHANGE = 90.0;
+  private static final double MINIMUM_EXPECTED_HOMING_ANGLE_CHANGE = 180.0;
   private final StaticBrake brakeNeutralRequest = new StaticBrake();
+  private final CoastOut coastNeutralRequest = new CoastOut();
 
   private final MotionMagicVoltage motionMagicRequest =
-      new MotionMagicVoltage(0).withEnableFOC(false);
+      new MotionMagicVoltage(0.0).withEnableFOC(false);
 
   // private final PositionVoltage pidRequest =
   //  new PositionVoltage(0).withEnableFOC(false);
@@ -53,39 +55,9 @@ public class WristSubsystem extends StateMachine<WristState> {
 
   public boolean atGoal() {
     return switch (getState()) {
-      case ALGAE_BACKWARD_NET ->
-          MathUtil.isNear(WristState.ALGAE_BACKWARD_NET.angle, motorAngle, 1);
-      case ALGAE_FORWARD_NET -> MathUtil.isNear(WristState.ALGAE_FORWARD_NET.angle, motorAngle, 1);
-      case ALGAE_PROCESSOR -> MathUtil.isNear(WristState.ALGAE_PROCESSOR.angle, motorAngle, 1);
-      case CORAL_SCORE_LINEUP_L1 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_LINEUP_L1.angle, motorAngle, 1);
-      case CORAL_SCORE_LINEUP_L2 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_LINEUP_L2.angle, motorAngle, 1);
-      case CORAL_SCORE_LINEUP_L3 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_LINEUP_L3.angle, motorAngle, 1);
-      case CORAL_SCORE_LINEUP_L4 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_LINEUP_L4.angle, motorAngle, 1);
-
-      case CORAL_SCORE_PLACING_L1 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_PLACING_L1.angle, motorAngle, 1);
-      case CORAL_SCORE_PLACING_L2 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_PLACING_L2.angle, motorAngle, 1);
-      case CORAL_SCORE_PLACING_L3 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_PLACING_L3.angle, motorAngle, 1);
-      case CORAL_SCORE_PLACING_L4 ->
-          MathUtil.isNear(WristState.CORAL_SCORE_PLACING_L4.angle, motorAngle, 1);
-
-      case GROUND_ALGAE_INTAKE ->
-          MathUtil.isNear(WristState.GROUND_ALGAE_INTAKE.angle, motorAngle, 1);
-      case GROUND_CORAL_INTAKE ->
-          MathUtil.isNear(WristState.GROUND_CORAL_INTAKE.angle, motorAngle, 1);
-      case STOWED -> MathUtil.isNear(WristState.STOWED.angle, motorAngle, 1);
-
+      default -> MathUtil.isNear(getState().angle, motorAngle, 1);
+      case COLLISION_AVOIDANCE -> MathUtil.isNear(collisionAvoidanceGoal, motorAngle, 1);
       case PRE_MATCH_HOMING -> true;
-      case INTAKING_CORAL_STATION ->
-          MathUtil.isNear(WristState.INTAKING_CORAL_STATION.angle, motorAngle, 1);
-      case UNJAM -> MathUtil.isNear(WristState.UNJAM.angle, motorAngle, 1);
-      default -> false;
     };
   }
 
@@ -107,88 +79,18 @@ public class WristSubsystem extends StateMachine<WristState> {
         // TODO: Set homing voltage to like 2ish
         motor.setVoltage(0);
       }
-      case ALGAE_BACKWARD_NET -> {
+      case COLLISION_AVOIDANCE -> {
         motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.ALGAE_BACKWARD_NET.angle))));
-      }
-
-      case ALGAE_FORWARD_NET -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.ALGAE_FORWARD_NET.angle))));
-      }
-      case ALGAE_PROCESSOR -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.ALGAE_PROCESSOR.angle))));
-      }
-      case CORAL_SCORE_LINEUP_L1 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LINEUP_L1.angle))));
-      }
-      case CORAL_SCORE_PLACING_L1 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_PLACING_L1.angle))));
-      }
-      case CORAL_SCORE_LINEUP_L2 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LINEUP_L2.angle))));
-      }
-      case CORAL_SCORE_PLACING_L2 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_PLACING_L2.angle))));
-      }
-      case CORAL_SCORE_LINEUP_L3 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LINEUP_L3.angle))));
-      }
-      case CORAL_SCORE_PLACING_L3 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_PLACING_L3.angle))));
-      }
-      case CORAL_SCORE_LINEUP_L4 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_LINEUP_L4.angle))));
-      }
-      case CORAL_SCORE_PLACING_L4 -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.CORAL_SCORE_PLACING_L4.angle))));
-      }
-      case GROUND_ALGAE_INTAKE -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.GROUND_ALGAE_INTAKE.angle))));
-      }
-      case GROUND_CORAL_INTAKE -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.GROUND_CORAL_INTAKE.angle))));
-      }
-      case STOWED -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.STOWED.angle))));
-      }
-      case INTAKING_CORAL_STATION -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.INTAKING_CORAL_STATION.angle))));
-      }
-      case UNJAM -> {
-        motor.setControl(
-            motionMagicRequest.withPosition(
-                Units.degreesToRotations(clamp(WristState.UNJAM.angle))));
-      }
-      default -> {}
+          motionMagicRequest.withPosition(
+            Units.degreesToRotations(clamp(collisionAvoidanceGoal))));
+          }
+          case PRE_MATCH_HOMING -> {
+            motor.setControl(coastNeutralRequest);
+          }
+          default -> {
+            motor.setControl(
+                motionMagicRequest.withPosition(Units.degreesToRotations(clamp(newState.angle))));
+          }
     }
   }
 
@@ -197,20 +99,24 @@ public class WristSubsystem extends StateMachine<WristState> {
     super.robotPeriodic();
     DogLog.log("Wrist/StatorCurrent", motor.getStatorCurrent().getValueAsDouble());
     DogLog.log("Wrist/AppliedVoltage", motor.getMotorVoltage().getValueAsDouble());
-    DogLog.log("Wrist/Position", motor.getPosition().getValueAsDouble());
+    DogLog.log("Wrist/Position", motorAngle);
     if (DriverStation.isDisabled()) {
       DogLog.log("Wrist/LowestAngle", lowestSeenAngle);
       DogLog.log("Wrist/HighestAngle", highestSeenAngle);
     }
+    if (rangeOfMotionGood()) {
+      DogLog.clearFault("Wrist not seen range of motion");
+    } else {
+      DogLog.logFault("Wrist not seen range of motion", AlertType.kWarning);
+    }
 
     switch (getState()) {
       case PRE_MATCH_HOMING -> {
-        if ((highestSeenAngle - lowestSeenAngle) > MINIMUM_EXPECTED_HOMING_ANGLE_CHANGE) {
+        if (rangeOfMotionGood()) {
           if (DriverStation.isEnabled()) {
-            motor.setControl(
-                motionMagicRequest.withPosition(
-                    Units.degreesToRotations(
-                        RobotConfig.get().wrist().minAngle() + (motorAngle - lowestSeenAngle))));
+            motor.setPosition(
+                Units.degreesToRotations(
+                    RobotConfig.get().wrist().minAngle() + (motorAngle - lowestSeenAngle)));
 
             setStateFromRequest(WristState.STOWED);
           } else {
@@ -240,6 +146,10 @@ public class WristSubsystem extends StateMachine<WristState> {
 
     // Don't do anything
     return currentState;
+  }
+
+  public boolean rangeOfMotionGood() {
+    return (highestSeenAngle - lowestSeenAngle) > MINIMUM_EXPECTED_HOMING_ANGLE_CHANGE;
   }
 
   private static double clamp(double armAngle) {

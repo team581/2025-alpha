@@ -46,9 +46,6 @@ public class Limelight extends StateMachine<LimelightState> {
       double pitchRate,
       double roll,
       double rollRate) {
-    if (getState() == LimelightState.TAGS) {
-      return;
-    }
     LimelightHelpers.SetRobotOrientation(
         limelightTableName, robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
   }
@@ -58,7 +55,17 @@ public class Limelight extends StateMachine<LimelightState> {
   }
 
   public Optional<TagResult> getInterpolatedTagResult() {
-    return interpolatedResult;
+    return getState() == LimelightState.TAGS || getState() == LimelightState.REEF_TAGS
+        ? interpolatedResult
+        : Optional.empty();
+  }
+
+  public Optional<GamePieceResult> getCoralResult() {
+    return getState() == LimelightState.CORAL ? coralResult : Optional.empty();
+  }
+
+  public Optional<PurpleResult> getPurpleResult() {
+    return getState() == LimelightState.PURPLE ? purpleResult : Optional.empty();
   }
 
   private Optional<TagResult> calculateInterpolatedTagResult(Optional<TagResult> rawTagResult) {
@@ -73,24 +80,28 @@ public class Limelight extends StateMachine<LimelightState> {
   }
 
   private Optional<TagResult> calculateRawTagResult() {
-    if (getState() != LimelightState.TAGS || getState() != LimelightState.REEF_TAGS) {
+    if (getState() != LimelightState.TAGS && getState() != LimelightState.REEF_TAGS) {
+      DogLog.timestamp("Vision/" + name + "/NotInTagState");
       return Optional.empty();
     }
 
     var estimatePose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightTableName);
 
     if (estimatePose == null) {
+      DogLog.timestamp("Vision/" + name + "/EstimatedPoseNull");
       return Optional.empty();
     }
 
     DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", estimatePose.pose);
 
     if (estimatePose.tagCount == 0) {
+      DogLog.timestamp("Vision/" + name + "/MT2TagCountZero");
       return Optional.empty();
     }
 
     // This prevents pose estimator from having crazy poses if the Limelight loses power
     if (estimatePose.pose.getX() == 0.0 && estimatePose.pose.getY() == 0.0) {
+      DogLog.timestamp("Vision/" + name + "/MT2XYZero");
       return Optional.empty();
     }
 
@@ -157,6 +168,7 @@ public class Limelight extends StateMachine<LimelightState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
+    DogLog.log("Vision/" + name + "/State", getState());
     LimelightHelpers.setPipelineIndex(limelightTableName, getState().pipelineIndex);
     switch (getState()) {
       case TAGS -> updateHealth(interpolatedResult);
@@ -195,6 +207,7 @@ public class Limelight extends StateMachine<LimelightState> {
   }
 
   public CameraHealth getCameraHealth() {
+    DogLog.log("Vision/" + name + "/Health", cameraHealth);
     return cameraHealth;
   }
 }

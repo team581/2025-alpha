@@ -82,18 +82,31 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   @Override
   protected void afterTransition(ElevatorState newState) {
     switch (newState) {
+      case CLIMBING,
+          NET,
+          PROCESSOR,
+          ALGAE_DISLODGE_L2,
+          ALGAE_DISLODGE_L3,
+          ALGAE_INTAKE_L2,
+          ALGAE_INTAKE_L3,
+          CORAL_L1_PLACE,
+          CORAL_L2_PLACE,
+          CORAL_L3_PLACE,
+          CORAL_L4_PLACE,
+          GROUND_ALGAE_INTAKE,
+          GROUND_CORAL_INTAKE,
+          STOWED,
+          INTAKING_CORAL_STATION,
+          UNJAM -> {
+        leftMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
+        rightMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
+      }
       case MID_MATCH_HOMING -> {
         // TODO: Set homing voltage to like 2ish
         leftMotor.setVoltage(0);
         rightMotor.setVoltage(0);
       }
-      case COLLISION_AVOIDANCE -> {
-        // Will be set in robotPeriodic()
-      }
-      default -> {
-        leftMotor.setControl(positionRequest.withPosition(clampHeight(getState().height)));
-        rightMotor.setControl(positionRequest.withPosition(clampHeight(getState().height)));
-      }
+      default -> {}
     }
   }
 

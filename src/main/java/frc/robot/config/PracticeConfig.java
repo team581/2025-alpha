@@ -4,11 +4,13 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
@@ -18,7 +20,7 @@ import frc.robot.config.RobotConfig.ClimberConfig;
 import frc.robot.config.RobotConfig.ElevatorConfig;
 import frc.robot.config.RobotConfig.IntakeConfig;
 import frc.robot.config.RobotConfig.LightsConfig;
-import frc.robot.config.RobotConfig.PivotConfig;
+import frc.robot.config.RobotConfig.RollConfig;
 import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
 import frc.robot.config.RobotConfig.WristConfig;
@@ -31,45 +33,80 @@ class PracticeConfig {
 
   public static final RobotConfig practiceBot =
       new RobotConfig(
-          "competition",
+          "practice",
           new ElevatorConfig(
-              // TODO: Get actual Values
               CANIVORE_NAME,
               15,
               16,
-              // TODO: Sensor to mechanism ratio should be gear ratio multiplied by the sprocket
-              // circumfrence
+              // Sensor to mechanism ratio is the gear ratio multiplied by the sprocket circumfrence
               new TalonFXConfiguration()
-                  .withSlot0(new Slot0Configs().withKP(0.0).withKV(0))
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(NeutralModeValue.Coast))
+                  .withSlot0(
+                      new Slot0Configs()
+                          .withKP(1.0)
+                          .withKV(0)
+                          .withKG(0.4)
+                          .withGravityType(GravityTypeValue.Elevator_Static))
+                  .withMotionMagic(
+                      new MotionMagicConfigs()
+                          .withMotionMagicAcceleration(250.0)
+                          .withMotionMagicCruiseVelocity(250.0))
                   .withFeedback(
-                      new FeedbackConfigs().withSensorToMechanismRatio(999 * (Math.PI * 999))),
+                      new FeedbackConfigs()
+                          .withSensorToMechanismRatio(
+                              1
+                                  / ((14.0 / 50.0)
+                                      * (36.0 / 50.0)
+                                      * (2.0 / 1.0)
+                                      * (Math.PI * 1.274)))),
               new TalonFXConfiguration()
-                  .withSlot0(new Slot0Configs().withKP(0.0).withKV(0))
+                  .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast))
+                  .withSlot0(
+                      new Slot0Configs()
+                          .withKP(1.0)
+                          .withKV(0)
+                          .withKG(0.4)
+                          .withGravityType(GravityTypeValue.Elevator_Static))
+                  .withMotionMagic(
+                      new MotionMagicConfigs()
+                          .withMotionMagicAcceleration(250.0)
+                          .withMotionMagicCruiseVelocity(250.0))
                   .withFeedback(
-                      new FeedbackConfigs().withSensorToMechanismRatio(999 * (Math.PI * 999))),
+                      new FeedbackConfigs()
+                          .withSensorToMechanismRatio(
+                              1
+                                  / ((14.0 / 50.0)
+                                      * (36.0 / 50.0)
+                                      * (2.0 / 1.0)
+                                      * (Math.PI * 1.274)))),
               0,
               0,
               0,
-              68,
-              0,
+              58,
               0.25),
           new IntakeConfig(
               RIO_CAN_NAME,
               20,
               21,
-              17,
-              19,
               new Debouncer(0.0, DebounceType.kBoth),
               new Debouncer(0.0, DebounceType.kBoth),
               new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(0))
-                  .withMotorOutput(
-                      new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)),
-              new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(0))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
                   .withMotorOutput(
                       new MotorOutputConfigs()
-                          .withInverted(InvertedValue.CounterClockwise_Positive))),
+                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(NeutralModeValue.Coast)),
+              new TalonFXConfiguration()
+                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                          .withNeutralMode(NeutralModeValue.Coast))),
           new SwerveConfig(
               new PhoenixPIDController(10, 0, 1),
               true,
@@ -105,33 +142,70 @@ class PracticeConfig {
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
-          new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.MADTOWN),
+          new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.HOME),
           new WristConfig(
               RIO_CAN_NAME,
               22,
-              new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(0.0).withKV(0)),
-              0,
-              180,
+              new TalonFXConfiguration()
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withNeutralMode(NeutralModeValue.Brake)
+                          .withInverted(InvertedValue.Clockwise_Positive))
+                  .withSlot0(
+                      new Slot0Configs()
+                          .withKP(100.0)
+                          .withKV(0.0)
+                          .withKD(3.0)
+                          .withKG(0.3)
+                          .withGravityType(GravityTypeValue.Arm_Cosine))
+                  .withMotionMagic(
+                      new MotionMagicConfigs()
+                          .withMotionMagicAcceleration(5)
+                          .withMotionMagicCruiseVelocity(10))
+                  .withFeedback(
+                      new FeedbackConfigs()
+                          .withSensorToMechanismRatio((64 / 8) * (50 / 18) * (36 / 12)))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withSupplyCurrentLimitEnable(true)
+                          .withStatorCurrentLimitEnable(true)
+                          .withSupplyCurrentLimit(25.0)
+                          .withStatorCurrentLimit(40.0)),
+              -85.0,
+              200,
               0,
               0),
-          new PivotConfig(
+          new RollConfig(
               RIO_CAN_NAME,
               23,
               new TalonFXConfiguration()
-                  .withSlot0(new Slot0Configs().withKP(0.0).withKV(0))
+                  .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+                  .withFeedback(
+                      new FeedbackConfigs().withSensorToMechanismRatio((60 / 8) * (60 / 15)))
+                  .withSlot0(new Slot0Configs().withKP(50).withKV(0))
+                  .withVoltage(
+                      new VoltageConfigs().withPeakForwardVoltage(4).withPeakReverseVoltage(-4))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
                           .withStatorCurrentLimit(10)
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(10)),
-              0,
-              0),
+              // TODO: Slides recommend 10A threshold
+              10,
+              101),
           new ClimberConfig(
               CANIVORE_NAME,
               24,
               25,
-              new TalonFXConfiguration(),
+              new TalonFXConfiguration()
+                  .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimitEnable(true)
+                          .withStatorCurrentLimit(10)
+                          .withSupplyCurrentLimitEnable(true)
+                          .withSupplyCurrentLimit(10)),
               new CANcoderConfiguration()
                   .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0))),
           new LightsConfig(RIO_CAN_NAME, 18));
