@@ -90,6 +90,7 @@ class PracticeConfig {
               RIO_CAN_NAME,
               20,
               21,
+              26,
               new Debouncer(0.0, DebounceType.kBoth),
               new Debouncer(0.0, DebounceType.kBoth),
               new TalonFXConfiguration()

@@ -1,7 +1,9 @@
 package frc.robot.intake;
 
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
+import edu.wpi.first.math.filter.Debouncer;
 import frc.robot.config.RobotConfig;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
@@ -9,6 +11,9 @@ import frc.robot.util.state_machines.StateMachine;
 public class IntakeSubsystem extends StateMachine<IntakeState> {
   private final TalonFX topMotor;
   private final TalonFX bottomMotor;
+  private final CANdi candi;
+  private final Debouncer topDebouncer = RobotConfig.get().intake().topDebouncer();
+  private final Debouncer bottomDebouncer = RobotConfig.get().intake().bottomDebouncer();
 
   private boolean topSensorRaw = false;
   private boolean bottomSensorRaw = false;
@@ -18,7 +23,7 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   private boolean bottomMotorGP = false;
   private boolean hasGP = false;
 
-  public IntakeSubsystem(TalonFX topMotor, TalonFX bottomMotor) {
+  public IntakeSubsystem(TalonFX topMotor, TalonFX bottomMotor, CANdi candi) {
 
     super(SubsystemPriority.INTAKE, IntakeState.IDLE_NO_GP);
 
@@ -26,6 +31,7 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     bottomMotor.getConfigurator().apply(RobotConfig.get().intake().bottomMotorConfig());
     this.topMotor = topMotor;
     this.bottomMotor = bottomMotor;
+    this.candi = candi;
   }
 
   @Override
@@ -33,6 +39,11 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     topMotorGP = (topMotor.getStatorCurrent().getValueAsDouble() > 10);
     bottomMotorGP = (bottomMotor.getStatorCurrent().getValueAsDouble() > 10);
     hasGP = topMotorGP || bottomMotorGP;
+
+    topSensorRaw = candi.getS1Closed().getValue();
+    bottomSensorRaw = candi.getS1Closed().getValue();
+    topSensorDebounced = topDebouncer.calculate(topSensorRaw);
+    bottomSensorDebounced = bottomDebouncer.calculate(bottomSensorRaw);
   }
 
   public boolean getTopSensor() {
