@@ -5,8 +5,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.fms.FmsSubsystem;
 
 public class MagnetismUtil {
-  private static final double kP = 2.0;
-  private static final double MAX_ASSIST = 2.0;
+  private static final double kP = 3.0;
+  private static final double MAX_ASSIST = 5.0;
   private static final double MIN_ASSIST = 1.0;
   private static final double ASSIST_RADIUS = 2.0;
 

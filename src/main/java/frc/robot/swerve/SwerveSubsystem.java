@@ -281,7 +281,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/ModuleStates", drivetrainState.ModuleStates);
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
-    DogLog.log("Swerve/MagnetizedSpeeds", magnetizedTeleopSpeeds);
+    DogLog.log("Swerve/TeleopSpeeds", teleopSpeeds);
+    DogLog.log("Swerve/MagnetizedSpeeds", magnetizedTeleopSpeeds.minus(teleopSpeeds));
   }
 
   private void startSimThread() {
