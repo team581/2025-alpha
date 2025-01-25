@@ -111,7 +111,9 @@ class PracticeConfig {
               22,
               new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(0.0).withKV(0)),
               0,
-              180),
+              180,
+              0,
+              0),
           new PivotConfig(
               RIO_CAN_NAME,
               23,

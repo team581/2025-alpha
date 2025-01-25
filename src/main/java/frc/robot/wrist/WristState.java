@@ -4,6 +4,7 @@ public enum WristState {
   STOWED(0.0),
   UNJAM(0.0),
   PRE_MATCH_HOMING(0.0),
+  MID_MATCH_HOMING(0.0),
 
   CORAL_SCORE_LINEUP_L1(0.0),
   CORAL_SCORE_LINEUP_L2(0.0),

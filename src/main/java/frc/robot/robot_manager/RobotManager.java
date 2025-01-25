@@ -607,7 +607,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case REHOME_WRIST -> {
         // TODO: Create wrist rehome state
-        wrist.setState(WristState.STOWED);
+        wrist.setState(WristState.MID_MATCH_HOMING);
         intake.setState(IntakeState.IDLE_NO_GP);
         elevator.setState(ElevatorState.STOWED);
         swerve.setSnapsEnabled(false);

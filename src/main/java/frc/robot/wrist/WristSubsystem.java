@@ -8,12 +8,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.config.RobotConfig;
+import frc.robot.pivot.PivotState;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
 public class WristSubsystem extends StateMachine<WristState> {
   private final TalonFX motor;
   private double motorAngle;
+  private double motorCurrent;
   private double lowestSeenAngle = Double.MAX_VALUE;
   private double highestSeenAngle = Double.MIN_VALUE;
   private double collisionAvoidanceGoal;
@@ -94,11 +96,17 @@ public class WristSubsystem extends StateMachine<WristState> {
       lowestSeenAngle = Math.min(lowestSeenAngle, motorAngle);
       highestSeenAngle = Math.max(highestSeenAngle, motorAngle);
     }
+
+    motorCurrent = motor.getStatorCurrent().getValueAsDouble();
   }
 
   @Override
   protected void afterTransition(WristState newState) {
     switch (newState) {
+      case MID_MATCH_HOMING -> {
+        // TODO: Set homing voltage to like 2ish
+        motor.setVoltage(0);
+      }
       case ALGAE_BACKWARD_NET -> {
         motor.setControl(
             motionMagicRequest.withPosition(
@@ -218,6 +226,20 @@ public class WristSubsystem extends StateMachine<WristState> {
 
       default -> {}
     }
+  }
+  
+
+
+  @Override
+  protected WristState getNextState(WristState currentState) {
+    if (currentState == WristState.MID_MATCH_HOMING
+        && motorCurrent > RobotConfig.get().wrist().homingCurrentThreshold()) {
+      motor.setPosition(RobotConfig.get().wrist().homingPosition());
+      return WristState.STOWED;
+    }
+
+    // Don't do anything
+    return currentState;
   }
 
   private static double clamp(double armAngle) {
