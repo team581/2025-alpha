@@ -8,7 +8,7 @@ public class MagnetismUtil {
   private static final double kP = 2.0;
   private static final double MAX_ASSIST = 2.0;
   private static final double MIN_ASSIST = 1.0;
-  private static final double ASSIST_RADIUS = 1.5;
+  private static final double ASSIST_RADIUS = 2.0;
 
   private static double clamp(double val) {
     return Math.min(Math.max(val, MIN_ASSIST), MAX_ASSIST);
@@ -23,6 +23,10 @@ public class MagnetismUtil {
       i++;
     }
     return reefPipes;
+  }
+
+  private static double nonZeroDivide(double a, double b) {
+    return b == 0 ? 0 : a / b;
   }
 
   public static ChassisSpeeds getMagnetizedChassisSpeeds(
@@ -41,17 +45,17 @@ public class MagnetismUtil {
 
       timesRan += 1.0;
     }
-    double averageHeading =
-        (Math.atan2(
-                    fieldRelativeRobotSpeeds.vxMetersPerSecond,
-                    fieldRelativeRobotSpeeds.vyMetersPerSecond)
-                + (accumulateAngle / timesRan))
-            / 2;
-    double robotVectorMagnitude =
+    if (timesRan == 0.0) {
+      return fieldRelativeRobotSpeeds;
+    }
+    double robotSpeed =
         Math.hypot(
-                fieldRelativeRobotSpeeds.vxMetersPerSecond,
-                fieldRelativeRobotSpeeds.vyMetersPerSecond)
-            * (accumulateMagnitude / timesRan);
+            fieldRelativeRobotSpeeds.vxMetersPerSecond, fieldRelativeRobotSpeeds.vyMetersPerSecond);
+    double averageHeading =
+        Math.signum(fieldRelativeRobotSpeeds.vyMetersPerSecond)
+                * Math.acos(nonZeroDivide(fieldRelativeRobotSpeeds.vxMetersPerSecond, robotSpeed))
+            + (accumulateAngle / timesRan) / 2;
+    double robotVectorMagnitude = robotSpeed * (accumulateMagnitude / timesRan);
 
     return new ChassisSpeeds(
         robotVectorMagnitude * Math.cos(averageHeading),
