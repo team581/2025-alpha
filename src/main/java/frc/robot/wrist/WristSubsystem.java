@@ -76,7 +76,6 @@ public class WristSubsystem extends StateMachine<WristState> {
   protected void afterTransition(WristState newState) {
     switch (newState) {
       case MID_MATCH_HOMING -> {
-        // TODO: Set homing voltage to like 2ish
         motor.setVoltage(-0.5);
       }
       case COLLISION_AVOIDANCE -> {

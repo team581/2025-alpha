@@ -191,7 +191,6 @@ class PracticeConfig {
                           .withStatorCurrentLimit(10)
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(10)),
-              // TODO: Slides recommend 10A threshold
               10,
               101),
           new ClimberConfig(
