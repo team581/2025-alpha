@@ -29,7 +29,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private double collisionAvoidanceGoal;
 
   // Mid-match homing
-  private double highestMotorCurrent;
+  private double averageStatorCurrent;
 
   public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.PRE_MATCH_HOMING);
@@ -63,12 +63,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
         (leftMotor.getPosition().getValueAsDouble() + rightMotor.getPosition().getValueAsDouble())
             / 2.0;
 
-    if (leftMotor.getStatorCurrent().getValueAsDouble()
-        > rightMotor.getStatorCurrent().getValueAsDouble()) {
-      highestMotorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
-    } else {
-      highestMotorCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
-    }
+    averageStatorCurrent = (leftMotor.getStatorCurrent().getValueAsDouble() +  rightMotor.getStatorCurrent().getValueAsDouble()) /2.0;
   }
 
   @Override
@@ -134,7 +129,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   @Override
   protected ElevatorState getNextState(ElevatorState currentState) {
     if (currentState == ElevatorState.MID_MATCH_HOMING
-        && highestMotorCurrent > RobotConfig.get().elevator().homingCurrentThreshold()) {
+        && averageStatorCurrent > RobotConfig.get().elevator().homingCurrentThreshold()) {
       leftMotor.setPosition(RobotConfig.get().elevator().homingEndHeight());
       rightMotor.setPosition(RobotConfig.get().elevator().homingEndHeight());
       return ElevatorState.STOWED;
