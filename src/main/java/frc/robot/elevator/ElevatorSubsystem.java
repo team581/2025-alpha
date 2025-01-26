@@ -83,31 +83,18 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   @Override
   protected void afterTransition(ElevatorState newState) {
     switch (newState) {
-      case CLIMBING,
-          NET,
-          PROCESSOR,
-          ALGAE_DISLODGE_L2,
-          ALGAE_DISLODGE_L3,
-          ALGAE_INTAKE_L2,
-          ALGAE_INTAKE_L3,
-          CORAL_L1_PLACE,
-          CORAL_L2_PLACE,
-          CORAL_L3_PLACE,
-          CORAL_L4_PLACE,
-          GROUND_ALGAE_INTAKE,
-          GROUND_CORAL_INTAKE,
-          STOWED,
-          INTAKING_CORAL_STATION,
-          UNJAM -> {
+      default -> {
         leftMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
         rightMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
       }
       case MID_MATCH_HOMING -> {
-        // TODO: Set homing voltage to like 2ish
         leftMotor.setVoltage(-0.5);
         rightMotor.setVoltage(-0.5);
       }
-      default -> {}
+      case COLLISION_AVOIDANCE -> {
+        leftMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
+        rightMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
+      }
     }
   }
 
@@ -119,6 +106,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
     DogLog.log("Elevator/Left/AppliedVoltage", leftMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Elevator/Right/AppliedVoltage", rightMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Elevator/Height", averageMeasuredHeight);
+    DogLog.log("Elevator/AtGoal", atGoal());
 
     switch (getState()) {
       case PRE_MATCH_HOMING -> {

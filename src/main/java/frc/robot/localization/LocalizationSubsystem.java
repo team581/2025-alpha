@@ -1,5 +1,6 @@
 package frc.robot.localization;
 
+import com.ctre.phoenix6.Utils;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -30,7 +31,6 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   private final ImuSubsystem imu;
   private final VisionSubsystem vision;
   private final SwerveSubsystem swerve;
-  private double lastAddedVisionTimestamp = 0;
   private List<TagResult> latestResult = new ArrayList<>();
 
   public LocalizationSubsystem(ImuSubsystem imu, VisionSubsystem vision, SwerveSubsystem swerve) {
@@ -50,7 +50,8 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   }
 
   public Pose2d getPose(double timestamp) {
-    return swerve.drivetrain.samplePoseAt(timestamp).orElse(getPose());
+    var newTimestamp = Utils.fpgaToCurrentTime(timestamp);
+    return swerve.drivetrain.samplePoseAt(newTimestamp).orElse(getPose());
   }
 
   @Override
@@ -60,17 +61,9 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     for (var results : latestResult) {
       Pose2d visionPose = results.pose();
 
-      double visionTimestamp = results.timestamp();
+      double visionTimestamp = Utils.fpgaToCurrentTime(results.timestamp());
 
-      if (visionTimestamp == lastAddedVisionTimestamp) {
-        // Don't add the same vision pose over and over
-        DogLog.timestamp("Vision/Debug/TimestampEqualToLastAdded");
-
-      } else {
-        DogLog.timestamp("Vision/Debug/AddVisionMeasurement");
-        swerve.drivetrain.addVisionMeasurement(visionPose, visionTimestamp, VISION_STD_DEVS);
-        lastAddedVisionTimestamp = visionTimestamp;
-      }
+      swerve.drivetrain.addVisionMeasurement(visionPose, visionTimestamp, VISION_STD_DEVS);
     }
 
     DogLog.log("Localization/EstimatedPose", getPose());

@@ -1,6 +1,5 @@
 package frc.robot.robot_manager.collision_avoidance;
 
-import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.robot_manager.SuperstructurePosition;
@@ -9,23 +8,25 @@ import java.util.List;
 import java.util.Optional;
 
 public class CollisionAvoidance {
-  private static final double wristLength = 22.0;
+  private static final double wristLength = 19.0;
   private static final SuperstructurePosition safePoint1 = new SuperstructurePosition(0.0, 0.0);
   private static final SuperstructurePosition safePoint2 = new SuperstructurePosition(90.0, 0.0);
 
   // private static final SuperstructurePosition safePoint2 = new SuperstructurePosition(0.0, 0.0);
   private static final SuperstructurePosition[] corners =
       new SuperstructurePosition[] {
-        new SuperstructurePosition(7.4436508139, 135.0),
-        new SuperstructurePosition(65.0, 85.0) // h=22-\sin(a)*22 + 1(for clearence) -> a = 135
+        new SuperstructurePosition(5.7, 135.0),
+        new SuperstructurePosition(57.0, 15.0) // h=22-\sin(a)*22 + 1(for clearence) -> a = 135
       };
 
   public static Optional<SuperstructurePosition> plan(
       SuperstructurePosition current, SuperstructurePosition goal) {
-    var possibleGoalPoints = List.of(goal, safePoint1, safePoint2);
 
-    DogLog.log("CollisionAvoidance/isInBadZone", isInBadZone(current));
-    return getGoalPoint(possibleGoalPoints, current, goal);
+    return Optional.empty();
+    // var possibleGoalPoints = List.of(goal, safePoint1, safePoint2);
+
+    // DogLog.log("CollisionAvoidance/isInBadZone", isInBadZone(current));
+    // return getGoalPoint(possibleGoalPoints, current, goal);
   }
 
   private CollisionAvoidance() {}
