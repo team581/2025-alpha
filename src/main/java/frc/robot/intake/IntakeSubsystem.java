@@ -84,7 +84,6 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
       case INTAKING_CORAL -> {
         topMotor.setVoltage(10.0);
         bottomMotor.setVoltage(10.0);
-
       }
       case SCORE_ALGEA_NET -> {
         topMotor.setVoltage(-1.0);
@@ -95,8 +94,8 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
         bottomMotor.setVoltage(-1.0);
       }
       case SCORE_CORAL -> {
-        topMotor.setVoltage(-1.0);
-        bottomMotor.setVoltage(-1.0);
+        topMotor.setVoltage(-2.0);
+        bottomMotor.setVoltage(-2.0);
       }
       case OUTTAKING -> {
         topMotor.setVoltage(-1.0);
