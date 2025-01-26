@@ -63,7 +63,10 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
         (leftMotor.getPosition().getValueAsDouble() + rightMotor.getPosition().getValueAsDouble())
             / 2.0;
 
-    averageStatorCurrent = (leftMotor.getStatorCurrent().getValueAsDouble() +  rightMotor.getStatorCurrent().getValueAsDouble()) /2.0;
+    averageStatorCurrent =
+        (leftMotor.getStatorCurrent().getValueAsDouble()
+                + rightMotor.getStatorCurrent().getValueAsDouble())
+            / 2.0;
   }
 
   @Override
