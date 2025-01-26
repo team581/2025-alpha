@@ -1,103 +1,99 @@
 package frc.robot.robot_manager.collision_avoidance;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.robot_manager.SuperstructurePosition;
-import java.util.ArrayList;
+import java.util.Optional;
 
 public class CollisionAvoidanceUtils {
-  private static final double wristLength = 1.0;
-  static final Pose2d safePoint1 = new Pose2d();
-  static final Pose2d safePoint2 = new Pose2d();
+  private static final double wristLength = 19.0;
 
-  private static final Pose2d[] corners =
-      new Pose2d[] {
-        new Pose2d(-1, 1, Rotation2d.fromDegrees(0)), new Pose2d(1, 2, Rotation2d.fromDegrees(0))
-      }; // BOTTOM LEFT CORNER IS INDEX 0 and TOP RIGHT CORNER IS INDEX 1
-  private static ArrayList<Pose2d> possibleGoalPoints = new ArrayList<Pose2d>();
-  private static double closestDistance;
-  private static ArrayList<Pose2d> availablePoints = new ArrayList<Pose2d>();
-  private static Pose2d goalPose = new Pose2d();
+  // private static final SuperstructurePosition safePoint2 = new SuperstructurePosition(0.0, 0.0);
 
-  public static boolean collides(Pose2d currentPose, Pose2d goalPose) {
+  public static Optional<SuperstructurePosition> plan(
+      SuperstructurePosition current, SuperstructurePosition goal) {
 
-    double x1 = corners[0].getX();
-    double y1 = corners[0].getY();
-    double y2 = corners[1].getY();
-    double x2 = corners[1].getX();
+    return getGoalPoint(current, goal);
+  }
 
-    double currentPoseX = currentPose.getX();
-    double currentPoseY = currentPose.getY();
-
-    double goalPoseX = goalPose.getX();
-    double goalPoseY = goalPose.getY();
-    // If the points are (x1, y1) and (x2, y2), then the two-point form reads:
-
-    // y - y1 = (y2 - y1)/(x2 - x1) × (x - x1).
-    Pose2d xInterceptionPoint =
-        new Pose2d(
-            x1,
-            (goalPoseY - currentPoseY) / (goalPoseX - currentPoseX) * (x1 - currentPoseX)
-                + currentPoseY,
-            Rotation2d.fromDegrees(0));
-    Pose2d yInterceptionPoint =
-        new Pose2d(
-            y1,
-            (y1 - currentPoseY + currentPoseX)
-                / ((goalPoseY - currentPoseY) / (goalPoseX - currentPoseX)),
-            Rotation2d.fromDegrees(0));
-    Pose2d y2InterceptionPoint =
-        new Pose2d(
-            y2,
-            (y2 - currentPoseY + currentPoseX)
-                / ((goalPoseY - currentPoseY) / (goalPoseX - currentPoseX)),
-            Rotation2d.fromDegrees(0));
-
-    if (y1 < xInterceptionPoint.getY() && xInterceptionPoint.getY() < y2) {
-      return true;
-    }
-    if (x1 < yInterceptionPoint.getY() && yInterceptionPoint.getY() < x2) {
-      return true;
-    }
-    if (x1 < y2InterceptionPoint.getY() && y2InterceptionPoint.getY() < x2) {
+  private static boolean inZone(SuperstructurePosition current, CollisionBoxes collisionBox) {
+    Translation2d translation =
+        angleHeightToTranslation(current.wristAngle(), current.elevatorHeight());
+    Translation2d bottomCorner = collisionBox.box.bottomCorner();
+    Translation2d topCorner = collisionBox.box.topCorner();
+    if (bottomCorner.getX() < translation.getX()
+        && translation.getX() < topCorner.getX()
+        && bottomCorner.getY() < translation.getY()
+        && translation.getY() < topCorner.getY()) {
       return true;
     }
     return false;
   }
 
-  static Pose2d angleHeightToPose(double wristAngle, double elevatorHeight) {
-    return new Pose2d(
-        Math.cos(wristAngle) * wristLength,
-        elevatorHeight + Math.sin(wristAngle) * wristLength,
-        Rotation2d.fromDegrees(0.0));
+  static CollisionBoxes getZone(SuperstructurePosition current) {
+    if (inZone(current, CollisionBoxes.BOX_1)) {
+      return CollisionBoxes.BOX_1;
+    } else if (inZone(current, CollisionBoxes.BOX_2)) {
+      return CollisionBoxes.BOX_2;
+    } else if (inZone(current, CollisionBoxes.BOX_3)) {
+      return CollisionBoxes.BOX_3;
+    } else if (inZone(current, CollisionBoxes.BOX_4)) {
+      return CollisionBoxes.BOX_4;
+    } else if (inZone(current, CollisionBoxes.BOX_5)) {
+      return CollisionBoxes.BOX_5;
+    } else if (inZone(current, CollisionBoxes.BOX_6)) {
+      return CollisionBoxes.BOX_6;
+    } else if (inZone(current, CollisionBoxes.BOX_7)) {
+      return CollisionBoxes.BOX_7;
+    } else {
+      return CollisionBoxes.BAD_BOX;
+    }
   }
 
-  private static SuperstructurePosition poseToSuperstructurePosition(Pose2d pose) {
-    return new SuperstructurePosition(
-        pose.getY() - (Math.sin(Math.cos(pose.getX() / wristLength)) * wristLength),
-        Math.cos(pose.getX() / wristLength));
+  private static CollisionBoxes numToCollisionBoxes(int num) {
+    if (num == 1) {
+      return CollisionBoxes.BOX_1;
+    } else if (num == 2) {
+      return CollisionBoxes.BOX_2;
+    } else if (num == 3) {
+      return CollisionBoxes.BOX_3;
+    } else if (num == 4) {
+      return CollisionBoxes.BOX_4;
+    } else if (num == 5) {
+      return CollisionBoxes.BOX_5;
+    } else if (num == 6) {
+      return CollisionBoxes.BOX_6;
+    } else return CollisionBoxes.BOX_7;
   }
 
-  private static double distancefromPoses(Pose2d currentPose, Pose2d goalPose) {
+  static Translation2d angleHeightToTranslation(double wristAngle, double elevatorHeight) {
+    return new Translation2d(
+        Math.cos(Units.degreesToRadians(wristAngle)) * wristLength,
+        elevatorHeight + Math.sin(Units.degreesToRadians(wristAngle)) * wristLength);
+  }
+
+  static double distancefromTranslations(
+      Translation2d currentTranslation, Translation2d goalTranslation) {
     return Math.sqrt(
-        (currentPose.getX() - goalPose.getX()) + (currentPose.getY() - goalPose.getY()));
+        (Math.pow(goalTranslation.getX() - currentTranslation.getX(), 2))
+            + (Math.pow(goalTranslation.getY() - currentTranslation.getY(), 2)));
   }
 
-  static Pose2d getGoalPoint(ArrayList<Pose2d> possibleGoalPoints, Pose2d currentPose) {
-    for (int i = 0; i < possibleGoalPoints.size(); ) {
-      if (!collides(currentPose, possibleGoalPoints.get(i))) {
-        availablePoints.set(i, possibleGoalPoints.get(i));
-      }
-      i++;
-    }
-    closestDistance = Double.MAX_VALUE;
-    for (int w = 0; w < availablePoints.size(); w++) {
+  private static Optional<SuperstructurePosition> getGoalPoint(
+      SuperstructurePosition currentSuperstructurePosition,
+      SuperstructurePosition goalSuperstructurePosition) {
+    CollisionBoxes currentZone = getZone(currentSuperstructurePosition);
+    CollisionBoxes goalZone = getZone(goalSuperstructurePosition);
 
-      if (distancefromPoses(currentPose, availablePoints.get(w)) < closestDistance) {
-
-        goalPose = availablePoints.get(w);
-      }
+    // if (MathUtil.isNear(goalZone.box.zoneNum(), currentZone.box.zoneNum(), 1)) {
+    //   return Optional.empty();
+    // }
+    if (currentZone.box.zoneNum() < goalZone.box.zoneNum()) {
+      return Optional.of(numToCollisionBoxes(currentZone.box.zoneNum() + 1).box.safeZone());
+    } else if (currentZone.box.zoneNum() > goalZone.box.zoneNum()) {
+      return Optional.of(numToCollisionBoxes(currentZone.box.zoneNum() - 1).box.safeZone());
     }
-    return goalPose;
+
+    return Optional.empty();
   }
 }
