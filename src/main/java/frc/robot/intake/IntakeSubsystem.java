@@ -2,6 +2,8 @@ package frc.robot.intake;
 
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.S1StateValue;
+import com.ctre.phoenix6.signals.S2StateValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
 import frc.robot.config.RobotConfig;
@@ -12,19 +14,16 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   private final TalonFX topMotor;
   private final TalonFX bottomMotor;
   private final CANdi candi;
-  private final Debouncer topDebouncer = RobotConfig.get().intake().topDebouncer();
-  private final Debouncer bottomDebouncer = RobotConfig.get().intake().bottomDebouncer();
+  private final Debouncer rightDebouncer = RobotConfig.get().intake().rightDebouncer();
+  private final Debouncer leftDebouncer = RobotConfig.get().intake().leftDebouncer();
 
-  private boolean topSensorRaw = false;
-  private boolean bottomSensorRaw = false;
-  private boolean topSensorDebounced = false;
-  private boolean bottomSensorDebounced = false;
-  private boolean topMotorGP = false;
-  private boolean bottomMotorGP = false;
+  private boolean rightSensorRaw = false;
+  private boolean leftSensorRaw = false;
+  private boolean rightSensorDebounced = false;
+  private boolean leftSensorDebounced = false;
   private boolean hasGP = false;
 
   public IntakeSubsystem(TalonFX topMotor, TalonFX bottomMotor, CANdi candi) {
-
     super(SubsystemPriority.INTAKE, IntakeState.IDLE_NO_GP);
 
     topMotor.getConfigurator().apply(RobotConfig.get().intake().topMotorConfig());
@@ -36,22 +35,20 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
 
   @Override
   protected void collectInputs() {
-    topMotorGP = (topMotor.getStatorCurrent().getValueAsDouble() > 10);
-    bottomMotorGP = (bottomMotor.getStatorCurrent().getValueAsDouble() > 10);
-    hasGP = topMotorGP || bottomMotorGP;
+    rightSensorRaw = candi.getS1State().getValue() != S1StateValue.High;
+    leftSensorRaw = candi.getS2State().getValue() != S2StateValue.Low;
+    rightSensorDebounced = rightDebouncer.calculate(rightSensorRaw);
+    leftSensorDebounced = leftDebouncer.calculate(leftSensorRaw);
 
-    topSensorRaw = candi.getS1Closed().getValue();
-    bottomSensorRaw = candi.getS1Closed().getValue();
-    topSensorDebounced = topDebouncer.calculate(topSensorRaw);
-    bottomSensorDebounced = bottomDebouncer.calculate(bottomSensorRaw);
+    hasGP = rightSensorDebounced || leftSensorDebounced;
   }
 
-  public boolean getTopSensor() {
-    return topSensorDebounced;
+  public boolean getRightSensor() {
+    return rightSensorDebounced;
   }
 
-  public boolean getBottomSensor() {
-    return bottomSensorDebounced;
+  public boolean getLeftSensor() {
+    return leftSensorDebounced;
   }
 
   public boolean getHasGP() {
@@ -116,10 +113,10 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
         "Intake/BottomMotor/SupplyCurrent", bottomMotor.getSupplyCurrent().getValueAsDouble());
     DogLog.log(
         "Intake/BottomMotor/AppliedVoltage", bottomMotor.getMotorVoltage().getValueAsDouble());
-    DogLog.log("Intake/Sensors/TopSensorRaw", topSensorRaw);
-    DogLog.log("Intake/Sensors/BottomSensorRaw", bottomSensorRaw);
-    DogLog.log("Intake/Sensors/TopSensorDebounced", topSensorDebounced);
-    DogLog.log("Intake/Sensors/BottomSensorDebounced", bottomSensorDebounced);
+    DogLog.log("Intake/Sensors/RightSensorRaw", rightSensorRaw);
+    DogLog.log("Intake/Sensors/LeftSensorRaw", leftSensorRaw);
+    DogLog.log("Intake/Sensors/RightSensorDebounced", rightSensorDebounced);
+    DogLog.log("Intake/Sensors/LeftSensorDebounced", leftSensorDebounced);
     DogLog.log("Intake/HasGP", hasGP);
   }
 }

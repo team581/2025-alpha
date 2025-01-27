@@ -91,8 +91,8 @@ class PracticeConfig {
               20,
               21,
               26,
-              new Debouncer(0.0, DebounceType.kBoth),
-              new Debouncer(0.0, DebounceType.kBoth),
+              new Debouncer(0.1, DebounceType.kBoth),
+              new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
                   .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
                   .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))

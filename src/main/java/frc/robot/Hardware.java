@@ -24,11 +24,12 @@ public class Hardware {
   public final TalonFX intakeBottomMotor =
       new TalonFX(
           RobotConfig.get().intake().bottomMotorID(), RobotConfig.get().intake().canBusName());
-  public final CANdi candi = new CANdi(RobotConfig.get().intake().candiID(), RobotConfig.get().intake().canBusName());
+  public final CANdi candi =
+      new CANdi(RobotConfig.get().intake().candiID(), RobotConfig.get().intake().canBusName());
 
   public final TalonFX wristMotor =
-        new TalonFX(RobotConfig.get().wrist().motorID(), RobotConfig.get().wrist().canBusName());
-  
+      new TalonFX(RobotConfig.get().wrist().motorID(), RobotConfig.get().wrist().canBusName());
+
   public final TalonFX rollMotor =
       new TalonFX(RobotConfig.get().roll().motorID(), RobotConfig.get().roll().canBusName());
 
