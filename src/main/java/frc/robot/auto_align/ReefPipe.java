@@ -57,7 +57,11 @@ public enum ReefPipe {
     this.bluePose = bluePose;
   }
 
+  public Pose2d getPose(boolean isRedAlliance) {
+    return isRedAlliance ? redPose : bluePose;
+  }
+
   public Pose2d getPose() {
-    return (FmsSubsystem.isRedAlliance() ? redPose : bluePose);
+    return getPose(FmsSubsystem.isRedAlliance());
   }
 }

@@ -68,4 +68,9 @@ public class MagnetismUtilTest {
     ChassisSpeeds robotSpeed = new ChassisSpeeds(0.0, 0.0, 0.0);
     Assertions.assertEquals(robotSpeed, getMagnetizedChassisSpeeds(robotSpeed, robot));
   }
+
+  @Test
+  void testSignum() {
+    Assertions.assertEquals(1, Math.signum(0.0));
+  }
 }

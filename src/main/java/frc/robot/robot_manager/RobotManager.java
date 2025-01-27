@@ -20,7 +20,6 @@ import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
 import frc.robot.roll.RollState;
 import frc.robot.roll.RollSubsystem;
 import frc.robot.swerve.SnapUtil;
-import frc.robot.swerve.SwerveState;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
@@ -620,22 +619,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
     // Update snaps
     switch (getState()) {
-      case CORAL_L1_1_APPROACH,
-          CORAL_L1_2_LINEUP,
-          CORAL_L1_3_PLACE,
-          CORAL_L1_4_RELEASE,
-          CORAL_L2_1_APPROACH,
-          CORAL_L2_2_LINEUP,
-          CORAL_L2_3_PLACE,
-          CORAL_L2_4_RELEASE,
-          CORAL_L3_1_APPROACH,
-          CORAL_L3_2_LINEUP,
-          CORAL_L3_3_PLACE,
-          CORAL_L3_4_RELEASE,
-          CORAL_L4_1_APPROACH,
-          CORAL_L4_2_LINEUP,
-          CORAL_L4_3_PLACE,
-          CORAL_L4_4_RELEASE,
+      case
           DISLODGE_ALGAE_L2_WAIT,
           DISLODGE_ALGAE_L3_WAIT,
           DISLODGE_ALGAE_L2_PUSHING,
@@ -643,6 +627,25 @@ public class RobotManager extends StateMachine<RobotState> {
           INTAKE_ALGAE_L2,
           INTAKE_ALGAE_L3 -> {
         swerve.setSnapsEnabled(true);
+        swerve.setSnapToAngle(reefSnapAngle);
+      }
+      case CORAL_L1_1_APPROACH,
+      CORAL_L1_2_LINEUP,
+      CORAL_L1_3_PLACE,
+      CORAL_L1_4_RELEASE,
+      CORAL_L2_1_APPROACH,
+      CORAL_L2_2_LINEUP,
+      CORAL_L2_3_PLACE,
+      CORAL_L2_4_RELEASE,
+      CORAL_L3_1_APPROACH,
+      CORAL_L3_2_LINEUP,
+      CORAL_L3_3_PLACE,
+      CORAL_L3_4_RELEASE,
+      CORAL_L4_1_APPROACH,
+      CORAL_L4_2_LINEUP,
+      CORAL_L4_3_PLACE,
+      CORAL_L4_4_RELEASE -> {
+        swerve.enabledReefMagnetism();
         swerve.setSnapToAngle(reefSnapAngle);
       }
       default -> {}
@@ -691,7 +694,7 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   protected void collectInputs() {
     super.collectInputs();
-    nearestReefSidePose = AutoAlign.getClosestReefSide(localization.getPose());
+    nearestReefSidePose = AutoAlign.getClosestReefSide(localization.getPose()).getPose();
     reefSnapAngle = nearestReefSidePose.getRotation().getDegrees();
   }
 

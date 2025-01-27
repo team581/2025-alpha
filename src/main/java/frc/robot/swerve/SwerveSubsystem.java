@@ -1,7 +1,5 @@
 package frc.robot.swerve;
 
-import java.sql.Driver;
-
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -21,6 +19,7 @@ import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.ControllerHelpers;
+import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
@@ -64,7 +63,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private SwerveDriveState drivetrainState = new SwerveDriveState();
   private ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds();
   private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds magnetizedTeleopSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds magnetizedSpeeds = new ChassisSpeeds();
   private double goalSnapAngle = 0;
 
   /** The latest requested teleop speeds. */
@@ -127,7 +126,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
           DriverStation.isAutonomous()
               ? SwerveState.INTAKE_ASSIST_AUTO
               : SwerveState.INTAKE_ASSIST_TELEOP;
-      case REEF_MAGNETISM_TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.REEF_MAGNETISM_TELEOP;
+      case REEF_MAGNETISM_TELEOP ->
+          DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.REEF_MAGNETISM_TELEOP;
       case AUTO_SNAPS, TELEOP_SNAPS ->
           DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.TELEOP_SNAPS;
     };
@@ -179,7 +179,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     drivetrainState = drivetrain.getState();
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
-    magnetizedTeleopSpeeds = MagnetismUtil.getMagnetizedChassisSpeeds(fieldRelativeSpeeds, getDrivetrainState().Pose);
+    magnetizedSpeeds =
+        MagnetismUtil.getMagnetizedChassisSpeeds(fieldRelativeSpeeds, getDrivetrainState().Pose);
   }
 
   private ChassisSpeeds calculateFieldRelativeSpeeds() {
@@ -215,20 +216,20 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case REEF_MAGNETISM_TELEOP -> {
-        if (magnetizedTeleopSpeeds.omegaRadiansPerSecond == 0) {
+        if (magnetizedSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
-                  .withVelocityX(magnetizedTeleopSpeeds.vxMetersPerSecond)
-                  .withVelocityY(magnetizedTeleopSpeeds.vyMetersPerSecond)
+                  .withVelocityX(magnetizedSpeeds.vxMetersPerSecond)
+                  .withVelocityY(magnetizedSpeeds.vyMetersPerSecond)
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
 
         } else {
           drivetrain.setControl(
               drive
-                  .withVelocityX(magnetizedTeleopSpeeds.vxMetersPerSecond)
-                  .withVelocityY(magnetizedTeleopSpeeds.vyMetersPerSecond)
-                  .withRotationalRate(magnetizedTeleopSpeeds.omegaRadiansPerSecond)
+                  .withVelocityX(magnetizedSpeeds.vxMetersPerSecond)
+                  .withVelocityY(magnetizedSpeeds.vyMetersPerSecond)
+                  .withRotationalRate(magnetizedSpeeds.omegaRadiansPerSecond)
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
@@ -256,12 +257,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   public void enabledReefMagnetism() {
     // Helper function to enable magnetism in teleop, but not during auto
     // Since auto will have its own Trailblazer-y way of doing alignment
-      if (DriverStation.isAutonomous()) {
-        // No magnetism in auto, use regular snaps
-        setSnapsEnabled(true);
-      } else {
-        setStateFromRequest(SwerveState.REEF_MAGNETISM_TELEOP);
-      }
+    if (DriverStation.isAutonomous()) {
+      // No magnetism in auto, use regular snaps
+      setSnapsEnabled(true);
+    } else {
+      setStateFromRequest(SwerveState.REEF_MAGNETISM_TELEOP);
+    }
   }
 
   public void setSnapsEnabled(boolean newValue) {
@@ -282,7 +283,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
     DogLog.log("Swerve/TeleopSpeeds", teleopSpeeds);
-    DogLog.log("Swerve/MagnetizedSpeeds", magnetizedTeleopSpeeds.minus(teleopSpeeds));
+    DogLog.log("Swerve/MagnetizedSpeedsOffset", magnetizedSpeeds.minus(teleopSpeeds));
+    DogLog.log("Swerve/InputVectorAngle", MathHelpers.chassisSpeedsToTranslation2d(teleopSpeeds).getAngle().getDegrees());
+    DogLog.log("Swerve/OutputVectorAngle", MathHelpers.chassisSpeedsToTranslation2d(magnetizedSpeeds).getAngle().getDegrees());
   }
 
   private void startSimThread() {

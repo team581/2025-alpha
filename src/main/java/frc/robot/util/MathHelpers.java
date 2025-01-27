@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class MathHelpers {
   public static double roundTo(double value, double precision) {
@@ -17,6 +18,10 @@ public class MathHelpers {
 
   public static double csc(double radians) {
     return (1 / Math.sin(radians));
+  }
+
+  public static Translation2d chassisSpeedsToTranslation2d(ChassisSpeeds speeds) {
+    return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
   }
 
   private MathHelpers() {}

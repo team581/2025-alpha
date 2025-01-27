@@ -11,8 +11,9 @@ import java.util.Optional;
 
 public class AutoAlign {
   private static final List<ReefSide> ALL_REEF_SIDES = List.of(ReefSide.values());
+  private static final List<ReefPipe> ALL_REEF_PIPES = List.of(ReefPipe.values());
 
-  public static Pose2d getClosestReefSide(Pose2d robotPose, boolean isRedAlliance) {
+  public static ReefSide getClosestReefSide(Pose2d robotPose, boolean isRedAlliance) {
     var reefSide =
         ALL_REEF_SIDES.stream()
             .min(
@@ -25,11 +26,31 @@ public class AutoAlign {
                             .getTranslation()
                             .getDistance(b.getPose(isRedAlliance).getTranslation())))
             .get();
-    return reefSide.getPose(isRedAlliance);
+    return reefSide;
   }
 
-  public static Pose2d getClosestReefSide(Pose2d robotPose) {
+  public static Pose2d getClosestReefPipe(Pose2d robotPose, boolean isRedAlliance) {
+    var reefPipe =
+        ALL_REEF_PIPES.stream()
+            .min(
+                (a, b) ->
+                    Double.compare(
+                        robotPose
+                            .getTranslation()
+                            .getDistance(a.getPose(isRedAlliance).getTranslation()),
+                        robotPose
+                            .getTranslation()
+                            .getDistance(b.getPose(isRedAlliance).getTranslation())))
+            .get();
+    return reefPipe.getPose(isRedAlliance);
+  }
+
+  public static ReefSide getClosestReefSide(Pose2d robotPose) {
     return getClosestReefSide(robotPose, FmsSubsystem.isRedAlliance());
+  }
+
+  public static Pose2d getClosestReefPipe(Pose2d robotPose) {
+    return getClosestReefPipe(robotPose, FmsSubsystem.isRedAlliance());
   }
 
   public static boolean shouldNetScoreForwards(Pose2d robotPose) {
@@ -59,7 +80,7 @@ public class AutoAlign {
       Optional<TagResult> tagResult,
       CameraHealth tagCameraHealth) {
     var reefPose = getClosestReefSide(robotPose);
-    var closeToReefSide = isCloseToReefSide(robotPose, reefPose);
+    var closeToReefSide = isCloseToReefSide(robotPose, reefPose.getPose());
 
     if (closeToReefSide) {
       // We can't trust purple unless we are near the reef, to avoid false positives
