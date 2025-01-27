@@ -24,6 +24,7 @@ public class Limelight extends StateMachine<LimelightState> {
   private final CameraDataset cameraDataset;
 
   private final Timer limelightTimer = new Timer();
+  private final Timer seedIMUTimer = new Timer();
   private CameraHealth cameraHealth = CameraHealth.NO_TARGETS;
   private double limelightHeartbeat = -1;
 
@@ -81,27 +82,23 @@ public class Limelight extends StateMachine<LimelightState> {
 
   private Optional<TagResult> calculateRawTagResult() {
     if (getState() != LimelightState.TAGS && getState() != LimelightState.REEF_TAGS) {
-      DogLog.timestamp("Vision/" + name + "/NotInTagState");
       return Optional.empty();
     }
 
     var estimatePose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightTableName);
 
     if (estimatePose == null) {
-      DogLog.timestamp("Vision/" + name + "/EstimatedPoseNull");
       return Optional.empty();
     }
 
     DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", estimatePose.pose);
 
     if (estimatePose.tagCount == 0) {
-      DogLog.timestamp("Vision/" + name + "/MT2TagCountZero");
       return Optional.empty();
     }
 
     // This prevents pose estimator from having crazy poses if the Limelight loses power
     if (estimatePose.pose.getX() == 0.0 && estimatePose.pose.getY() == 0.0) {
-      DogLog.timestamp("Vision/" + name + "/MT2XYZero");
       return Optional.empty();
     }
 
@@ -181,6 +178,14 @@ public class Limelight extends StateMachine<LimelightState> {
       }
       default -> {}
     }
+
+    LimelightHelpers.SetIMUMode(limelightTableName, seedIMUTimer.hasElapsed(2.0) ? 2 : 1);
+  }
+
+  @Override
+  public void autonomousInit() {
+    seedIMUTimer.reset();
+    seedIMUTimer.start();
   }
 
   private void updateHealth(Optional<?> result) {

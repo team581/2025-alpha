@@ -11,6 +11,9 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
 public class IntakeSubsystem extends StateMachine<IntakeState> {
+  private static final double ALGAE_INTAKE_CURRENT = 20;
+  private static final double CORAL_INTAKE_CURRENT = 20;
+
   private final TalonFX topMotor;
   private final TalonFX bottomMotor;
   private final CANdi candi;
@@ -67,36 +70,36 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
         bottomMotor.disable();
       }
       case IDLE_W_ALGAE -> {
-        topMotor.setVoltage(0.0);
-        bottomMotor.setVoltage(0.0);
+        topMotor.setVoltage(1.5);
+        bottomMotor.setVoltage(1.5);
       }
       case IDLE_W_CORAL -> {
-        topMotor.setVoltage(0.0);
-        bottomMotor.setVoltage(0.0);
+        topMotor.setVoltage(0.25);
+        bottomMotor.setVoltage(0.25);
       }
       case INTAKING_ALGAE -> {
-        topMotor.setVoltage(0.0);
-        bottomMotor.setVoltage(0.0);
+        topMotor.setVoltage(4.0);
+        bottomMotor.setVoltage(4.0);
       }
       case INTAKING_CORAL -> {
-        topMotor.setVoltage(0.0);
-        bottomMotor.setVoltage(0.0);
+        topMotor.setVoltage(10.0);
+        bottomMotor.setVoltage(10.0);
       }
       case SCORE_ALGEA_NET -> {
-        topMotor.setVoltage(-0.0);
-        bottomMotor.setVoltage(-0.0);
+        topMotor.setVoltage(-1.0);
+        bottomMotor.setVoltage(-1.0);
       }
       case SCORE_ALGEA_PROCESSOR -> {
-        topMotor.setVoltage(-0.0);
-        bottomMotor.setVoltage(-0.0);
+        topMotor.setVoltage(-1.0);
+        bottomMotor.setVoltage(-1.0);
       }
       case SCORE_CORAL -> {
-        topMotor.setVoltage(-0.0);
-        bottomMotor.setVoltage(-0.0);
+        topMotor.setVoltage(-2.0);
+        bottomMotor.setVoltage(-2.0);
       }
       case OUTTAKING -> {
-        topMotor.setVoltage(-0.0);
-        bottomMotor.setVoltage(-0.0);
+        topMotor.setVoltage(-1.0);
+        bottomMotor.setVoltage(-1.0);
       }
     }
   }

@@ -11,11 +11,10 @@ import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
 
-public class ThreePiece1EDC extends BaseAuto {
-  private static final AutoConstraintOptions CONSTRAINTS =
-      new AutoConstraintOptions(4.75, 71.5, 8.5, 35.2);
+public class FourPiece1EDC extends BaseAuto {
+  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(1, 50, 4, 30);
 
-  public ThreePiece1EDC(RobotManager robotManager, Trailblazer trailblazer) {
+  public FourPiece1EDC(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
   }
 
@@ -32,7 +31,7 @@ public class ThreePiece1EDC extends BaseAuto {
             () ->
                 robotManager.localization.resetPose(
                     new Pose2d(10.289, 3.047, Rotation2d.fromDegrees(0.0)))),
-        actions.reHomeCommand(),
+        actions.rehomeRollCommand(),
         trailblazer.followSegment(
             new AutoSegment(
                 CONSTRAINTS,
@@ -68,6 +67,17 @@ public class ThreePiece1EDC extends BaseAuto {
         trailblazer.followSegment(
             new AutoSegment(
                 CONSTRAINTS,
-                new AutoPoint(new Pose2d(14.102, 4.789, Rotation2d.fromDegrees(-123.427))))));
+                new AutoPoint(new Pose2d(15.093, 6.079, Rotation2d.fromDegrees(-123.427))),
+                new AutoPoint(new Pose2d(16.292, 7.208, Rotation2d.fromDegrees(-123.819))))),
+        actions.intakeStationCommand(),
+        trailblazer.followSegment(
+            new AutoSegment(
+                CONSTRAINTS,
+                new AutoPoint(new Pose2d(15.295, 5.615, Rotation2d.fromDegrees(0))),
+                new AutoPoint(new Pose2d(14.391, 4.24, Rotation2d.fromDegrees(0))))),
+        Commands.sequence(autoCommands.l4LineupCommand(), actions.confirmScoreCommand()),
+        trailblazer.followSegment(
+            new AutoSegment(
+                CONSTRAINTS, new AutoPoint(new Pose2d(14.391, 4.24, Rotation2d.fromDegrees(0))))));
   }
 }

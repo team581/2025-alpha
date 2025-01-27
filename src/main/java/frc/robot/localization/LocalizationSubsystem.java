@@ -1,5 +1,6 @@
 package frc.robot.localization;
 
+import com.ctre.phoenix6.Utils;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -49,7 +50,8 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   }
 
   public Pose2d getPose(double timestamp) {
-    return swerve.drivetrain.samplePoseAt(timestamp).orElse(getPose());
+    var newTimestamp = Utils.fpgaToCurrentTime(timestamp);
+    return swerve.drivetrain.samplePoseAt(newTimestamp).orElse(getPose());
   }
 
   @Override
@@ -59,9 +61,8 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     for (var results : latestResult) {
       Pose2d visionPose = results.pose();
 
-      double visionTimestamp = results.timestamp();
+      double visionTimestamp = Utils.fpgaToCurrentTime(results.timestamp());
 
-      DogLog.timestamp("Vision/Debug/AddVisionMeasurement");
       swerve.drivetrain.addVisionMeasurement(visionPose, visionTimestamp, VISION_STD_DEVS);
     }
 
