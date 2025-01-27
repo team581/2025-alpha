@@ -39,11 +39,10 @@ public class MagnetismUtil {
     var magnetismWeight = (1 - nonZeroDivide(idealSpeeds.getNorm(), ASSIST_RADIUS));
 
     var unnormalizedTransform =
-            idealSpeeds
-                .times(magnetismWeight)
-                .plus(robotSpeeds.times(1-magnetismWeight));
+        idealSpeeds.times(magnetismWeight).plus(robotSpeeds.times(1 - magnetismWeight));
 
-    var normalizedTransform = new Translation2d(robotSpeeds.getNorm(), unnormalizedTransform.getAngle());
+    var normalizedTransform =
+        new Translation2d(robotSpeeds.getNorm(), unnormalizedTransform.getAngle());
     return new ChassisSpeeds(
         normalizedTransform.getX(),
         normalizedTransform.getY(),

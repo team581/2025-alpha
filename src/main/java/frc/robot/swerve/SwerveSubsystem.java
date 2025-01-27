@@ -284,8 +284,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
     DogLog.log("Swerve/TeleopSpeeds", teleopSpeeds);
     DogLog.log("Swerve/MagnetizedSpeedsOffset", magnetizedSpeeds.minus(teleopSpeeds));
-    DogLog.log("Swerve/InputVectorAngle", MathHelpers.chassisSpeedsToTranslation2d(teleopSpeeds).getAngle().getDegrees());
-    DogLog.log("Swerve/OutputVectorAngle", MathHelpers.chassisSpeedsToTranslation2d(magnetizedSpeeds).getAngle().getDegrees());
+    DogLog.log(
+        "Swerve/InputVectorAngle",
+        MathHelpers.chassisSpeedsToTranslation2d(teleopSpeeds).getAngle().getDegrees());
+    DogLog.log(
+        "Swerve/OutputVectorAngle",
+        MathHelpers.chassisSpeedsToTranslation2d(magnetizedSpeeds).getAngle().getDegrees());
   }
 
   private void startSimThread() {
