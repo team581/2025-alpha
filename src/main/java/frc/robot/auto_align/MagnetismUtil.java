@@ -25,12 +25,10 @@ public class MagnetismUtil {
     return b == 0 ? 0 : a / b;
   }
 
-  public static ChassisSpeeds getMagnetizedChassisSpeeds(
-      ChassisSpeeds fieldRelativeSpeeds, Pose2d robotPose) {
-    var closestReefPipe = robotPose.nearest(AutoAlign.getClosestReefSide(robotPose).getPipes());
-    var robotRelativeToPipe = robotPose.relativeTo(closestReefPipe).getTranslation();
+  public static ChassisSpeeds getMagnetizedChassisSpeeds(ChassisSpeeds fieldRelativeSpeeds, Pose2d robotPose, Pose2d goalPose){
+    var robotRelativeToPipe = robotPose.relativeTo(goalPose).getTranslation();
 
-    if (closestReefPipe.getTranslation().getDistance(robotPose.getTranslation()) > ASSIST_RADIUS) {
+    if (goalPose.getTranslation().getDistance(robotPose.getTranslation()) > ASSIST_RADIUS) {
       return fieldRelativeSpeeds;
     }
     var robotSpeeds = MathHelpers.chassisSpeedsToTranslation2d(fieldRelativeSpeeds);
@@ -47,5 +45,13 @@ public class MagnetismUtil {
         normalizedTransform.getX(),
         normalizedTransform.getY(),
         fieldRelativeSpeeds.omegaRadiansPerSecond);
+  }
+
+  // TODO(Hector): Rename this function to indicate this is used for the reef.
+  // Keeping name to not break current integration.
+  public static ChassisSpeeds getMagnetizedChassisSpeeds(
+      ChassisSpeeds fieldRelativeSpeeds, Pose2d robotPose) {
+    Pose2d closestReefPipe = robotPose.nearest(AutoAlign.getClosestReefSide(robotPose).getPipes());
+    return getMagnetizedChassisSpeeds(fieldRelativeSpeeds, robotPose, closestReefPipe);
   }
 }
