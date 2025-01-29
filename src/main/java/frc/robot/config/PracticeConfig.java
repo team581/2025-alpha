@@ -52,8 +52,8 @@ class PracticeConfig {
                           .withGravityType(GravityTypeValue.Elevator_Static))
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicAcceleration(0.1)
-                          .withMotionMagicCruiseVelocity(0.1))
+                          .withMotionMagicAcceleration(250.0)
+                          .withMotionMagicCruiseVelocity(25))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio(
@@ -72,8 +72,8 @@ class PracticeConfig {
                           .withGravityType(GravityTypeValue.Elevator_Static))
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicAcceleration(0.1)
-                          .withMotionMagicCruiseVelocity(0.1))
+                          .withMotionMagicAcceleration(250)
+                          .withMotionMagicCruiseVelocity(25))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio(
@@ -160,8 +160,8 @@ class PracticeConfig {
                           .withGravityType(GravityTypeValue.Arm_Cosine))
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicAcceleration(0.1)
-                          .withMotionMagicCruiseVelocity(0.1))
+                          .withMotionMagicAcceleration(5)
+                          .withMotionMagicCruiseVelocity(1))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio((64 / 8) * (50 / 18) * (36 / 12)))
