@@ -180,7 +180,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
     magnetizedSpeeds =
-        MagnetismUtil.getMagnetizedChassisSpeeds(fieldRelativeSpeeds, getDrivetrainState().Pose);
+        MagnetismUtil.getReefMagnetizedChassisSpeeds(teleopSpeeds, drivetrainState.Pose);
   }
 
   private ChassisSpeeds calculateFieldRelativeSpeeds() {

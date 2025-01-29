@@ -7,7 +7,7 @@ import frc.robot.fms.FmsSubsystem;
 import frc.robot.util.MathHelpers;
 
 public class MagnetismUtil {
-  private static final double IDEAL_MAGNITUDE = 10.0;
+  private static final double IDEAL_MAGNITUDE = 1.0;
   private static final double ASSIST_RADIUS = 2.0;
 
   private static Pose2d[] getPipePoses() {
@@ -26,30 +26,29 @@ public class MagnetismUtil {
   }
 
   public static ChassisSpeeds getMagnetizedChassisSpeeds(ChassisSpeeds fieldRelativeSpeeds, Pose2d robotPose, Pose2d goalPose){
-    var robotRelativeToPipe = robotPose.relativeTo(goalPose).getTranslation();
+    var robotRelativeToGoal = goalPose.minus(robotPose).getTranslation();
 
-    if (goalPose.getTranslation().getDistance(robotPose.getTranslation()) > ASSIST_RADIUS) {
+    if (robotRelativeToGoal.getNorm() > ASSIST_RADIUS) {
       return fieldRelativeSpeeds;
     }
     var robotSpeeds = MathHelpers.chassisSpeedsToTranslation2d(fieldRelativeSpeeds);
-    var idealSpeeds = new Translation2d(IDEAL_MAGNITUDE, robotRelativeToPipe.getAngle());
+    var idealSpeeds = new Translation2d(IDEAL_MAGNITUDE, robotRelativeToGoal.getAngle());
 
-    var magnetismWeight = (1 - nonZeroDivide(idealSpeeds.getNorm(), ASSIST_RADIUS));
+    var magnetismWeight = (1 - nonZeroDivide(robotRelativeToGoal.getNorm(), ASSIST_RADIUS));
 
     var unnormalizedTransform =
         idealSpeeds.times(magnetismWeight).plus(robotSpeeds.times(1 - magnetismWeight));
 
+        //TODO: maybe not unary minus
     var normalizedTransform =
-        new Translation2d(robotSpeeds.getNorm(), unnormalizedTransform.getAngle());
+        new Translation2d(robotSpeeds.getNorm(), unnormalizedTransform.getAngle()).unaryMinus();
     return new ChassisSpeeds(
         normalizedTransform.getX(),
         normalizedTransform.getY(),
         fieldRelativeSpeeds.omegaRadiansPerSecond);
   }
 
-  // TODO(Hector): Rename this function to indicate this is used for the reef.
-  // Keeping name to not break current integration.
-  public static ChassisSpeeds getMagnetizedChassisSpeeds(
+  public static ChassisSpeeds getReefMagnetizedChassisSpeeds(
       ChassisSpeeds fieldRelativeSpeeds, Pose2d robotPose) {
     Pose2d closestReefPipe = robotPose.nearest(AutoAlign.getClosestReefSide(robotPose).getPipes());
     return getMagnetizedChassisSpeeds(fieldRelativeSpeeds, robotPose, closestReefPipe);
