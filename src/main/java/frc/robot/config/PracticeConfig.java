@@ -86,13 +86,14 @@ class PracticeConfig {
               20,
               0,
               58,
-              0.4),
+              0.5),
           new IntakeConfig(
               RIO_CAN_NAME,
               20,
               21,
-              new Debouncer(0.0, DebounceType.kBoth),
-              new Debouncer(0.0, DebounceType.kBoth),
+              26,
+              new Debouncer(0.1, DebounceType.kBoth),
+              new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
                   .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
                   .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))

@@ -127,14 +127,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     // Ensure that we are in an auto state during auto, and a teleop state during teleop
     return switch (currentState) {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
-      case INTAKE_ASSIST_CORAL_AUTO, INTAKE_ASSIST_CORAL_TELEOP ->
-          DriverStation.isAutonomous()
-              ? SwerveState.INTAKE_ASSIST_CORAL_AUTO
-              : SwerveState.INTAKE_ASSIST_CORAL_TELEOP;
-      case INTAKE_ASSIST_ALGAE_AUTO, INTAKE_ASSIST_ALGAE_TELEOP ->
-          DriverStation.isAutonomous()
-              ? SwerveState.INTAKE_ASSIST_ALGAE_AUTO
-              : SwerveState.INTAKE_ASSIST_ALGAE_TELEOP;
+      case INTAKE_ASSIST_CORAL_TELEOP -> currentState;
+      case INTAKE_ASSIST_ALGAE_TELEOP -> SwerveState.INTAKE_ASSIST_ALGAE_TELEOP;
       case PURPLE_ALIGN -> currentState;
       case SCORE_ASSIST -> currentState;
       case AUTO_SNAPS, TELEOP_SNAPS ->
@@ -252,7 +246,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
               PURPLE_ALIGN,
               SCORE_ASSIST ->
           setStateFromRequest(newValue ? SwerveState.TELEOP_SNAPS : SwerveState.TELEOP);
-      case AUTO, AUTO_SNAPS, INTAKE_ASSIST_CORAL_AUTO, INTAKE_ASSIST_ALGAE_AUTO ->
+      case AUTO, AUTO_SNAPS ->
           setStateFromRequest(newValue ? SwerveState.AUTO_SNAPS : SwerveState.AUTO);
     }
   }
@@ -265,6 +259,19 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/ModuleStates", drivetrainState.ModuleStates);
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
+
+    DogLog.log(
+        "Swerve/OutputVoltageModule0",
+        drivetrain.getModule(0).getDriveMotor().getMotorVoltage().getValueAsDouble());
+    DogLog.log(
+        "Swerve/OutputVoltageModule1",
+        drivetrain.getModule(1).getDriveMotor().getMotorVoltage().getValueAsDouble());
+    DogLog.log(
+        "Swerve/OutputVoltageModule2",
+        drivetrain.getModule(2).getDriveMotor().getMotorVoltage().getValueAsDouble());
+    DogLog.log(
+        "Swerve/OutputVoltageModule3",
+        drivetrain.getModule(3).getDriveMotor().getMotorVoltage().getValueAsDouble());
   }
 
   private void startSimThread() {
