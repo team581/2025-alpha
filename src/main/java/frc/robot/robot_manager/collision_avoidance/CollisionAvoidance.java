@@ -2,7 +2,6 @@ package frc.robot.robot_manager.collision_avoidance;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.robot_manager.BoxZone;
 import frc.robot.robot_manager.SuperstructurePosition;
 import java.util.Optional;
 
@@ -17,22 +16,22 @@ public class CollisionAvoidance {
     return getGoalPoint(current, goal);
   }
 
-  private static boolean inZone(SuperstructurePosition current, CollisionBoxes collisionBox) {
-    BoxZone zone = collisionBox.box;
+  static boolean inZone(SuperstructurePosition current, CollisionBoxes collisionBox) {
     Translation2d translation =
         angleHeightToTranslation(current.wristAngle(), current.elevatorHeight());
-    Translation2d bottomCorner = zone.bottomCorner();
-    Translation2d topCorner = zone.topCorner();
-    if (bottomCorner.getX() < translation.getX()
-        && translation.getX() < topCorner.getX()
-        && bottomCorner.getY() < translation.getY()
-        && translation.getY() < topCorner.getY()) {
+    Translation2d bottomCorner = collisionBox.box.bottomCorner();
+    Translation2d topCorner = collisionBox.box.topCorner();
+    if (bottomCorner.getX() <= translation.getX()
+        && translation.getX() <= topCorner.getX()
+        && bottomCorner.getY() <= translation.getY()
+        && translation.getY() <= topCorner.getY()) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
-  private static CollisionBoxes getZone(SuperstructurePosition current) {
+  static CollisionBoxes getZone(SuperstructurePosition current) {
     if (inZone(current, CollisionBoxes.BOX_1)) {
       return CollisionBoxes.BOX_1;
     } else if (inZone(current, CollisionBoxes.BOX_2)) {
@@ -68,6 +67,19 @@ public class CollisionAvoidance {
     } else return CollisionBoxes.BOX_7;
   }
 
+  private static int collisionBoxToNum(CollisionBoxes zone) {
+    return switch (zone) {
+      case BOX_1 -> 1;
+      case BOX_2 -> 2;
+      case BOX_3 -> 3;
+      case BOX_4 -> 4;
+      case BOX_5 -> 5;
+      case BOX_6 -> 6;
+      case BOX_7 -> 7;
+      case BAD_BOX -> 99;
+    };
+  }
+
   static Translation2d angleHeightToTranslation(double wristAngle, double elevatorHeight) {
     return new Translation2d(
         Math.cos(Units.degreesToRadians(wristAngle)) * wristLength,
@@ -83,10 +95,10 @@ public class CollisionAvoidance {
     // if (MathUtil.isNear(goalZone.box.zoneNum(), currentZone.box.zoneNum(), 1)) {
     //   return Optional.empty();
     // }
-    if (currentZone.box.zoneNum() < goalZone.box.zoneNum()) {
-      return Optional.of(numToCollisionBoxes(currentZone.box.zoneNum() + 1).box.safeZone());
-    } else if (currentZone.box.zoneNum() > goalZone.box.zoneNum()) {
-      return Optional.of(numToCollisionBoxes(currentZone.box.zoneNum() - 1).box.safeZone());
+    if (collisionBoxToNum(currentZone) < collisionBoxToNum(goalZone)) {
+      return Optional.of(numToCollisionBoxes(collisionBoxToNum(currentZone) + 1).box.safeZone());
+    } else if (collisionBoxToNum(currentZone) > collisionBoxToNum(goalZone)) {
+      return Optional.of(numToCollisionBoxes(collisionBoxToNum(currentZone) - 1).box.safeZone());
     }
 
     return Optional.empty();

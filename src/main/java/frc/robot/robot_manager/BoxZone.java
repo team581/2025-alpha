@@ -5,10 +5,7 @@ import frc.robot.util.MathHelpers;
 import java.util.Objects;
 
 public record BoxZone(
-    int zoneNum,
-    Translation2d bottomCorner,
-    Translation2d topCorner,
-    SuperstructurePosition safeZone) {
+    Translation2d bottomCorner, Translation2d topCorner, SuperstructurePosition safeZone) {
   // Elevator heights are accurate to 0.1 inches
   private static final double ELEVATOR_PRECISION = 0.1;
   // Wrist angles are accurate to 0.1 degrees
