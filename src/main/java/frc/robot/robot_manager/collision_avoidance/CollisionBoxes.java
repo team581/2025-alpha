@@ -23,7 +23,7 @@ public enum CollisionBoxes {
           new Translation2d(1, 0), new Translation2d(20, 20), new SuperstructurePosition(0, 0))),
   BOX_5(
       new BoxZone( // middle left zone
-          new Translation2d(1, 20), new Translation2d(20, 45), new SuperstructurePosition(30, 45))),
+          new Translation2d(1, 20), new Translation2d(20, 45), new SuperstructurePosition(30, 0))),
   BOX_6(
       new BoxZone( // top left zone
           new Translation2d(0, 45), new Translation2d(20, 86), new SuperstructurePosition(67, 45))),
@@ -31,14 +31,7 @@ public enum CollisionBoxes {
       new BoxZone( // top right zone
           new Translation2d(-20, 67),
           new Translation2d(0, 86),
-          new SuperstructurePosition(67, 180))),
-  BAD_BOX(
-      new BoxZone(
-          new Translation2d(),
-          new Translation2d(),
-          new SuperstructurePosition(999, 999) // TODO: fix
-          ));
-
+          new SuperstructurePosition(67, 135)));
   public final BoxZone box;
 
   private CollisionBoxes(BoxZone box) {

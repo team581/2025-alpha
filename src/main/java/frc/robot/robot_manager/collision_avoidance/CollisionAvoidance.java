@@ -47,7 +47,7 @@ public class CollisionAvoidance {
     } else if (inZone(current, CollisionBoxes.BOX_7)) {
       return CollisionBoxes.BOX_7;
     } else {
-      return CollisionBoxes.BAD_BOX;
+      return null;
     }
   }
 
@@ -76,7 +76,6 @@ public class CollisionAvoidance {
       case BOX_5 -> 5;
       case BOX_6 -> 6;
       case BOX_7 -> 7;
-      case BAD_BOX -> 99;
     };
   }
 
