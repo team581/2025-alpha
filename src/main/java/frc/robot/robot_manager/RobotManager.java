@@ -659,7 +659,6 @@ public class RobotManager extends StateMachine<RobotState> {
         lights.setState(LightsState.PLACEHOLDER);
         climber.setState(ClimberState.STOWED);
       }
-
     }
   }
 
