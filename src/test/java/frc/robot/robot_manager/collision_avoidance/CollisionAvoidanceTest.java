@@ -25,7 +25,13 @@ public class CollisionAvoidanceTest {
     var expectedResult = true;
     assertEquals(expectedResult, result);
   }
-
+  @Test
+  void testGetZoneOutofBounds() {
+    SuperstructurePosition current = new SuperstructurePosition(100, 45);
+    var result = CollisionAvoidanceUtils.getZone(current);
+    var expectedResult = CollisionBoxes.BOX_6;
+    assertEquals(expectedResult, result);
+  }
   @Test
   void testGetZone1() {
     SuperstructurePosition current = new SuperstructurePosition(25, 180);

@@ -32,6 +32,8 @@ public class CollisionAvoidance {
   }
 
   static CollisionBoxes getZone(SuperstructurePosition current) {
+    CollisionBoxes closestBox = CollisionBoxes.BOX_3;
+    double closestDistance = Double.MAX_VALUE;
     if (inZone(current, CollisionBoxes.BOX_1)) {
       return CollisionBoxes.BOX_1;
     } else if (inZone(current, CollisionBoxes.BOX_2)) {
@@ -47,7 +49,24 @@ public class CollisionAvoidance {
     } else if (inZone(current, CollisionBoxes.BOX_7)) {
       return CollisionBoxes.BOX_7;
     } else {
-      return null;
+      for (int i = 0; i < 7; ) {
+        if (closestDistance
+            > distancefromTranslations(
+                angleHeightToTranslation(current.wristAngle(), current.elevatorHeight()),
+                angleHeightToTranslation(
+                    numToCollisionBoxes(i).box.safeZone().wristAngle(),
+                    numToCollisionBoxes(i).box.safeZone().elevatorHeight()))) {
+          closestBox = numToCollisionBoxes(i);
+          closestDistance =
+              distancefromTranslations(
+                  angleHeightToTranslation(current.wristAngle(), current.elevatorHeight()),
+                  angleHeightToTranslation(
+                      numToCollisionBoxes(i).box.safeZone().wristAngle(),
+                      numToCollisionBoxes(i).box.safeZone().elevatorHeight()));
+        }
+        i++;
+      }
+      return closestBox;
     }
   }
 
@@ -77,6 +96,13 @@ public class CollisionAvoidance {
       case BOX_6 -> 6;
       case BOX_7 -> 7;
     };
+  }
+
+  static double distancefromTranslations(
+      Translation2d currentTranslation, Translation2d goalTranslation) {
+    return Math.sqrt(
+        (Math.pow(goalTranslation.getX() - currentTranslation.getX(), 2))
+            + (Math.pow(goalTranslation.getY() - currentTranslation.getY(), 2)));
   }
 
   static Translation2d angleHeightToTranslation(double wristAngle, double elevatorHeight) {
