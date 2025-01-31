@@ -63,14 +63,15 @@ public class Robot extends TimedRobot {
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
   private final RumbleControllerSubsystem rumbleController =
-      new RumbleControllerSubsystem(hardware.driverController, false);
+      new RumbleControllerSubsystem(hardware.driverController, true);
 
   private final IntakeSubsystem intake =
       new IntakeSubsystem(hardware.intakeTopMotor, hardware.intakeBottomMotor, hardware.candi);
 
   private final WristSubsystem wrist = new WristSubsystem(hardware.wristMotor);
   private final RollSubsystem roll = new RollSubsystem(hardware.rollMotor, intake);
-  private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
+  private final LightsSubsystem lights =
+      new LightsSubsystem(hardware.candle, elevatorPurpleLimelight);
   private final ClimberSubsystem climber =
       new ClimberSubsystem(hardware.climberMotor, hardware.climberCANcoder);
   private final RobotManager robotManager =
@@ -88,7 +89,8 @@ public class Robot extends TimedRobot {
           backTagLimelight,
           lights,
           purple,
-          climber);
+          climber,
+          rumbleController);
 
   private final RobotCommands robotCommands = new RobotCommands(robotManager);
 
