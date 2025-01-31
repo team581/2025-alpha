@@ -66,8 +66,6 @@ public class CollisionAvoidanceTest {
     assertEquals(expectedResult, result);
   }
 
-
-
   @Test
   void testGetZone6() {
     SuperstructurePosition current = new SuperstructurePosition(67, 45);
@@ -93,8 +91,6 @@ public class CollisionAvoidanceTest {
 
     assertEquals(expectedResult, result.get());
   }
-
-
 
   @Test
   void testPlanNoCollisionsHigh() {

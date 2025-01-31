@@ -17,12 +17,8 @@ public class CollisionAvoidance {
     if (goalPoint.isPresent()) {
       DogLog.log("CollisionAvoidance/NextMovePresent", true);
 
-      DogLog.log(
-          "CollisionAvoidance/NextMove/elevatorHeight",
-          goalPoint.get().elevatorHeight());
-      DogLog.log(
-          "CollisionAvoidance/NextMove/wristAngle",
-          goalPoint.get().wristAngle());
+      DogLog.log("CollisionAvoidance/NextMove/elevatorHeight", goalPoint.get().elevatorHeight());
+      DogLog.log("CollisionAvoidance/NextMove/wristAngle", goalPoint.get().wristAngle());
     }
     DogLog.log("CollisionAvoidance/NextMovePresent", false);
     return goalPoint;
@@ -93,7 +89,7 @@ public class CollisionAvoidance {
       return CollisionBoxes.BOX_4;
     } else if (num == 5) {
       return CollisionBoxes.BOX_5;
-    } else  {
+    } else {
       return CollisionBoxes.BOX_6;
     }
   }
