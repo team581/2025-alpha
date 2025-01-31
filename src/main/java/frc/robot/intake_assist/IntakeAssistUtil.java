@@ -11,32 +11,23 @@ public class IntakeAssistUtil {
   private static final double ALGAE_ASSIST_KP = 0.1;
 
   public static ChassisSpeeds getCoralAssistSpeeds(
-      Optional<GamePieceResult> coral,
-      double robotHeading,
-      ChassisSpeeds fieldRelativeInputSpeeds) {
-    return getRobotRelativeAssistSpeeds(
-        coral, robotHeading, fieldRelativeInputSpeeds, CORAL_ASSIST_KP);
+      Optional<GamePieceResult> coral, double robotHeading) {
+    return getRobotRelativeAssistSpeeds(coral, robotHeading, CORAL_ASSIST_KP);
   }
 
   public static ChassisSpeeds getAlgaeAssistSpeeds(
-      Optional<GamePieceResult> algae,
-      double robotHeading,
-      ChassisSpeeds fieldRelativeInputSpeeds) {
-    return getRobotRelativeAssistSpeeds(
-        algae, robotHeading, fieldRelativeInputSpeeds, ALGAE_ASSIST_KP);
+      Optional<GamePieceResult> algae, double robotHeading) {
+    return getRobotRelativeAssistSpeeds(algae, robotHeading, ALGAE_ASSIST_KP);
   }
 
   private static ChassisSpeeds getRobotRelativeAssistSpeeds(
-      Optional<GamePieceResult> visionResult,
-      double robotHeading,
-      ChassisSpeeds fieldRelativeInputSpeeds,
-      double kP) {
+      Optional<GamePieceResult> visionResult, double robotHeading, double kP) {
     if (visionResult.isEmpty()) {
-      return fieldRelativeInputSpeeds;
+      return new ChassisSpeeds();
     }
 
     var gamePiecePoseRobotRelative =
-        GamePieceDetectionUtil.calculateRobotRelativeTranslationFromCamera(visionResult.get());
+        GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get());
     var gamePiecePoseRotatedRobot =
         gamePiecePoseRobotRelative.rotateBy(Rotation2d.fromDegrees(robotHeading));
     var xError = gamePiecePoseRotatedRobot.getX();
@@ -45,9 +36,6 @@ public class IntakeAssistUtil {
     var xEffort = xError * kP;
     var yEffort = yError * kP;
 
-    return new ChassisSpeeds(
-        fieldRelativeInputSpeeds.vxMetersPerSecond + xEffort,
-        fieldRelativeInputSpeeds.vyMetersPerSecond + yEffort,
-        fieldRelativeInputSpeeds.omegaRadiansPerSecond);
+    return new ChassisSpeeds(xEffort, yEffort, 0.0);
   }
 }

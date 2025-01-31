@@ -75,6 +75,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
 
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds assistSpeedsOffset = new ChassisSpeeds();
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return robotRelativeSpeeds;
@@ -116,6 +117,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     sendSwerveRequest();
   }
 
+  public void setAssistSpeedsOffset(ChassisSpeeds speedsOffset) {
+    assistSpeedsOffset = speedsOffset;
+  }
+
   public void setRobotRelativeAutoSpeeds(ChassisSpeeds speeds) {
     setFieldRelativeAutoSpeeds(
         ChassisSpeeds.fromRobotRelativeSpeeds(
@@ -127,8 +132,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     // Ensure that we are in an auto state during auto, and a teleop state during teleop
     return switch (currentState) {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
-      case INTAKE_ASSIST_CORAL_TELEOP -> currentState;
-      case INTAKE_ASSIST_ALGAE_TELEOP -> SwerveState.INTAKE_ASSIST_ALGAE_TELEOP;
+      case INTAKE_ASSIST_CORAL_TELEOP, INTAKE_ASSIST_ALGAE_TELEOP ->
+          DriverStation.isAutonomous() ? SwerveState.AUTO : currentState;
       case PURPLE_ALIGN -> currentState;
       case SCORE_ASSIST -> currentState;
       case AUTO_SNAPS, TELEOP_SNAPS ->
@@ -216,6 +221,16 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
+      case INTAKE_ASSIST_CORAL_TELEOP -> {
+        drivetrain.setControl(
+            drive
+                .withVelocityX(
+                    teleopSpeeds.vxMetersPerSecond + assistSpeedsOffset.vxMetersPerSecond)
+                .withVelocityY(
+                    teleopSpeeds.vyMetersPerSecond + assistSpeedsOffset.vyMetersPerSecond)
+                .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+                .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+      }
       case AUTO ->
           drivetrain.setControl(
               drive
@@ -235,6 +250,15 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setState(SwerveState newState) {
     setStateFromRequest(newState);
+  }
+
+  public void activateCoralIntakeAssist() {
+    // Intake assist is only during teleop, otherwise just do auto driving
+    if (DriverStation.isTeleop()) {
+      setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
+    } else {
+      setState(SwerveState.AUTO);
+    }
   }
 
   public void setSnapsEnabled(boolean newValue) {

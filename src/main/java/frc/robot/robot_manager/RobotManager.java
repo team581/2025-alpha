@@ -2,6 +2,7 @@ package frc.robot.robot_manager;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.ReefAlignState;
@@ -13,6 +14,7 @@ import frc.robot.elevator.ElevatorSubsystem;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeState;
 import frc.robot.intake.IntakeSubsystem;
+import frc.robot.intake_assist.IntakeAssistUtil;
 import frc.robot.lights.LightsState;
 import frc.robot.lights.LightsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
@@ -327,6 +329,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
         swerve.setSnapsEnabled(false);
         swerve.setSnapToAngle(0);
+        swerve.activateCoralIntakeAssist();
         roll.setState(RollState.STOWED);
         frontCoralLimelight.setState(LimelightState.CORAL);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
@@ -339,6 +342,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
         swerve.setSnapsEnabled(false);
         swerve.setSnapToAngle(0);
+        swerve.activateCoralIntakeAssist();
         roll.setState(RollState.INTAKING_CORAL_HORIZONTAL);
         frontCoralLimelight.setState(LimelightState.CORAL);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
@@ -844,6 +848,16 @@ public class RobotManager extends StateMachine<RobotState> {
     super.collectInputs();
     nearestReefSidePose = AutoAlign.getClosestReefSide(localization.getPose());
     reefSnapAngle = nearestReefSidePose.getRotation().getDegrees();
+
+    if (getState() == RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL
+        || getState() == RobotState.INTAKE_CORAL_FLOOR_UPRIGHT) {
+      ChassisSpeeds coralAssistSpeeds =
+          IntakeAssistUtil.getCoralAssistSpeeds(
+              frontCoralLimelight.getCoralResult(), imu.getRobotHeading());
+      DogLog.log("IntakeAssist/XSpeeds", coralAssistSpeeds.vxMetersPerSecond);
+      DogLog.log("IntakeAssist/YSpeeds", coralAssistSpeeds.vyMetersPerSecond);
+      swerve.setAssistSpeedsOffset(coralAssistSpeeds);
+    }
   }
 
   private boolean cameraOnlineAndFarEnoughFromReef() {
