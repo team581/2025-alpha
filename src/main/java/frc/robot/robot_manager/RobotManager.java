@@ -318,7 +318,8 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_CORAL_STATION_BACK -> {
         intake.setState(IntakeState.INTAKING_CORAL);
-        moveSuperstructure(ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
+        moveSuperstructure(
+            ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
         roll.setState(RollState.STOWED);
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
@@ -330,7 +331,8 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_CORAL_STATION_FRONT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
-        moveSuperstructure(ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
+        moveSuperstructure(
+            ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
         roll.setState(RollState.STOWED);
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
@@ -1161,7 +1163,7 @@ public class RobotManager extends StateMachine<RobotState> {
           INTAKE_CORAL_FLOOR_HORIZONTAL,
           INTAKE_CORAL_FLOOR_UPRIGHT,
           INTAKE_CORAL_STATION_BACK,
-          INTAKE_CORAL_STATION_FRONT-> {}
+          INTAKE_CORAL_STATION_FRONT -> {}
 
       case IDLE_ALGAE -> setStateFromRequest(RobotState.PROCESSOR_WAITING);
       case PROCESSOR_WAITING -> setStateFromRequest(RobotState.PROCESSOR_PREPARE_TO_SCORE);
