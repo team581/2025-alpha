@@ -92,10 +92,10 @@ public class CollisionAvoidance {
     } else if (num == 4) {
       return CollisionBoxes.BOX_4;
     } else if (num == 5) {
-      return CollisionBoxes.BOX_4;
-    } else if (num == 6) {
       return CollisionBoxes.BOX_5;
-    } else return CollisionBoxes.BOX_6;
+    } else  {
+      return CollisionBoxes.BOX_6;
+    }
   }
 
   private static int collisionBoxToNum(CollisionBoxes zone) {
