@@ -13,16 +13,17 @@ public class CollisionAvoidance {
 
   public static Optional<SuperstructurePosition> plan(
       SuperstructurePosition current, SuperstructurePosition goal) {
-    if (getGoalPoint(current, goal).isPresent()) {
+    var goalPoint = getGoalPoint(current, goal);
+    if (goalPoint.isPresent()) {
       DogLog.log(
           "CollisionAvoidance/NextMove/elevatorHeight",
-          getGoalPoint(current, goal).get().elevatorHeight());
+          goalPoint.get().elevatorHeight());
       DogLog.log(
-          "CollisionAvoidance/NextMove/elevatorHeight",
-          getGoalPoint(current, goal).get().wristAngle());
+          "CollisionAvoidance/NextMove/wristAngle",
+          goalPoint.get().wristAngle());
     }
 
-    return getGoalPoint(current, goal);
+    return goalPoint;
   }
 
   static boolean inZone(SuperstructurePosition current, CollisionBoxes collisionBox) {
@@ -129,6 +130,8 @@ public class CollisionAvoidance {
     // if (MathUtil.isNear(goalZone.box.zoneNum(), currentZone.box.zoneNum(), 1)) {
     //   return Optional.empty();
     // }
+    DogLog.log("CollisionAvoidance/currentZone", currentZone);
+    DogLog.log("CollisionAvoidance/goalZone", goalZone);
     if (collisionBoxToNum(currentZone) < collisionBoxToNum(goalZone)) {
       return Optional.of(numToCollisionBoxes(collisionBoxToNum(currentZone) + 1).box.safeZone());
     } else if (collisionBoxToNum(currentZone) > collisionBoxToNum(goalZone)) {
