@@ -667,6 +667,7 @@ public class RobotManager extends StateMachine<RobotState> {
     super.robotPeriodic();
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSidePose);
 
+    moveSuperstructure(latestElevatorGoal, latestWristGoal);
     // Continuous state actions
 
     // Update snaps
@@ -737,9 +738,9 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     // Superstructure collision avoidance logging
-    var currentSuperstructurePosition =
-        new SuperstructurePosition(elevator.getHeight(), wrist.getAngle());
-    CollisionAvoidance.plan(currentSuperstructurePosition, new SuperstructurePosition(54, 91));
+    // var currentSuperstructurePosition =
+    //     new SuperstructurePosition(elevator.getHeight(), wrist.getAngle());
+    // CollisionAvoidance.plan(currentSuperstructurePosition, new SuperstructurePosition(54, 91));
   }
 
   @Override
@@ -1117,7 +1118,13 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
+  private ElevatorState latestElevatorGoal = ElevatorState.STOWED;
+  private WristState latestWristGoal = WristState.PRE_MATCH_HOMING;
+
   private void moveSuperstructure(ElevatorState elevatorGoal, WristState wristGoal) {
+    latestElevatorGoal = elevatorGoal;
+    latestWristGoal = wristGoal;
+
     var maybeIntermediaryPosition =
         CollisionAvoidance.plan(
             new SuperstructurePosition(elevator.getHeight(), wrist.getAngle()),

@@ -17,7 +17,7 @@ public enum CollisionBoxes {
           new SuperstructurePosition(0, 180))), // 0 and angle of station intake
   BOX_3(
       new BoxZone( // middle to the left
-          new Translation2d(-1, 0), new Translation2d(20, 30), new SuperstructurePosition(0, 90))),
+          new Translation2d(-1, 0), new Translation2d(20, 20), new SuperstructurePosition(0, 45))),
 
   BOX_4(
       new BoxZone( // middle left zone

@@ -53,7 +53,7 @@ class PracticeConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicAcceleration(250.0)
-                          .withMotionMagicCruiseVelocity(25))
+                          .withMotionMagicCruiseVelocity(250.0))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio(
@@ -73,7 +73,7 @@ class PracticeConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicAcceleration(250)
-                          .withMotionMagicCruiseVelocity(25))
+                          .withMotionMagicCruiseVelocity(250.0))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio(
@@ -162,7 +162,7 @@ class PracticeConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicAcceleration(5)
-                          .withMotionMagicCruiseVelocity(1))
+                          .withMotionMagicCruiseVelocity(10.0))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio((64 / 8) * (50 / 18) * (36 / 12)))
