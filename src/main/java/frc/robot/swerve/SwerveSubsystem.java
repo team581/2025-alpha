@@ -229,6 +229,16 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
+      case INTAKE_ASSIST_CORAL_TELEOP -> {
+        drivetrain.setControl(
+            drive
+                .withVelocityX(
+                    teleopSpeeds.vxMetersPerSecond + assistSpeedsOffset.vxMetersPerSecond)
+                .withVelocityY(
+                    teleopSpeeds.vyMetersPerSecond + assistSpeedsOffset.vyMetersPerSecond)
+                .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+                .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+      }
       case REEF_MAGNETISM_TELEOP -> {
         if (magnetizedSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
@@ -276,6 +286,15 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setState(SwerveState newState) {
     setStateFromRequest(newState);
+  }
+
+  public void activateCoralIntakeAssist() {
+    // Intake assist is only during teleop, otherwise just do auto driving
+    if (DriverStation.isTeleop()) {
+      setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
+    } else {
+      setState(SwerveState.AUTO);
+    }
   }
 
   public void enabledReefMagnetism() {
