@@ -219,18 +219,8 @@ public class RobotManager extends StateMachine<RobotState> {
         yield currentState;
       }
 
-      case INTAKE_CORAL_STATION ->
-          intake.getHasGP() ? RobotState.AFTER_INTAKE_CORAL_STATION : currentState;
-      case NET_BACK_SCORING -> intake.getHasGP() ? currentState : RobotState.AFTER_NET_BACK_WAITING;
-      case PRE_INTAKE_CORAL_STATION ->
-          wrist.atGoal() && elevator.atGoal() ? RobotState.INTAKE_CORAL_STATION : currentState;
-      case PRE_NET_BACK_WAITING ->
-          wrist.atGoal() && elevator.atGoal() ? RobotState.NET_BACK_WAITING : currentState;
-
-      case AFTER_INTAKE_CORAL_STATION ->
-          wrist.atGoal() && elevator.atGoal() ? RobotState.IDLE_CORAL : currentState;
-      case AFTER_NET_BACK_WAITING ->
-          wrist.atGoal() && elevator.atGoal() ? RobotState.IDLE_NO_GP : currentState;
+      case INTAKE_CORAL_STATION -> intake.getHasGP() ? RobotState.IDLE_CORAL : currentState;
+      case NET_BACK_SCORING -> intake.getHasGP() ? currentState : RobotState.IDLE_NO_GP;
     };
   }
 
@@ -703,63 +693,6 @@ public class RobotManager extends StateMachine<RobotState> {
         lights.setState(LightsState.PLACEHOLDER);
         climber.setState(ClimberState.STOWED);
       }
-      case PRE_INTAKE_CORAL_STATION -> {
-        intake.setState(IntakeState.INTAKING_CORAL);
-        elevator.setState(ElevatorState.PRE_INTAKE_CORAL_STATION);
-        wrist.setState(WristState.PRE_INTAKE_CORAL_STATION);
-        roll.setState(RollState.STOWED);
-        swerve.setSnapsEnabled(true);
-        swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
-        frontCoralLimelight.setState(LimelightState.TAGS);
-        elevatorPurpleLimelight.setState(LimelightState.PURPLE);
-        backTagLimelight.setState(LimelightState.TAGS);
-        lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
-        climber.setState(ClimberState.STOWED);
-      }
-      case PRE_NET_BACK_WAITING -> {
-        intake.setState(IntakeState.IDLE_W_ALGAE);
-        elevator.setState(ElevatorState.NET);
-        wrist.setState(WristState.STOWED);
-        elevator.setState(ElevatorState.NET);
-        wrist.setState(WristState.STOWED);
-
-        swerve.setSnapsEnabled(true);
-        swerve.setSnapToAngle(SnapUtil.getBackwardNetDirection());
-        roll.setState(RollState.STOWED);
-        elevatorPurpleLimelight.setState(LimelightState.PURPLE);
-        frontCoralLimelight.setState(LimelightState.TAGS);
-        backTagLimelight.setState(LimelightState.TAGS);
-        lights.setState(getLightStateForScoring());
-        climber.setState(ClimberState.STOWED);
-      }
-      case AFTER_INTAKE_CORAL_STATION -> {
-        intake.setState(IntakeState.IDLE_W_CORAL);
-        elevator.setState(ElevatorState.PRE_INTAKE_CORAL_STATION);
-        wrist.setState(WristState.PRE_INTAKE_CORAL_STATION);
-        roll.setState(RollState.STOWED);
-        swerve.setSnapsEnabled(true);
-        swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
-        frontCoralLimelight.setState(LimelightState.TAGS);
-        elevatorPurpleLimelight.setState(LimelightState.PURPLE);
-        backTagLimelight.setState(LimelightState.TAGS);
-        lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
-        climber.setState(ClimberState.STOWED);
-        rumbleController.rumbleRequest();
-      }
-      case AFTER_NET_BACK_WAITING -> {
-        intake.setState(IntakeState.IDLE_NO_GP);
-        elevator.setState(ElevatorState.NET);
-        wrist.setState(WristState.STOWED);
-        swerve.setSnapsEnabled(true);
-        swerve.setSnapToAngle(SnapUtil.getBackwardNetDirection());
-        roll.setState(RollState.STOWED);
-        elevatorPurpleLimelight.setState(LimelightState.PURPLE);
-        frontCoralLimelight.setState(LimelightState.TAGS);
-        backTagLimelight.setState(LimelightState.TAGS);
-        lights.setState(getLightStateForScoring());
-        climber.setState(ClimberState.STOWED);
-        rumbleController.rumbleRequest();
-      }
     }
   }
 
@@ -768,6 +701,7 @@ public class RobotManager extends StateMachine<RobotState> {
     super.robotPeriodic();
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSidePose);
 
+    moveSuperstructure(latestElevatorGoal, latestWristGoal);
     // Continuous state actions
 
     // Update snaps
@@ -838,9 +772,9 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     // Superstructure collision avoidance logging
-    var currentSuperstructurePosition =
-        new SuperstructurePosition(elevator.getHeight(), wrist.getAngle());
-    CollisionAvoidance.plan(currentSuperstructurePosition, currentSuperstructurePosition);
+    // var currentSuperstructurePosition =
+    //     new SuperstructurePosition(elevator.getHeight(), wrist.getAngle());
+    // CollisionAvoidance.plan(currentSuperstructurePosition, new SuperstructurePosition(54, 91));
   }
 
   @Override
@@ -1002,7 +936,7 @@ public class RobotManager extends StateMachine<RobotState> {
     gamePieceMode = GamePieceMode.CORAL;
     switch (getState()) {
       case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
-      default -> setStateFromRequest(RobotState.PRE_INTAKE_CORAL_STATION);
+      default -> setStateFromRequest(RobotState.INTAKE_CORAL_STATION);
     }
   }
 
@@ -1131,7 +1065,7 @@ public class RobotManager extends StateMachine<RobotState> {
     gamePieceMode = GamePieceMode.ALGAE;
     switch (getState()) {
       case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
-      default -> setStateFromRequest(RobotState.PRE_NET_BACK_WAITING);
+      default -> setStateFromRequest(RobotState.NET_BACK_WAITING);
     }
   }
 
@@ -1228,7 +1162,13 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
+  private ElevatorState latestElevatorGoal = ElevatorState.STOWED;
+  private WristState latestWristGoal = WristState.PRE_MATCH_HOMING;
+
   private void moveSuperstructure(ElevatorState elevatorGoal, WristState wristGoal) {
+    latestElevatorGoal = elevatorGoal;
+    latestWristGoal = wristGoal;
+
     var maybeIntermediaryPosition =
         CollisionAvoidance.plan(
             new SuperstructurePosition(elevator.getHeight(), wrist.getAngle()),
@@ -1240,20 +1180,15 @@ public class RobotManager extends StateMachine<RobotState> {
       // A collision was detected, so we need to go to an intermediary point
       elevator.setCollisionAvoidanceGoal(intermediaryPosition.elevatorHeight());
       elevator.setState(ElevatorState.COLLISION_AVOIDANCE);
-      DogLog.log("RobotManager/CollisionAvoidance/Elevator", intermediaryPosition.elevatorHeight());
 
       wrist.setCollisionAvoidanceGoal(intermediaryPosition.wristAngle());
       wrist.setState(WristState.COLLISION_AVOIDANCE);
-      DogLog.log("RobotManager/CollisionAvoidance/Wrist", intermediaryPosition.wristAngle());
 
     } else {
       // No collision, go straight to goal state
       elevator.setState(elevatorGoal);
       wrist.setState(wristGoal);
-      DogLog.log("RobotManager/CollisionAvoidance/Elevator", 0);
-      DogLog.log("RobotManager/CollisionAvoidance/Wrist", 0);
     }
-    DogLog.log("RobotManager/CollisionAvoidanceTriggered", maybeIntermediaryPosition.isPresent());
   }
 
   private ReefAlignState getReefAlignState() {
