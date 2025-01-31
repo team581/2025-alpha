@@ -15,6 +15,8 @@ public class CollisionAvoidance {
       SuperstructurePosition current, SuperstructurePosition goal) {
     var goalPoint = getGoalPoint(current, goal);
     if (goalPoint.isPresent()) {
+      DogLog.log("CollisionAvoidance/NextMovePresent", true);
+
       DogLog.log(
           "CollisionAvoidance/NextMove/elevatorHeight",
           goalPoint.get().elevatorHeight());
@@ -22,7 +24,7 @@ public class CollisionAvoidance {
           "CollisionAvoidance/NextMove/wristAngle",
           goalPoint.get().wristAngle());
     }
-
+    DogLog.log("CollisionAvoidance/NextMovePresent", false);
     return goalPoint;
   }
 
@@ -52,12 +54,12 @@ public class CollisionAvoidance {
       return CollisionBoxes.BOX_3;
     } else if (inZone(current, CollisionBoxes.BOX_4)) {
       return CollisionBoxes.BOX_4;
+    } else if (inZone(current, CollisionBoxes.BOX_4)) {
+      return CollisionBoxes.BOX_4;
     } else if (inZone(current, CollisionBoxes.BOX_5)) {
       return CollisionBoxes.BOX_5;
     } else if (inZone(current, CollisionBoxes.BOX_6)) {
       return CollisionBoxes.BOX_6;
-    } else if (inZone(current, CollisionBoxes.BOX_7)) {
-      return CollisionBoxes.BOX_7;
     } else {
       for (int i = 0; i < 7; ) {
         if (closestDistance
@@ -90,10 +92,10 @@ public class CollisionAvoidance {
     } else if (num == 4) {
       return CollisionBoxes.BOX_4;
     } else if (num == 5) {
-      return CollisionBoxes.BOX_5;
+      return CollisionBoxes.BOX_4;
     } else if (num == 6) {
-      return CollisionBoxes.BOX_6;
-    } else return CollisionBoxes.BOX_7;
+      return CollisionBoxes.BOX_5;
+    } else return CollisionBoxes.BOX_6;
   }
 
   private static int collisionBoxToNum(CollisionBoxes zone) {
@@ -104,7 +106,6 @@ public class CollisionAvoidance {
       case BOX_4 -> 4;
       case BOX_5 -> 5;
       case BOX_6 -> 6;
-      case BOX_7 -> 7;
     };
   }
 
@@ -132,6 +133,7 @@ public class CollisionAvoidance {
     // }
     DogLog.log("CollisionAvoidance/currentZone", currentZone);
     DogLog.log("CollisionAvoidance/goalZone", goalZone);
+
     if (collisionBoxToNum(currentZone) < collisionBoxToNum(goalZone)) {
       return Optional.of(numToCollisionBoxes(collisionBoxToNum(currentZone) + 1).box.safeZone());
     } else if (collisionBoxToNum(currentZone) > collisionBoxToNum(goalZone)) {
