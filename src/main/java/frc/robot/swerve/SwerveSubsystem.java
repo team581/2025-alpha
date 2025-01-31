@@ -284,6 +284,15 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     setStateFromRequest(newState);
   }
 
+  public void activateCoralIntakeAssist() {
+    // Intake assist is only during teleop, otherwise just do auto driving
+    if (DriverStation.isTeleop()) {
+      setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
+    } else {
+      setState(SwerveState.AUTO);
+    }
+  }
+
   public void enabledReefMagnetism() {
     // Helper function to enable magnetism in teleop, but not during auto
     // Since auto will have its own Trailblazer-y way of doing alignment
