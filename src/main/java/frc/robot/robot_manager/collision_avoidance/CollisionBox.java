@@ -1,8 +1,11 @@
 package frc.robot.robot_manager.collision_avoidance;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.robot_manager.SuperstructurePosition;
+import java.util.ArrayList;
+import java.util.List;
 
 public enum CollisionBox {
   BOX_1(
@@ -51,6 +54,37 @@ public enum CollisionBox {
       case 6 -> BOX_6;
       default -> BOX_3;
     };
+  }
+
+  public static void visualize() {
+    var allCorners = new ArrayList<List<Translation2d>>(CollisionBox.values().length);
+
+    for (var box : values()) {
+      var corners = getCorners(box.bounds);
+      allCorners.add(corners);
+      DogLog.log(
+          "CollisionAvoidance/Boxes/" + box.toString(), corners.toArray(Translation2d[]::new));
+    }
+
+    DogLog.log(
+        "CollisionAvoidance/Boxes/All",
+        allCorners.stream().flatMap(List::stream).toArray(Translation2d[]::new));
+  }
+
+  private static List<Translation2d> getCorners(Rectangle2d rectangle) {
+    return List.of(
+        new Translation2d(
+            rectangle.getCenter().getX() - rectangle.getXWidth() / 2,
+            rectangle.getCenter().getY() - rectangle.getYWidth() / 2),
+        new Translation2d(
+            rectangle.getCenter().getX() + rectangle.getXWidth() / 2,
+            rectangle.getCenter().getY() - rectangle.getYWidth() / 2),
+        new Translation2d(
+            rectangle.getCenter().getX() + rectangle.getXWidth() / 2,
+            rectangle.getCenter().getY() + rectangle.getYWidth() / 2),
+        new Translation2d(
+            rectangle.getCenter().getX() - rectangle.getXWidth() / 2,
+            rectangle.getCenter().getY() + rectangle.getYWidth() / 2));
   }
 
   private CollisionBox(int id, Rectangle2d bounds, SuperstructurePosition safeZone) {
