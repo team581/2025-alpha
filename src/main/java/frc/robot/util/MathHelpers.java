@@ -23,6 +23,13 @@ public class MathHelpers {
   public static Translation2d chassisSpeedsToTranslation2d(ChassisSpeeds speeds) {
     return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
   }
+  public static ChassisSpeeds translation2dToChassisSpeeds(Translation2d translation2d) {
+    return new ChassisSpeeds(translation2d.getX(),translation2d.getY(), 0.0);
+  }
+
+  public static double nonZeroDivide(double a, double b) {
+    return b == 0 ? 0 : a / b;
+  }
 
   private MathHelpers() {}
 }

@@ -41,16 +41,12 @@ public enum ReefSide {
   public final Pose2d redPose;
   public final ReefPipe pipe1;
   public final ReefPipe pipe2;
-  public final List<Pose2d> redPipes;
-  public final List<Pose2d> bluePipes;
 
   private ReefSide(Pose2d bluePose, Pose2d redPose, ReefPipe pipe1, ReefPipe pipe2) {
     this.bluePose = bluePose;
     this.redPose = redPose;
     this.pipe1 = pipe1;
     this.pipe2 = pipe2;
-    redPipes = List.of(pipe1.redPose, pipe2.redPose);
-    bluePipes = List.of(pipe1.bluePose, pipe2.bluePose);
   }
 
   public Pose2d getPose(boolean isRedAlliance) {
@@ -61,7 +57,7 @@ public enum ReefSide {
     return getPose(FmsSubsystem.isRedAlliance());
   }
 
-  public List<Pose2d> getPipes() {
-    return FmsSubsystem.isRedAlliance() ? redPipes : bluePipes;
+  public List<Pose2d> getPipes(ReefPipeLevel level) {
+    return List.of(pipe1.getPose(level), pipe2.getPose(level));
   }
 }

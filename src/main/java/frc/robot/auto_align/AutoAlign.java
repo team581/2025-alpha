@@ -37,12 +37,12 @@ public class AutoAlign {
                     Double.compare(
                         robotPose
                             .getTranslation()
-                            .getDistance(a.getPose(isRedAlliance).getTranslation()),
+                            .getDistance(a.getPose(ReefPipeLevel.BASE, isRedAlliance).getTranslation()),
                         robotPose
                             .getTranslation()
-                            .getDistance(b.getPose(isRedAlliance).getTranslation())))
+                            .getDistance(b.getPose(ReefPipeLevel.BASE, isRedAlliance).getTranslation())))
             .get();
-    return reefPipe.getPose(isRedAlliance);
+    return reefPipe.getPose(ReefPipeLevel.BASE, isRedAlliance);
   }
 
   public static ReefSide getClosestReefSide(Pose2d robotPose) {

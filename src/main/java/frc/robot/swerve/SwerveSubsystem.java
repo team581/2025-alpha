@@ -19,7 +19,6 @@ import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.ControllerHelpers;
-import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
@@ -282,14 +281,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/ModuleStates", drivetrainState.ModuleStates);
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
-    DogLog.log("Swerve/TeleopSpeeds", teleopSpeeds);
-    DogLog.log("Swerve/MagnetizedSpeedsOffset", magnetizedSpeeds.minus(teleopSpeeds));
-    DogLog.log(
-        "Swerve/InputVectorAngle",
-        MathHelpers.chassisSpeedsToTranslation2d(teleopSpeeds).getAngle().getDegrees());
-    DogLog.log(
-        "Swerve/OutputVectorAngle",
-        MathHelpers.chassisSpeedsToTranslation2d(magnetizedSpeeds).getAngle().getDegrees());
   }
 
   private void startSimThread() {
