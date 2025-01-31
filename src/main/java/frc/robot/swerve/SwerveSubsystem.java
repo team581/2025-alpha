@@ -16,8 +16,9 @@ import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.auto_align.MagnetismUtil;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
-import frc.robot.generated.TunerConstants;
-import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.generated.CompBotTunerConstants;
+import frc.robot.generated.PracticeBotTunerConstants;
+import frc.robot.generated.PracticeBotTunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.ControllerHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
@@ -35,12 +36,19 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
 
   public final TunerSwerveDrivetrain drivetrain =
-      new TunerSwerveDrivetrain(
-          TunerConstants.DrivetrainConstants,
-          TunerConstants.FrontLeft,
-          TunerConstants.FrontRight,
-          TunerConstants.BackLeft,
-          TunerConstants.BackRight);
+      RobotConfig.IS_PRACTICE_BOT
+          ? new TunerSwerveDrivetrain(
+              PracticeBotTunerConstants.DrivetrainConstants,
+              PracticeBotTunerConstants.FrontLeft,
+              PracticeBotTunerConstants.FrontRight,
+              PracticeBotTunerConstants.BackLeft,
+              PracticeBotTunerConstants.BackRight)
+          : new TunerSwerveDrivetrain(
+              CompBotTunerConstants.DrivetrainConstants,
+              CompBotTunerConstants.FrontLeft,
+              CompBotTunerConstants.FrontRight,
+              CompBotTunerConstants.BackLeft,
+              CompBotTunerConstants.BackRight);
 
   public final Pigeon2 drivetrainPigeon = drivetrain.getPigeon2();
 
@@ -121,10 +129,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     // Ensure that we are in an auto state during auto, and a teleop state during teleop
     return switch (currentState) {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
-      case INTAKE_ASSIST_AUTO, INTAKE_ASSIST_TELEOP ->
+      case INTAKE_ASSIST_ALGAE_TELEOP, INTAKE_ASSIST_CORAL_TELEOP ->
           DriverStation.isAutonomous()
-              ? SwerveState.INTAKE_ASSIST_AUTO
-              : SwerveState.INTAKE_ASSIST_TELEOP;
+              ? SwerveState.AUTO
+              : currentState;
       case REEF_MAGNETISM_TELEOP ->
           DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.REEF_MAGNETISM_TELEOP;
       case AUTO_SNAPS, TELEOP_SNAPS ->
@@ -266,9 +274,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setSnapsEnabled(boolean newValue) {
     switch (getState()) {
-      case TELEOP, TELEOP_SNAPS, INTAKE_ASSIST_TELEOP, REEF_MAGNETISM_TELEOP ->
+      case TELEOP,
+              TELEOP_SNAPS,
+              INTAKE_ASSIST_CORAL_TELEOP,
+              INTAKE_ASSIST_ALGAE_TELEOP,
+              REEF_MAGNETISM_TELEOP ->
           setStateFromRequest(newValue ? SwerveState.TELEOP_SNAPS : SwerveState.TELEOP);
-      case AUTO, AUTO_SNAPS, INTAKE_ASSIST_AUTO ->
+      case AUTO, AUTO_SNAPS ->
           setStateFromRequest(newValue ? SwerveState.AUTO_SNAPS : SwerveState.AUTO);
     }
   }
@@ -281,6 +293,19 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/ModuleStates", drivetrainState.ModuleStates);
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
+
+    DogLog.log(
+        "Swerve/OutputVoltageModule0",
+        drivetrain.getModule(0).getDriveMotor().getMotorVoltage().getValueAsDouble());
+    DogLog.log(
+        "Swerve/OutputVoltageModule1",
+        drivetrain.getModule(1).getDriveMotor().getMotorVoltage().getValueAsDouble());
+    DogLog.log(
+        "Swerve/OutputVoltageModule2",
+        drivetrain.getModule(2).getDriveMotor().getMotorVoltage().getValueAsDouble());
+    DogLog.log(
+        "Swerve/OutputVoltageModule3",
+        drivetrain.getModule(3).getDriveMotor().getMotorVoltage().getValueAsDouble());
   }
 
   private void startSimThread() {

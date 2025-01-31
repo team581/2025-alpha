@@ -29,12 +29,12 @@ public class MagnetismUtil {
     var normalizedTransform =
         new Translation2d(robotSpeeds.getNorm(), unnormalizedTransform.getAngle());
 
-        ChassisSpeeds magnetizedSpeeds =
-            new ChassisSpeeds(
-                normalizedTransform.getX(),
-                normalizedTransform.getY(),
-                fieldRelativeSpeeds.omegaRadiansPerSecond);
-    DogLog.log("Debug/RobotVectorAngle", robotSpeeds.plus(new Translation2d(0.001,0)).getAngle());
+    ChassisSpeeds magnetizedSpeeds =
+        new ChassisSpeeds(
+            normalizedTransform.getX(),
+            normalizedTransform.getY(),
+            fieldRelativeSpeeds.omegaRadiansPerSecond);
+    DogLog.log("Debug/RobotVectorAngle", robotSpeeds.plus(new Translation2d(0.001, 0)).getAngle());
     DogLog.log("Debug/IdealVectorAngle", idealSpeeds.getAngle());
     DogLog.log("Debug/IdealSpeeds", MathHelpers.translation2dToChassisSpeeds(idealSpeeds));
     DogLog.log("Debug/RobotSpeeds", MathHelpers.translation2dToChassisSpeeds(robotSpeeds));
@@ -48,7 +48,8 @@ public class MagnetismUtil {
 
   public static ChassisSpeeds getReefMagnetizedChassisSpeeds(
       ChassisSpeeds fieldRelativeSpeeds, Pose2d robotPose) {
-    Pose2d closestReefPipe = robotPose.nearest(AutoAlign.getClosestReefSide(robotPose).getPipes(ReefPipeLevel.L1));
+    Pose2d closestReefPipe =
+        robotPose.nearest(AutoAlign.getClosestReefSide(robotPose).getPipes(ReefPipeLevel.L1));
 
     return getMagnetizedChassisSpeeds(fieldRelativeSpeeds, robotPose, closestReefPipe);
   }

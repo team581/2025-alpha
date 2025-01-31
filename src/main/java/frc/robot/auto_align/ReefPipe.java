@@ -42,7 +42,6 @@ public enum ReefPipe {
       new Pose2d(3.9463, 3.4319, new Rotation2d(-2.0944)),
       new Pose2d(13.5774, 4.62008, new Rotation2d(1.0472)));
 
-
   private static final Pose2d L1Offset = new Pose2d(-0.5, 0, Rotation2d.kZero);
   private static final Pose2d L2Offset = new Pose2d(-0.5, 0, Rotation2d.kZero);
   private static final Pose2d L3Offset = new Pose2d(-0.5, 0, Rotation2d.kZero);
@@ -59,15 +58,17 @@ public enum ReefPipe {
   public Pose2d getPose(ReefPipeLevel level, boolean isRedAlliance) {
     var basePipePose = isRedAlliance ? redPose : bluePose;
 
-      var offset = switch (level) {
-        case BASE -> new Pose2d();
-        case L1 -> L1Offset;
-        case L2 -> L2Offset;
-        case L3 -> L3Offset;
-        case L4 -> L4Offset;
-      };
+    var offset =
+        switch (level) {
+          case BASE -> new Pose2d();
+          case L1 -> L1Offset;
+          case L2 -> L2Offset;
+          case L3 -> L3Offset;
+          case L4 -> L4Offset;
+        };
 
-      return new Pose2d(basePipePose.getTranslation().plus(offset.getTranslation()), basePipePose.getRotation());
+    return new Pose2d(
+        basePipePose.getTranslation().plus(offset.getTranslation()), basePipePose.getRotation());
   }
 
   public Pose2d getPose(ReefPipeLevel level) {

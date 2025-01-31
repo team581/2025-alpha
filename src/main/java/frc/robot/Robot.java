@@ -2,7 +2,9 @@ package frc.robot;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -63,14 +65,15 @@ public class Robot extends TimedRobot {
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
   private final RumbleControllerSubsystem rumbleController =
-      new RumbleControllerSubsystem(hardware.driverController, false);
+      new RumbleControllerSubsystem(hardware.driverController, true);
 
   private final IntakeSubsystem intake =
-      new IntakeSubsystem(hardware.intakeTopMotor, hardware.intakeBottomMotor);
+      new IntakeSubsystem(hardware.intakeTopMotor, hardware.intakeBottomMotor, hardware.candi);
 
   private final WristSubsystem wrist = new WristSubsystem(hardware.wristMotor);
   private final RollSubsystem roll = new RollSubsystem(hardware.rollMotor, intake);
-  private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
+  private final LightsSubsystem lights =
+      new LightsSubsystem(hardware.candle, elevatorPurpleLimelight);
   private final ClimberSubsystem climber =
       new ClimberSubsystem(hardware.climberMotor, hardware.climberCANcoder);
   private final RobotManager robotManager =
@@ -88,7 +91,8 @@ public class Robot extends TimedRobot {
           backTagLimelight,
           lights,
           purple,
-          climber);
+          climber,
+          rumbleController);
 
   private final RobotCommands robotCommands = new RobotCommands(robotManager);
 
@@ -139,13 +143,11 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     Stopwatch.getInstance().stop("Scheduler/CommandSchedulerPeriodic");
 
-    // Memory logging
-    DogLog.log("Debug/Memory/Total", Runtime.getRuntime().totalMemory());
-    DogLog.log("Debug/Memory/Free", Runtime.getRuntime().freeMemory());
-    DogLog.log("Debug/Memory/Max", Runtime.getRuntime().maxMemory());
-    DogLog.log(
-        "Debug/Memory/Used",
-        Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+    if (RobotController.getBatteryVoltage() < 12.5) {
+      DogLog.logFault("Battery voltage low", AlertType.kWarning);
+    } else {
+      DogLog.clearFault("Battery voltage low");
+    }
   }
 
   @Override
@@ -226,7 +228,12 @@ public class Robot extends TimedRobot {
         .driverController
         .povRight()
         .onTrue(robotCommands.setGamepieceModeCommand(GamePieceMode.ALGAE));
-    hardware.driverController.start().onTrue(robotCommands.reHomeCommand());
+    hardware.driverController.start().onTrue(robotCommands.rehomeRollCommand());
     hardware.driverController.back().onTrue(localization.getZeroCommand());
+
+    hardware.operatorController.a().onTrue(robotCommands.rehomeElevatorCommand());
+    hardware.operatorController.b().onTrue(robotCommands.rehomeWristCommand());
+    hardware.operatorController.y().onTrue(robotCommands.rehomeRollCommand());
+    hardware.operatorController.x().onTrue(robotCommands.unjamCommand());
   }
 }

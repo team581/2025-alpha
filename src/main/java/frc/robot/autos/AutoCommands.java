@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
+import frc.robot.robot_manager.RobotState;
 import java.util.List;
 
 public class AutoCommands {
@@ -26,5 +27,17 @@ public class AutoCommands {
 
   public Command l4LineupCommand() {
     return Commands.runOnce(robotManager::l4CoralLineupRequest, requirements);
+  }
+
+  public Command l4ScoreAndReleaseCommand() {
+    return Commands.run(robotManager::l4coralPlaceAndReleaseRequest, requirements)
+        .until(() -> robotManager.getState() == RobotState.IDLE_NO_GP)
+        .withTimeout(4);
+  }
+
+  public Command intakeStationWaitUntilCommand() {
+    return Commands.run(robotManager::intakeStationRequest, requirements)
+        .until(() -> robotManager.getState() == RobotState.IDLE_CORAL)
+        .withTimeout(4);
   }
 }

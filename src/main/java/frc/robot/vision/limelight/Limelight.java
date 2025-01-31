@@ -24,6 +24,7 @@ public class Limelight extends StateMachine<LimelightState> {
   private final CameraDataset cameraDataset;
 
   private final Timer limelightTimer = new Timer();
+  private final Timer seedIMUTimer = new Timer();
   private CameraHealth cameraHealth = CameraHealth.NO_TARGETS;
   private double limelightHeartbeat = -1;
 
@@ -177,11 +178,19 @@ public class Limelight extends StateMachine<LimelightState> {
       }
       default -> {}
     }
+
+    LimelightHelpers.SetIMUMode(limelightTableName, seedIMUTimer.hasElapsed(2.0) ? 2 : 1);
+  }
+
+  @Override
+  public void autonomousInit() {
+    seedIMUTimer.reset();
+    seedIMUTimer.start();
   }
 
   private void updateHealth(Optional<?> result) {
     var newHeartbeat = LimelightHelpers.getLimelightNTDouble(limelightTableName, "hb");
-
+    DogLog.log("Vision/" + name + "/Heartbeat", newHeartbeat);
     if (limelightHeartbeat != newHeartbeat) {
       limelightTimer.restart();
     }
@@ -200,6 +209,14 @@ public class Limelight extends StateMachine<LimelightState> {
       return;
     }
     cameraHealth = CameraHealth.NO_TARGETS;
+  }
+
+  public void setBlinkEnabled(boolean enabled) {
+    if (enabled) {
+      LimelightHelpers.setLEDMode_ForceBlink(limelightTableName);
+    } else {
+      LimelightHelpers.setLEDMode_ForceOff(limelightTableName);
+    }
   }
 
   public CameraHealth getCameraHealth() {

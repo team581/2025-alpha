@@ -27,13 +27,13 @@ import frc.robot.config.RobotConfig.WristConfig;
 import frc.robot.generated.PracticeBotTunerConstants;
 import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
-class PracticeConfig {
+class CompConfig {
   private static final String CANIVORE_NAME = PracticeBotTunerConstants.kCANBus.getName();
   private static final String RIO_CAN_NAME = "rio";
 
-  public static final RobotConfig practiceBot =
+  public static final RobotConfig competitionBot =
       new RobotConfig(
-          "practice",
+          "competition",
           new ElevatorConfig(
               CANIVORE_NAME,
               15,
@@ -46,14 +46,14 @@ class PracticeConfig {
                           .withNeutralMode(NeutralModeValue.Brake))
                   .withSlot0(
                       new Slot0Configs()
-                          .withKP(1.0)
+                          .withKP(0.0)
                           .withKV(0)
-                          .withKG(0.4)
+                          .withKG(0.0)
                           .withGravityType(GravityTypeValue.Elevator_Static))
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicAcceleration(250.0)
-                          .withMotionMagicCruiseVelocity(250.0))
+                          .withMotionMagicAcceleration(0.0)
+                          .withMotionMagicCruiseVelocity(0.0))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio(
@@ -66,14 +66,14 @@ class PracticeConfig {
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
                   .withSlot0(
                       new Slot0Configs()
-                          .withKP(1.0)
+                          .withKP(0.0)
                           .withKV(0)
-                          .withKG(0.4)
+                          .withKG(0.0)
                           .withGravityType(GravityTypeValue.Elevator_Static))
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicAcceleration(250)
-                          .withMotionMagicCruiseVelocity(250.0))
+                          .withMotionMagicAcceleration(0.0)
+                          .withMotionMagicCruiseVelocity(0.0))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio(
@@ -86,14 +86,14 @@ class PracticeConfig {
               20,
               0,
               58,
-              0.5),
+              0.4),
           new IntakeConfig(
               RIO_CAN_NAME,
               20,
               21,
               26,
-              new Debouncer(0.1, DebounceType.kBoth),
-              new Debouncer(0.1, DebounceType.kBoth),
+              new Debouncer(0.0, DebounceType.kBoth),
+              new Debouncer(0.0, DebounceType.kBoth),
               new TalonFXConfiguration()
                   .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
                   .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
@@ -154,15 +154,15 @@ class PracticeConfig {
                           .withInverted(InvertedValue.Clockwise_Positive))
                   .withSlot0(
                       new Slot0Configs()
-                          .withKP(100.0)
+                          .withKP(0.0)
                           .withKV(0.0)
-                          .withKD(3.0)
-                          .withKG(0.3)
+                          .withKD(0.0)
+                          .withKG(0.0)
                           .withGravityType(GravityTypeValue.Arm_Cosine))
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicAcceleration(5)
-                          .withMotionMagicCruiseVelocity(10.0))
+                          .withMotionMagicCruiseVelocity(10))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio((64 / 8) * (50 / 18) * (36 / 12)))
@@ -183,7 +183,7 @@ class PracticeConfig {
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
                   .withFeedback(
                       new FeedbackConfigs().withSensorToMechanismRatio((60 / 8) * (60 / 15)))
-                  .withSlot0(new Slot0Configs().withKP(50).withKV(0))
+                  .withSlot0(new Slot0Configs().withKP(0).withKV(0))
                   .withVoltage(
                       new VoltageConfigs().withPeakForwardVoltage(4).withPeakReverseVoltage(-4))
                   .withCurrentLimits(
@@ -210,5 +210,5 @@ class PracticeConfig {
                   .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
-  private PracticeConfig() {}
+  private CompConfig() {}
 }

@@ -31,7 +31,7 @@ public enum RobotState {
   NET_BACK_SCORING,
 
   CORAL_L1_1_APPROACH,
-  CORAL_L1_2_LINEUP,
+  // L1 scoring has no LINEUP state since it's so simple to score
   CORAL_L1_3_PLACE,
   CORAL_L1_4_RELEASE,
 
@@ -48,11 +48,15 @@ public enum RobotState {
   CORAL_L4_1_APPROACH,
   CORAL_L4_2_LINEUP,
   CORAL_L4_3_PLACE,
+  CORAL_L4_3_PLACE_THEN_RELEASE,
   CORAL_L4_4_RELEASE,
 
   CLIMBING_1_LINEUP,
   CLIMBING_2_HANGING,
 
   UNJAM,
-  REHOME;
+
+  REHOME_ELEVATOR,
+  REHOME_WRIST,
+  REHOME_ROLL;
 }
