@@ -136,9 +136,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     // Ensure that we are in an auto state during auto, and a teleop state during teleop
     return switch (currentState) {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
-      case INTAKE_ASSIST_ALGAE_TELEOP, INTAKE_ASSIST_CORAL_TELEOP ->
+      case INTAKE_ASSIST_CORAL_TELEOP, INTAKE_ASSIST_ALGAE_TELEOP ->
           DriverStation.isAutonomous() ? SwerveState.AUTO : currentState;
-      case REEF_MAGNETISM_TELEOP ->
+          case REEF_MAGNETISM_TELEOP ->
           DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.REEF_MAGNETISM_TELEOP;
       case AUTO_SNAPS, TELEOP_SNAPS ->
           DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.TELEOP_SNAPS;
@@ -281,6 +281,15 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setState(SwerveState newState) {
     setStateFromRequest(newState);
+  }
+
+  public void activateCoralIntakeAssist() {
+    // Intake assist is only during teleop, otherwise just do auto driving
+    if (DriverStation.isTeleop()) {
+      setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
+    } else {
+      setState(SwerveState.AUTO);
+    }
   }
 
   public void enabledReefMagnetism() {
