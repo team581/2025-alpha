@@ -1,5 +1,6 @@
 package frc.robot.robot_manager.collision_avoidance;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.robot_manager.SuperstructurePosition;
@@ -12,6 +13,14 @@ public class CollisionAvoidance {
 
   public static Optional<SuperstructurePosition> plan(
       SuperstructurePosition current, SuperstructurePosition goal) {
+    if (getGoalPoint(current, goal).isPresent()) {
+      DogLog.log(
+          "CollisionAvoidance/NextMove/elevatorHeight",
+          getGoalPoint(current, goal).get().elevatorHeight());
+      DogLog.log(
+          "CollisionAvoidance/NextMove/elevatorHeight",
+          getGoalPoint(current, goal).get().wristAngle());
+    }
 
     return getGoalPoint(current, goal);
   }

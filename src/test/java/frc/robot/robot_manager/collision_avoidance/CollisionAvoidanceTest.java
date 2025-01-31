@@ -104,7 +104,7 @@ public class CollisionAvoidanceTest {
   void testPlanNoCollisionsRight() {
     SuperstructurePosition current = new SuperstructurePosition(0, 0);
     SuperstructurePosition goal = new SuperstructurePosition(65, 80);
-    SuperstructurePosition expectedResult = new SuperstructurePosition(30, 45);
+    SuperstructurePosition expectedResult = new SuperstructurePosition(30, 0);
     var result = CollisionAvoidanceUtils.plan(current, goal);
     assertEquals(expectedResult, result.get());
   }

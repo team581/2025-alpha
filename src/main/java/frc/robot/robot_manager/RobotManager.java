@@ -739,7 +739,7 @@ public class RobotManager extends StateMachine<RobotState> {
     // Superstructure collision avoidance logging
     var currentSuperstructurePosition =
         new SuperstructurePosition(elevator.getHeight(), wrist.getAngle());
-    CollisionAvoidance.plan(currentSuperstructurePosition, currentSuperstructurePosition);
+    CollisionAvoidance.plan(currentSuperstructurePosition, new SuperstructurePosition(54, 180));
   }
 
   @Override
