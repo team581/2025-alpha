@@ -24,6 +24,8 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
 public class SwerveSubsystem extends StateMachine<SwerveState> {
+  // TODO: Remove this once magnetism is stable
+  private static final boolean MAGNETISM_ENABLED = false;
 
   public static final double MaxSpeed = 4.75;
   private static final double MaxAngularRate = Units.rotationsToRadians(4);
@@ -185,7 +187,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
     magnetizedSpeeds =
-        MagnetismUtil.getReefMagnetizedChassisSpeeds(teleopSpeeds, drivetrainState.Pose);
+        MAGNETISM_ENABLED
+            ? MagnetismUtil.getReefMagnetizedChassisSpeeds(teleopSpeeds, drivetrainState.Pose)
+            : new ChassisSpeeds();
   }
 
   private ChassisSpeeds calculateFieldRelativeSpeeds() {
