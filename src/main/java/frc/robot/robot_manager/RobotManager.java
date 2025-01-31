@@ -216,12 +216,18 @@ public class RobotManager extends StateMachine<RobotState> {
 
         yield currentState;
       }
-
-      case INTAKE_CORAL_STATION ->
+      case INTAKE_CORAL_STATION_FRONT -> {
+        if (intake.getHasGP()) {
+          rumbleController.rumbleRequest();
+          yield RobotState.IDLE_CORAL;
+        }
+        yield currentState;
+      }
+      case INTAKE_CORAL_STATION_BACK ->
           intake.getHasGP() ? RobotState.AFTER_INTAKE_CORAL_STATION : currentState;
       case NET_BACK_SCORING -> intake.getHasGP() ? currentState : RobotState.AFTER_NET_BACK_WAITING;
       case PRE_INTAKE_CORAL_STATION ->
-          wrist.atGoal() && elevator.atGoal() ? RobotState.INTAKE_CORAL_STATION : currentState;
+          wrist.atGoal() && elevator.atGoal() ? RobotState.INTAKE_CORAL_STATION_BACK : currentState;
       case PRE_NET_BACK_WAITING ->
           wrist.atGoal() && elevator.atGoal() ? RobotState.NET_BACK_WAITING : currentState;
 
@@ -310,9 +316,21 @@ public class RobotManager extends StateMachine<RobotState> {
         lights.setState(LightsState.IDLE_NO_GP_ALGAE_MODE);
         climber.setState(ClimberState.STOWED);
       }
-      case INTAKE_CORAL_STATION -> {
+      case INTAKE_CORAL_STATION_BACK -> {
         intake.setState(IntakeState.INTAKING_CORAL);
-        moveSuperstructure(ElevatorState.INTAKING_CORAL_STATION, WristState.INTAKING_CORAL_STATION);
+        moveSuperstructure(ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
+        roll.setState(RollState.STOWED);
+        swerve.setSnapsEnabled(true);
+        swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
+        frontCoralLimelight.setState(LimelightState.TAGS);
+        elevatorPurpleLimelight.setState(LimelightState.PURPLE);
+        backTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
+        climber.setState(ClimberState.STOWED);
+      }
+      case INTAKE_CORAL_STATION_FRONT -> {
+        intake.setState(IntakeState.INTAKING_CORAL);
+        moveSuperstructure(ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
         roll.setState(RollState.STOWED);
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
@@ -792,7 +810,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(reefSnapAngle);
       }
-      case INTAKE_CORAL_STATION -> {
+      case INTAKE_CORAL_STATION_BACK, INTAKE_CORAL_STATION_FRONT -> {
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
       }
@@ -894,7 +912,7 @@ public class RobotManager extends StateMachine<RobotState> {
           l3CoralLineupRequest();
         }
       }
-      case INTAKE_CORAL_STATION -> {
+      case INTAKE_CORAL_STATION_BACK, INTAKE_CORAL_STATION_FRONT -> {
         if (newMode == GamePieceMode.ALGAE) {
           stowRequest();
         }
@@ -1142,7 +1160,8 @@ public class RobotManager extends StateMachine<RobotState> {
           DISLODGE_ALGAE_L3_PUSHING,
           INTAKE_CORAL_FLOOR_HORIZONTAL,
           INTAKE_CORAL_FLOOR_UPRIGHT,
-          INTAKE_CORAL_STATION -> {}
+          INTAKE_CORAL_STATION_BACK,
+          INTAKE_CORAL_STATION_FRONT-> {}
 
       case IDLE_ALGAE -> setStateFromRequest(RobotState.PROCESSOR_WAITING);
       case PROCESSOR_WAITING -> setStateFromRequest(RobotState.PROCESSOR_PREPARE_TO_SCORE);
