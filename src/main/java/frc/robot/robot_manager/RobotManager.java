@@ -2,6 +2,7 @@ package frc.robot.robot_manager;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.AutoAlign;
@@ -92,6 +93,7 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   private double reefSnapAngle = 0.0;
+  private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
   private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
   private Pose2d nearestReefSidePose = new Pose2d();
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
