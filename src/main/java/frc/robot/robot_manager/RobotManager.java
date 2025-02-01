@@ -216,7 +216,8 @@ public class RobotManager extends StateMachine<RobotState> {
         yield currentState;
       }
 
-      case INTAKE_CORAL_STATION -> intake.getHasGP() ? RobotState.IDLE_CORAL : currentState;
+      case INTAKE_CORAL_STATION -> intake.getHasGP() ? RobotState.SMART_STOW : currentState;
+      case SMART_STOW -> elevator.atGoal() && roll.atGoal() ? RobotState.IDLE_CORAL : currentState;
       case NET_BACK_SCORING -> intake.getHasGP() ? currentState : RobotState.IDLE_NO_GP;
     };
   }
@@ -305,6 +306,18 @@ public class RobotManager extends StateMachine<RobotState> {
         roll.setState(RollState.STOWED);
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
+        frontCoralLimelight.setState(LimelightState.TAGS);
+        elevatorPurpleLimelight.setState(LimelightState.PURPLE);
+        backTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
+        climber.setState(ClimberState.STOWED);
+      }
+      case SMART_STOW -> {
+        intake.setState(IntakeState.IDLE_W_CORAL);
+        moveSuperstructure(ElevatorState.STOWED, WristState.INTAKING_CORAL_STATION);
+        swerve.setSnapsEnabled(false);
+        swerve.setSnapToAngle(0);
+        roll.setState(RollState.SMART_STOW);
         frontCoralLimelight.setState(LimelightState.TAGS);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
         backTagLimelight.setState(LimelightState.TAGS);

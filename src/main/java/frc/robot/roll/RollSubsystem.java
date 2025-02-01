@@ -41,6 +41,10 @@ public class RollSubsystem extends StateMachine<RollState> {
         motor.setControl(
             motionMagicRequest.withPosition(Units.degreesToRotations(getScoreDirection())));
       }
+      case SMART_STOW -> {
+        motor.setControl(
+            motionMagicRequest.withPosition(Units.degreesToRotations(getSmartStowDirection())));
+      }
       case UNHOMED -> motor.disable();
       default -> {
         motor.setControl(
@@ -75,6 +79,16 @@ public class RollSubsystem extends StateMachine<RollState> {
     return -90;
   }
 
+  private double getSmartStowDirection() {
+    if (intake.getLeftSensor()) {
+      return -90;
+    } else if (intake.getRightSensor()) {
+      return 90;
+    } else {
+      return 20;
+    }
+  }
+
   public void setState(RollState newState) {
     if (getState() == RollState.UNHOMED) {
       if (newState == RollState.HOMING) {
@@ -89,6 +103,7 @@ public class RollSubsystem extends StateMachine<RollState> {
     return switch (getState()) {
       case HOMING -> false;
       case CORAL_SCORE -> MathUtil.isNear(getScoreDirection(), motorAngle, 1);
+      case SMART_STOW -> MathUtil.isNear(getSmartStowDirection(), motorAngle, 1);
       default -> MathUtil.isNear(getState().angle, motorAngle, 1);
     };
   }
@@ -98,7 +113,7 @@ public class RollSubsystem extends StateMachine<RollState> {
     super.robotPeriodic();
     DogLog.log("Roll/StatorCurrent", motor.getStatorCurrent().getValueAsDouble());
     DogLog.log("Roll/AppliedVoltage", motor.getMotorVoltage().getValueAsDouble());
-    DogLog.log("Roll/Position", motorAngle);
+    DogLog.log("Roll/Angle", motorAngle);
     if (DriverStation.isEnabled()) {
       if (getState() == RollState.HOMING) {
         DogLog.logFault("Roll Unhomed", AlertType.kWarning);
