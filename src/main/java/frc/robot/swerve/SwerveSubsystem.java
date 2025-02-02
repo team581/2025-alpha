@@ -252,16 +252,14 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case PURPLE_ALIGN_TELEOP -> {
-        if (purpleSpeeds.omegaRadiansPerSecond == 0) {
+        if (teleopSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(teleopSpeeds.vxMetersPerSecond + purpleSpeeds.vxMetersPerSecond)
                   .withVelocityY(teleopSpeeds.vyMetersPerSecond + purpleSpeeds.vyMetersPerSecond)
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-
         } else {
-
           drivetrain.setControl(
               drive
                   .withVelocityX(teleopSpeeds.vxMetersPerSecond + purpleSpeeds.vxMetersPerSecond)
@@ -272,22 +270,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case PURPLE_ALIGN_AUTO -> {
-        if (purpleSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(autoSpeeds.vxMetersPerSecond + purpleSpeeds.vxMetersPerSecond)
                   .withVelocityY(autoSpeeds.vyMetersPerSecond + purpleSpeeds.vyMetersPerSecond)
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
                   .withDriveRequestType(DriveRequestType.Velocity));
-        } else {
-          drivetrain.setControl(
-              drive
-                  .withVelocityX(autoSpeeds.vxMetersPerSecond + purpleSpeeds.vxMetersPerSecond)
-                  .withVelocityY(autoSpeeds.vyMetersPerSecond + purpleSpeeds.vyMetersPerSecond)
-                  .withRotationalRate(
-                      autoSpeeds.omegaRadiansPerSecond + purpleSpeeds.omegaRadiansPerSecond)
-                  .withDriveRequestType(DriveRequestType.Velocity));
-        }
+
       }
       case AUTO ->
           drivetrain.setControl(
