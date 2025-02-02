@@ -270,13 +270,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case PURPLE_ALIGN_AUTO -> {
-          drivetrain.setControl(
-              driveToAngle
-                  .withVelocityX(autoSpeeds.vxMetersPerSecond + purpleSpeeds.vxMetersPerSecond)
-                  .withVelocityY(autoSpeeds.vyMetersPerSecond + purpleSpeeds.vyMetersPerSecond)
-                  .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
-                  .withDriveRequestType(DriveRequestType.Velocity));
-
+        drivetrain.setControl(
+            driveToAngle
+                .withVelocityX(autoSpeeds.vxMetersPerSecond + purpleSpeeds.vxMetersPerSecond)
+                .withVelocityY(autoSpeeds.vyMetersPerSecond + purpleSpeeds.vyMetersPerSecond)
+                .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
+                .withDriveRequestType(DriveRequestType.Velocity));
       }
       case AUTO ->
           drivetrain.setControl(
