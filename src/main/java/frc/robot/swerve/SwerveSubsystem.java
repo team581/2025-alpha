@@ -74,7 +74,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
   private ChassisSpeeds magnetizedSpeeds = new ChassisSpeeds();
   private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
   private double goalSnapAngle = 0;
 
   /** The latest requested teleop speeds. */
@@ -128,9 +127,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
             speeds, Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble())));
   }
 
-  public void setPurpleSpeeds(ChassisSpeeds speeds) {
-    purpleSpeeds = speeds;
-  }
 
   public void setPurpleSpeeds(ChassisSpeeds speeds) {
     purpleSpeeds = speeds;
@@ -143,10 +139,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
       case INTAKE_ASSIST_ALGAE_TELEOP, INTAKE_ASSIST_CORAL_TELEOP ->
           DriverStation.isAutonomous() ? SwerveState.AUTO : currentState;
-      case PURPLE_ALIGN_TELEOP, PURPLE_ALIGN_AUTO ->
-          DriverStation.isAutonomous()
-              ? SwerveState.PURPLE_ALIGN_AUTO
-              : SwerveState.PURPLE_ALIGN_TELEOP;
       case PURPLE_ALIGN_TELEOP, PURPLE_ALIGN_AUTO ->
           DriverStation.isAutonomous()
               ? SwerveState.PURPLE_ALIGN_AUTO
@@ -338,14 +330,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     }
   }
 
-  public void enablePurpleAlign() {
-    if (DriverStation.isTeleop()) {
-      setStateFromRequest(SwerveState.PURPLE_ALIGN_TELEOP);
-    } else {
-      setState(SwerveState.PURPLE_ALIGN_AUTO);
-    }
-  }
-
   public void setSnapsEnabled(boolean newValue) {
     switch (getState()) {
       case TELEOP,
@@ -353,10 +337,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
               INTAKE_ASSIST_CORAL_TELEOP,
               INTAKE_ASSIST_ALGAE_TELEOP,
               PURPLE_ALIGN_TELEOP,
-              PURPLE_ALIGN_TELEOP,
               REEF_MAGNETISM_TELEOP ->
           setStateFromRequest(newValue ? SwerveState.TELEOP_SNAPS : SwerveState.TELEOP);
-      case AUTO, AUTO_SNAPS, PURPLE_ALIGN_AUTO ->
       case AUTO, AUTO_SNAPS, PURPLE_ALIGN_AUTO ->
           setStateFromRequest(newValue ? SwerveState.AUTO_SNAPS : SwerveState.AUTO);
     }

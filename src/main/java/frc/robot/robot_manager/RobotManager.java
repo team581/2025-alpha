@@ -94,7 +94,6 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private double reefSnapAngle = 0.0;
   private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
   private Pose2d nearestReefSidePose = new Pose2d();
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
 
