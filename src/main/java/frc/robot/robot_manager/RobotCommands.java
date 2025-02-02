@@ -56,7 +56,7 @@ public class RobotCommands {
   }
 
   public Command highLineupCommand() {
-    return Commands.runOnce(robot::highLineupRequest, requirements).withName("HighLineupCommand");
+    return Commands.runOnce(robot::highApproachRequest, requirements).withName("HighLineupCommand");
   }
 
   public Command setGamepieceModeCommand(GamePieceMode newMode) {

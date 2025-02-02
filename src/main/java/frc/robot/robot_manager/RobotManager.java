@@ -848,12 +848,12 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_ALGAE_L2, DISLODGE_ALGAE_L2_WAIT, DISLODGE_ALGAE_L2_PUSHING -> {
         if (newMode == GamePieceMode.CORAL) {
-          l2CoralLineupRequest();
+          l2CoralApproachRequest();
         }
       }
       case INTAKE_ALGAE_L3, DISLODGE_ALGAE_L3_WAIT, DISLODGE_ALGAE_L3_PUSHING -> {
         if (newMode == GamePieceMode.CORAL) {
-          l3CoralLineupRequest();
+          l3CoralApproachRequest();
         }
       }
       case INTAKE_CORAL_STATION -> {
@@ -893,7 +893,7 @@ public class RobotManager extends StateMachine<RobotState> {
           NET_FORWARD_WAITING,
           NET_FORWARD_PREPARE_TO_SCORE -> {
         if (newMode == GamePieceMode.CORAL) {
-          l4CoralLineupRequest();
+          l4CoralApproachRequest();
         }
       }
       case PROCESSOR_WAITING, PROCESSOR_PREPARE_TO_SCORE -> {
@@ -1000,7 +1000,7 @@ public class RobotManager extends StateMachine<RobotState> {
     if (gamePieceMode == GamePieceMode.ALGAE) {
       intakeAlgaeL2Request();
     } else {
-      l2CoralLineupRequest();
+      l2CoralApproachRequest();
     }
   }
 
@@ -1012,7 +1012,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-  public void l2CoralLineupRequest() {
+  public void l2CoralApproachRequest() {
     gamePieceMode = GamePieceMode.CORAL;
     switch (getState()) {
       case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
@@ -1024,7 +1024,7 @@ public class RobotManager extends StateMachine<RobotState> {
     if (gamePieceMode == GamePieceMode.ALGAE) {
       intakeAlgaeL3Request();
     } else {
-      l3CoralLineupRequest();
+      l3CoralApproachRequest();
     }
   }
 
@@ -1036,7 +1036,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-  public void l3CoralLineupRequest() {
+  public void l3CoralApproachRequest() {
     gamePieceMode = GamePieceMode.CORAL;
     switch (getState()) {
       case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
@@ -1068,11 +1068,11 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-  public void highLineupRequest() {
+  public void highApproachRequest() {
     if (gamePieceMode == GamePieceMode.ALGAE) {
       algaeNetRequest();
     } else {
-      l4CoralLineupRequest();
+      l4CoralApproachRequest();
     }
   }
 
@@ -1101,11 +1101,18 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
-  public void l4CoralLineupRequest() {
+  public void l4CoralApproachRequest() {
     gamePieceMode = GamePieceMode.CORAL;
     switch (getState()) {
       case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
       default -> setStateFromRequest(RobotState.CORAL_L4_1_APPROACH);
+    }
+  }
+  public void l4CoralLineupRequest() {
+    gamePieceMode = GamePieceMode.CORAL;
+    switch (getState()) {
+      case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
+      default -> setStateFromRequest(RobotState.CORAL_L4_2_LINEUP);
     }
   }
 
