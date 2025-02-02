@@ -2,14 +2,10 @@ package frc.robot.purple;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import frc.robot.auto_align.AutoAlign;
-import frc.robot.auto_align.ReefPipeLevel;
-import frc.robot.autos.followers.PathFollower;
 import frc.robot.vision.limelight.Limelight;
 
 public class Purple {
@@ -64,11 +60,13 @@ public class Purple {
 
   // public ChassisSpeeds getPoseAlignChassisSpeeds(Pose2d robotPose, ReefPipeLevel level) {
   //   var pipePose = AutoAlign.getClosestReefPipe(robotPose, level);
-  //   var pipePoseRobotRelative = pipePose.getTranslation().rotateBy(Rotation2d.fromDegrees(360-robotPose.getRotation().getDegrees())).minus(robotPose.getTranslation());
+  //   var pipePoseRobotRelative =
+  // pipePose.getTranslation().rotateBy(Rotation2d.fromDegrees(360-robotPose.getRotation().getDegrees())).minus(robotPose.getTranslation());
   //   var forwardOffset = pipePoseRobotRelative.getX();
   //   var forwardOffsetTranslation = new Translation2d(forwardOffset, 0.0);
   //   var forwardOffsetTranslationRotated =
-  //       forwardOffsetTranslation.rotateBy(Rotation2d.fromDegrees(robotPose.getRotation().getDegrees()));
+  //
+  // forwardOffsetTranslation.rotateBy(Rotation2d.fromDegrees(robotPose.getRotation().getDegrees()));
   //   var xError = forwardOffsetTranslationRotated.getX();
   //   var yError = forwardOffsetTranslationRotated.getY();
   //   DogLog.log("PurpleAlignment/Tag/XError", xError);
@@ -80,7 +78,6 @@ public class Purple {
   //   DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
   //   return new ChassisSpeeds(xEffort, yEffort, 0.0);
   // }
-
 
   public ChassisSpeeds getPurpleAlignChassisSpeeds(double robotHeading) {
     var maybeResult = purpleCamera.getPurpleResult();
