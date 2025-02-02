@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class MathHelpers {
@@ -17,6 +18,10 @@ public class MathHelpers {
 
   public static double csc(double radians) {
     return (1 / Math.sin(radians));
+  }
+
+  public static double angleModulus(double angleDegrees) {
+    return MathUtil.inputModulus(angleDegrees, -180, 180);
   }
 
   private MathHelpers() {}

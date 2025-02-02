@@ -332,10 +332,10 @@ public class RobotManager extends StateMachine<RobotState> {
       case INTAKE_CORAL_STATION_FRONT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
         moveSuperstructure(
-            ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
+            ElevatorState.INTAKING_CORAL_STATION_FRONT, WristState.INTAKING_CORAL_STATION_FRONT);
         roll.setState(RollState.STOWED);
         swerve.setSnapsEnabled(true);
-        swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
+        swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0);
         frontCoralLimelight.setState(LimelightState.TAGS);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
         backTagLimelight.setState(LimelightState.TAGS);
@@ -783,6 +783,7 @@ public class RobotManager extends StateMachine<RobotState> {
   public void robotPeriodic() {
     super.robotPeriodic();
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSidePose);
+    DogLog.log("RobotManager/ShouldIntakeForward", AutoAlign.shouldIntakeStationForward(localization.getPose()));
 
     // Continuous state actions
 
@@ -812,9 +813,13 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(reefSnapAngle);
       }
-      case INTAKE_CORAL_STATION_BACK, INTAKE_CORAL_STATION_FRONT -> {
+      case INTAKE_CORAL_STATION_BACK -> {
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
+      }
+      case INTAKE_CORAL_STATION_FRONT ->{
+        swerve.setSnapsEnabled(true);
+        swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0);
       }
       default -> {}
     }
@@ -1005,6 +1010,22 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void intakeStationRequest() {
+    if (AutoAlign.shouldIntakeStationForward(localization.getPose())) {
+      intakeStationForwardRequest();
+    } else {
+      intakeStationBackwardRequest();
+    }
+  }
+
+  public void intakeStationForwardRequest() {
+    gamePieceMode = GamePieceMode.CORAL;
+    switch (getState()) {
+      case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
+      default -> setStateFromRequest(RobotState.INTAKE_CORAL_STATION_FRONT);
+    }
+  }
+
+  public void intakeStationBackwardRequest() {
     gamePieceMode = GamePieceMode.CORAL;
     switch (getState()) {
       case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
