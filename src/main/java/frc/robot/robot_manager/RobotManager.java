@@ -783,7 +783,9 @@ public class RobotManager extends StateMachine<RobotState> {
   public void robotPeriodic() {
     super.robotPeriodic();
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSidePose);
-    DogLog.log("RobotManager/ShouldIntakeForward", AutoAlign.shouldIntakeStationForward(localization.getPose()));
+    DogLog.log(
+        "RobotManager/ShouldIntakeForward",
+        AutoAlign.shouldIntakeStationForward(localization.getPose()));
 
     // Continuous state actions
 
@@ -817,7 +819,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()));
       }
-      case INTAKE_CORAL_STATION_FRONT ->{
+      case INTAKE_CORAL_STATION_FRONT -> {
         swerve.setSnapsEnabled(true);
         swerve.setSnapToAngle(SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0);
       }

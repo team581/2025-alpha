@@ -6,7 +6,6 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.purple.PurpleState;
 import frc.robot.swerve.SnapUtil;
-import frc.robot.util.MathHelpers;
 import frc.robot.vision.CameraHealth;
 import frc.robot.vision.results.TagResult;
 import java.util.List;
@@ -133,5 +132,4 @@ public class AutoAlign {
 
     return ReefAlignState.HAS_TAGS_WRONG_POSITION;
   }
-
 }
