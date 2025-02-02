@@ -799,7 +799,7 @@ public class RobotManager extends StateMachine<RobotState> {
     super.collectInputs();
     nearestReefSidePose = AutoAlign.getClosestReefSide(localization.getPose()).getPose();
     reefSnapAngle = nearestReefSidePose.getRotation().getDegrees();
-    purpleSpeeds = purple.getPurpleAlignChassisSpeeds(imu.getRobotHeading());
+    purpleSpeeds = purple.getCombinedTagAndPurpleChassisSpeeds(imu.getRobotHeading());
   }
 
   private boolean cameraOnlineAndFarEnoughFromReef() {

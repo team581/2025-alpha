@@ -1,6 +1,7 @@
 package frc.robot.vision.limelight;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.fms.FmsSubsystem;
@@ -149,6 +150,26 @@ public class Limelight extends StateMachine<LimelightState> {
     DogLog.log("Vision/" + name + "/Purple/ty", purpleTY);
 
     return Optional.of(new PurpleResult(purpleTX, purpleTY, timestamp));
+  }
+
+  public Optional<Pose2d> getRobotRelativePoseToTag() {
+    if (getState() != LimelightState.TAGS || getState() != LimelightState.REEF_TAGS) {
+      return Optional.empty();
+    }
+
+    var pose = LimelightHelpers.getBotPose3d_TargetSpace(limelightTableName).toPose2d();
+    if (pose == null) {
+      return Optional.empty();
+    }
+
+    DogLog.log("Vision/" + name + "/Tags/RawRobotRelativeToTagPose", pose);
+
+    // This prevents having crazy poses if the Limelight loses power
+    if (pose.getX() == 0.0 && pose.getY() == 0.0) {
+      return Optional.empty();
+    }
+
+    return Optional.of(pose);
   }
 
   private int[] getAllianceBasedReefTagIDs() {
