@@ -4,6 +4,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,7 +17,10 @@ public class RollSubsystem extends StateMachine<RollState> {
   private final TalonFX motor;
   private double motorAngle;
   private double motorCurrent;
+  private double averageMotorCurrent;
   private double smartStowAngle;
+
+  private LinearFilter linearFilter = LinearFilter.movingAverage(10);
 
   private final IntakeSubsystem intake;
 
@@ -55,21 +59,22 @@ public class RollSubsystem extends StateMachine<RollState> {
   }
 
   @Override
+  protected void collectInputs() {
+    motorAngle = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
+    motorCurrent = motor.getStatorCurrent().getValueAsDouble();
+    averageMotorCurrent = linearFilter.calculate(motorCurrent);
+  }
+
+  @Override
   protected RollState getNextState(RollState currentState) {
     if (currentState == RollState.HOMING
-        && motorCurrent > RobotConfig.get().roll().homingCurrentThreshold()) {
+        && averageMotorCurrent > RobotConfig.get().roll().homingCurrentThreshold()) {
       motor.setPosition(Units.degreesToRotations(RobotConfig.get().roll().homingPosition()));
       return RollState.STOWED;
     }
 
     // Don't do anything
     return currentState;
-  }
-
-  @Override
-  protected void collectInputs() {
-    motorAngle = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
-    motorCurrent = motor.getStatorCurrent().getValueAsDouble();
   }
 
   private double getScoreDirection() {
@@ -80,7 +85,7 @@ public class RollSubsystem extends StateMachine<RollState> {
   }
 
   private double getSmartStowDirection() {
-    if (!intake.getLeftSensor() && !intake.getRightSensor()) {
+    if (intake.getLeftSensor() && intake.getRightSensor()) {
       return 0;
     } else if (intake.getLeftSensor()) {
       return -90;
@@ -111,7 +116,8 @@ public class RollSubsystem extends StateMachine<RollState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-    DogLog.log("Roll/StatorCurrent", motor.getStatorCurrent().getValueAsDouble());
+    DogLog.log("Roll/StatorCurrent", motorCurrent);
+    DogLog.log("Roll/AverageStatorCurrent", averageMotorCurrent);
     DogLog.log("Roll/AppliedVoltage", motor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Roll/Angle", motorAngle);
     DogLog.log("Roll/AtGoal", atGoal());

@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -23,6 +24,9 @@ public class WristSubsystem extends StateMachine<WristState> {
   private static final double MINIMUM_EXPECTED_HOMING_ANGLE_CHANGE = 180.0;
   private final StaticBrake brakeNeutralRequest = new StaticBrake();
   private final CoastOut coastNeutralRequest = new CoastOut();
+
+  private double averageMotorCurrent;
+  private LinearFilter linearFilter = LinearFilter.movingAverage(10);
 
   private final MotionMagicVoltage motionMagicRequest =
       new MotionMagicVoltage(0.0).withEnableFOC(false);
@@ -70,6 +74,7 @@ public class WristSubsystem extends StateMachine<WristState> {
     }
 
     motorCurrent = motor.getStatorCurrent().getValueAsDouble();
+    averageMotorCurrent = linearFilter.calculate(motorCurrent);
   }
 
   @Override
@@ -96,7 +101,8 @@ public class WristSubsystem extends StateMachine<WristState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-    DogLog.log("Wrist/StatorCurrent", motor.getStatorCurrent().getValueAsDouble());
+    DogLog.log("Wrist/StatorCurrent", motorCurrent);
+    DogLog.log("Wrist/AverageStatorCurrent", averageMotorCurrent);
     DogLog.log("Wrist/AppliedVoltage", motor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Wrist/Angle", motorAngle);
     DogLog.log("Wrist/AtGoal", atGoal());
@@ -137,7 +143,7 @@ public class WristSubsystem extends StateMachine<WristState> {
   @Override
   protected WristState getNextState(WristState currentState) {
     if (currentState == WristState.MID_MATCH_HOMING
-        && motorCurrent > RobotConfig.get().wrist().homingCurrentThreshold()) {
+        && averageMotorCurrent > RobotConfig.get().wrist().homingCurrentThreshold()) {
       motor.setPosition(Units.degreesToRotations(RobotConfig.get().wrist().homingPosition()));
       return WristState.STOWED;
     }
