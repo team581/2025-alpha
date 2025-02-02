@@ -16,6 +16,7 @@ public class RollSubsystem extends StateMachine<RollState> {
   private final TalonFX motor;
   private double motorAngle;
   private double motorCurrent;
+  private double smartStowAngle;
 
   private final IntakeSubsystem intake;
 
@@ -42,8 +43,9 @@ public class RollSubsystem extends StateMachine<RollState> {
             motionMagicRequest.withPosition(Units.degreesToRotations(getScoreDirection())));
       }
       case SMART_STOW -> {
+        smartStowAngle = getSmartStowDirection();
         motor.setControl(
-            motionMagicRequest.withPosition(Units.degreesToRotations(getSmartStowDirection())));
+            motionMagicRequest.withPosition(Units.degreesToRotations(smartStowAngle)));
       }
       case UNHOMED -> motor.disable();
       default -> {
@@ -75,17 +77,16 @@ public class RollSubsystem extends StateMachine<RollState> {
     if (intake.getLeftSensor()) {
       return 90;
     }
-
     return -90;
   }
 
   private double getSmartStowDirection() {
-    if (intake.getLeftSensor()) {
+    if (!intake.getLeftSensor() && !intake.getRightSensor()) {
+      return 0;
+    } else if (intake.getLeftSensor()) {
       return -90;
-    } else if (intake.getRightSensor()) {
-      return 90;
     } else {
-      return 20;
+      return 90;
     }
   }
 
@@ -103,7 +104,7 @@ public class RollSubsystem extends StateMachine<RollState> {
     return switch (getState()) {
       case HOMING -> false;
       case CORAL_SCORE -> MathUtil.isNear(getScoreDirection(), motorAngle, 1);
-      case SMART_STOW -> MathUtil.isNear(getSmartStowDirection(), motorAngle, 1);
+      case SMART_STOW -> MathUtil.isNear(smartStowAngle, motorAngle, 2);
       default -> MathUtil.isNear(getState().angle, motorAngle, 1);
     };
   }
@@ -114,6 +115,7 @@ public class RollSubsystem extends StateMachine<RollState> {
     DogLog.log("Roll/StatorCurrent", motor.getStatorCurrent().getValueAsDouble());
     DogLog.log("Roll/AppliedVoltage", motor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Roll/Angle", motorAngle);
+    DogLog.log("Roll/AtGoal", atGoal());
     if (DriverStation.isEnabled()) {
       if (getState() == RollState.HOMING) {
         DogLog.logFault("Roll Unhomed", AlertType.kWarning);
