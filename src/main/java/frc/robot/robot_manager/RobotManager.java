@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.ReefAlignState;
+import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.climber.ClimberState;
 import frc.robot.climber.ClimberSubsystem;
 import frc.robot.controller.RumbleControllerSubsystem;
@@ -92,6 +93,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private double reefSnapAngle = 0.0;
   private Pose2d nearestReefSidePose = new Pose2d();
+  private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
 
   @Override
   protected RobotState getNextState(RobotState currentState) {
@@ -1222,6 +1224,7 @@ public class RobotManager extends StateMachine<RobotState> {
     return AutoAlign.getReefAlignState(
         localization.getPose(),
         purple.getPurpleState(),
+        scoringLevel,
         frontCoralLimelight
             .getInterpolatedTagResult()
             .or(backTagLimelight::getInterpolatedTagResult),
