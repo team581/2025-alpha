@@ -289,7 +289,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     }
   }
 
-  public void activateCoralIntakeAssist() {
+  public void enableCoralIntakeAssist() {
     // Intake assist is only during teleop, otherwise just do auto driving
     if (DriverStation.isTeleop()) {
       setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);

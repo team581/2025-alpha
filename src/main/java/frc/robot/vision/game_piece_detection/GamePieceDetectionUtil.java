@@ -89,9 +89,10 @@ public class GamePieceDetectionUtil {
     return robotRelativeToFieldRelativeGamePiecePose(robotPose, adjustedTranslationForIntake);
   }
 
-  public static Translation2d calculateRobotRelativePoseToIntake(GamePieceResult visionResult) {
+  public static Translation2d calculateRobotRelativePoseToIntake(
+      GamePieceResult visionResult, double offset) {
     var robotRelativeGamePiecePose = calculateRobotRelativeTranslationFromCamera(visionResult);
     return new Translation2d(
-        robotRelativeGamePiecePose.getX() - 0.762, robotRelativeGamePiecePose.getY());
+        robotRelativeGamePiecePose.getX() - offset, robotRelativeGamePiecePose.getY());
   }
 }
