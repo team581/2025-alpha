@@ -127,7 +127,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
             speeds, Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble())));
   }
 
-
   public void setPurpleSpeeds(ChassisSpeeds speeds) {
     purpleSpeeds = speeds;
   }
