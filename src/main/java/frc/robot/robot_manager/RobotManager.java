@@ -217,7 +217,8 @@ public class RobotManager extends StateMachine<RobotState> {
       }
 
       case INTAKE_CORAL_STATION -> intake.getHasGP() ? RobotState.SMART_STOW_1 : currentState;
-      case SMART_STOW_1 -> elevator.atGoal() && roll.atGoal() ? RobotState.SMART_STOW_2 : currentState;
+      case SMART_STOW_1 ->
+          elevator.atGoal() && roll.atGoal() ? RobotState.SMART_STOW_2 : currentState;
       case SMART_STOW_2 -> wrist.atGoal() ? RobotState.IDLE_CORAL : currentState;
       case NET_BACK_SCORING -> intake.getHasGP() ? currentState : RobotState.IDLE_NO_GP;
     };

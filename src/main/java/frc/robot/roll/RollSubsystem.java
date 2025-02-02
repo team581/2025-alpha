@@ -44,8 +44,7 @@ public class RollSubsystem extends StateMachine<RollState> {
       }
       case SMART_STOW -> {
         smartStowAngle = getSmartStowDirection();
-        motor.setControl(
-            motionMagicRequest.withPosition(Units.degreesToRotations(smartStowAngle)));
+        motor.setControl(motionMagicRequest.withPosition(Units.degreesToRotations(smartStowAngle)));
       }
       case UNHOMED -> motor.disable();
       default -> {
