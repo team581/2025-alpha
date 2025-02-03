@@ -2,22 +2,27 @@ package frc.robot.purple;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.auto_align.AutoAlign;
+import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.vision.limelight.Limelight;
 
 public class Purple {
   private final Limelight purpleCamera;
-  private final Limelight frontTagCamera;
   private static final double PURPLE_SIDEWAYS_KP = 2.0;
   private static final double TAG_KP = 2.5;
-  private static final double ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE = 0.55;
 
-  public Purple(Limelight purpleCamera, Limelight frontTagCamera) {
+  private static final double SEEN_PURPLE_TIMEOUT = 3.0;
+  private double lastTimeSeen = 0.0;
+  private boolean seenPurple = false;
+
+  public Purple(Limelight purpleCamera) {
     this.purpleCamera = purpleCamera;
-    this.frontTagCamera = frontTagCamera;
   }
 
   public PurpleState getPurpleState() {
@@ -35,54 +40,27 @@ public class Purple {
     return PurpleState.VISIBLE_NOT_CENTERED;
   }
 
-  public ChassisSpeeds getTagAlignForwardsChassisSpeeds(double robotHeading) {
-    var maybePose = frontTagCamera.getRobotRelativePoseToTag();
-    if (maybePose.isEmpty()) {
-      return new ChassisSpeeds();
+  public static ChassisSpeeds getPoseAlignmentChassisSpeeds(
+      Pose2d robotPose, ReefPipeLevel level, boolean forwardOnly) {
+    var scoringTranslationFieldRelative =
+        AutoAlign.getClosestReefPipe(robotPose, level).getTranslation();
+
+    var scoringTranslationRobotRelative =
+        scoringTranslationFieldRelative
+            .minus(robotPose.getTranslation())
+            .rotateBy(Rotation2d.fromDegrees(360 - robotPose.getRotation().getDegrees()));
+    var goalTranslationUnrotated = new Translation2d();
+    if (forwardOnly) {
+      goalTranslationUnrotated = new Translation2d(0, scoringTranslationRobotRelative.getX());
+    } else {
+      goalTranslationUnrotated = scoringTranslationRobotRelative;
     }
-    DogLog.log("PurpleAlignment/Tag/Pose", maybePose.get());
 
-    var rawForwardOffset = -1 * maybePose.get().getZ();
-    var forwardOffset = rawForwardOffset - ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE;
-    DogLog.log("PurpleAlignment/Tag/RawForwardError", rawForwardOffset);
-    DogLog.log("PurpleAlignment/Tag/ForwardError", forwardOffset);
+    var goalTranslation = goalTranslationUnrotated.rotateBy(robotPose.getRotation());
 
-    var forwardOffsetTranslation = new Translation2d(forwardOffset, 0.0);
-    var forwardOffsetTranslationRotated =
-        forwardOffsetTranslation.rotateBy(Rotation2d.fromDegrees(robotHeading));
-    var xError = forwardOffsetTranslationRotated.getX();
-    var yError = forwardOffsetTranslationRotated.getY();
-    DogLog.log("PurpleAlignment/Tag/XError", xError);
-    DogLog.log("PurpleAlignment/Tag/YError", yError);
+    var xEffort = goalTranslation.getX() * TAG_KP;
+    var yEffort = goalTranslation.getY() * TAG_KP;
 
-    var xEffort = xError * TAG_KP;
-    var yEffort = yError * TAG_KP;
-    DogLog.log("PurpleAlignment/Tag/XEffort", xEffort);
-    DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
-    return new ChassisSpeeds(xEffort, yEffort, 0.0);
-  }
-
-  public ChassisSpeeds getTagAlignForwardsSidewaysChassisSpeeds(double robotHeading) {
-    var maybePose = frontTagCamera.getRobotRelativePoseToTag();
-    if (maybePose.isEmpty()) {
-      return new ChassisSpeeds();
-    }
-    DogLog.log("PurpleAlignment/Tag/Pose", maybePose.get());
-
-    var forwardOffset = maybePose.get().getX() - ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE;
-    var sidewaysOffset = -1 * maybePose.get().getY();
-    var forwardOffsetTranslation = new Translation2d(forwardOffset, sidewaysOffset);
-    var forwardOffsetTranslationRotated =
-        forwardOffsetTranslation.rotateBy(Rotation2d.fromDegrees(robotHeading));
-    var xError = forwardOffsetTranslationRotated.getX();
-    var yError = forwardOffsetTranslationRotated.getY();
-    DogLog.log("PurpleAlignment/Tag/XError", xError);
-    DogLog.log("PurpleAlignment/Tag/YError", yError);
-
-    var xEffort = xError * TAG_KP;
-    var yEffort = yError * TAG_KP;
-    DogLog.log("PurpleAlignment/Tag/XEffort", xEffort);
-    DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
     return new ChassisSpeeds(xEffort, yEffort, 0.0);
   }
 
@@ -107,12 +85,25 @@ public class Purple {
     return new ChassisSpeeds(xEffort, yEffort, 0.0);
   }
 
-  public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds(double robotHeading) {
-    var tagSpeeds = getTagAlignForwardsChassisSpeeds(robotHeading);
-    var purpleSpeeds = getPurpleAlignChassisSpeeds(robotHeading);
-    var combinedSpeeds = tagSpeeds.plus(purpleSpeeds);
-    DogLog.log("PurpleAlignment/Combined/XEffort", combinedSpeeds.vxMetersPerSecond);
-    DogLog.log("PurpleAlignment/Combined/YEffort", combinedSpeeds.vyMetersPerSecond);
-    return combinedSpeeds;
+  public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds(
+      Pose2d robotPose, ReefPipeLevel reefPipeLevel) {
+    DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
+    DogLog.log("PurpleAlignment/LastSeenTimestamp", lastTimeSeen);
+
+    return switch (getPurpleState()) {
+      case NO_PURPLE -> {
+        if (Timer.getFPGATimestamp() - lastTimeSeen >= SEEN_PURPLE_TIMEOUT) {
+          seenPurple = false;
+        }
+        yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, seenPurple);
+      }
+      case VISIBLE_NOT_CENTERED -> {
+        seenPurple = true;
+        lastTimeSeen = Timer.getFPGATimestamp();
+        yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true)
+            .plus(getPurpleAlignChassisSpeeds(robotPose.getRotation().getDegrees()));
+      }
+      case CENTERED -> getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true);
+    };
   }
 }

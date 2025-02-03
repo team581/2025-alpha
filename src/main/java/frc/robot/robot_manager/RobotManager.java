@@ -803,7 +803,6 @@ public class RobotManager extends StateMachine<RobotState> {
     super.collectInputs();
     nearestReefSidePose = AutoAlign.getClosestReefSide(localization.getPose()).getPose();
     reefSnapAngle = nearestReefSidePose.getRotation().getDegrees();
-    purpleSpeeds = purple.getCombinedTagAndPurpleChassisSpeeds(imu.getRobotHeading());
     scoringLevel =
         switch (getState()) {
           case CORAL_L1_1_APPROACH, CORAL_L1_3_PLACE, CORAL_L1_4_RELEASE -> ReefPipeLevel.L1;
@@ -815,6 +814,9 @@ public class RobotManager extends StateMachine<RobotState> {
               ReefPipeLevel.L4;
           default -> ReefPipeLevel.BASE;
         };
+
+    purpleSpeeds =
+        purple.getCombinedTagAndPurpleChassisSpeeds(localization.getPose(), scoringLevel);
   }
 
   private boolean cameraOnlineAndFarEnoughFromReef() {
