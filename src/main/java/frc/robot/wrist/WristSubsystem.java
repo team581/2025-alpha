@@ -26,7 +26,7 @@ public class WristSubsystem extends StateMachine<WristState> {
   private final CoastOut coastNeutralRequest = new CoastOut();
 
   private double averageMotorCurrent;
-  private LinearFilter linearFilter = LinearFilter.movingAverage(10);
+  private LinearFilter linearFilter = LinearFilter.movingAverage(5);
 
   private final MotionMagicVoltage motionMagicRequest =
       new MotionMagicVoltage(0.0).withEnableFOC(false);
@@ -42,7 +42,7 @@ public class WristSubsystem extends StateMachine<WristState> {
   }
 
   public void setState(WristState newState) {
-    if (getState() != WristState.PRE_MATCH_HOMING || newState == WristState.MID_MATCH_HOMING) {
+    if (getState() != WristState.PRE_MATCH_HOMING && getState() != WristState.MID_MATCH_HOMING) {
 
       setStateFromRequest(newState);
     }

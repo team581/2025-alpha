@@ -20,7 +20,7 @@ public class RollSubsystem extends StateMachine<RollState> {
   private double averageMotorCurrent;
   private double smartStowAngle;
 
-  private LinearFilter linearFilter = LinearFilter.movingAverage(10);
+  private LinearFilter linearFilter = LinearFilter.movingAverage(5);
 
   private final IntakeSubsystem intake;
 

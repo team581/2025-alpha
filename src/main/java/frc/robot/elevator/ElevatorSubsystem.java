@@ -24,7 +24,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private double leftMotorCurrent;
   private double rightMotorCurrent;
 
-  private LinearFilter linearFilter = LinearFilter.movingAverage(10);
+  private LinearFilter linearFilter = LinearFilter.movingAverage(5);
 
   private final MotionMagicVoltage positionRequest =
       new MotionMagicVoltage(ElevatorState.STOWED.height);
@@ -52,7 +52,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
   public void setState(ElevatorState newState) {
     if (getState() != ElevatorState.PRE_MATCH_HOMING
-        || newState == ElevatorState.MID_MATCH_HOMING) {
+        && getState() != ElevatorState.MID_MATCH_HOMING) {
       setStateFromRequest(newState);
     }
   }
@@ -76,6 +76,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
     leftMotorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
     rightMotorCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+
     averageMotorCurrent = linearFilter.calculate((leftMotorCurrent + rightMotorCurrent) / 2.0);
 
     if (DriverStation.isDisabled()) {
@@ -143,7 +144,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
             ? collisionAvoidanceGoal
             : getState().height;
 
-    if (MathUtil.isNear(0, usedHeight, 1.0) && MathUtil.isNear(0, getHeight(), 1.0)) {
+    if (MathUtil.isNear(0, usedHeight, 1.0) && MathUtil.isNear(0, getHeight(), 1.0) && getState() != ElevatorState.MID_MATCH_HOMING) {
       leftMotor.disable();
       rightMotor.disable();
     }

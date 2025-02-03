@@ -665,9 +665,8 @@ public class RobotManager extends StateMachine<RobotState> {
         climber.setState(ClimberState.HANGING);
       }
       case UNJAM -> {
-        wrist.setState(WristState.UNJAM);
         intake.setState(IntakeState.OUTTAKING);
-        elevator.setState(ElevatorState.UNJAM);
+        moveSuperstructure(ElevatorState.UNJAM, WristState.UNJAM);
         swerve.setSnapsEnabled(false);
         swerve.setSnapToAngle(0);
         roll.setState(RollState.STOWED);
@@ -678,9 +677,8 @@ public class RobotManager extends StateMachine<RobotState> {
         climber.setState(ClimberState.STOWED);
       }
       case REHOME_ELEVATOR -> {
-        wrist.setState(WristState.STOWED);
         intake.setState(IntakeState.IDLE_NO_GP);
-        elevator.setState(ElevatorState.MID_MATCH_HOMING);
+        moveSuperstructure(ElevatorState.MID_MATCH_HOMING, WristState.STOWED);
         swerve.setSnapsEnabled(false);
         swerve.setSnapToAngle(0);
         roll.setState(RollState.STOWED);
@@ -691,9 +689,8 @@ public class RobotManager extends StateMachine<RobotState> {
         climber.setState(ClimberState.STOWED);
       }
       case REHOME_WRIST -> {
-        wrist.setState(WristState.MID_MATCH_HOMING);
         intake.setState(IntakeState.IDLE_NO_GP);
-        elevator.setState(ElevatorState.STOWED);
+        moveSuperstructure(ElevatorState.STOWED, WristState.MID_MATCH_HOMING);
         swerve.setSnapsEnabled(false);
         swerve.setSnapToAngle(0);
         roll.setState(RollState.STOWED);
@@ -704,9 +701,8 @@ public class RobotManager extends StateMachine<RobotState> {
         climber.setState(ClimberState.STOWED);
       }
       case REHOME_ROLL -> {
-        wrist.setState(WristState.STOWED);
         intake.setState(IntakeState.IDLE_NO_GP);
-        elevator.setState(ElevatorState.STOWED);
+        moveSuperstructure(ElevatorState.STOWED, WristState.STOWED);
         swerve.setSnapsEnabled(false);
         swerve.setSnapToAngle(0);
         roll.setState(RollState.HOMING);
