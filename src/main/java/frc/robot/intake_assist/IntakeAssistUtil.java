@@ -9,8 +9,8 @@ import frc.robot.vision.results.GamePieceResult;
 import java.util.Optional;
 
 public class IntakeAssistUtil {
-  private static final double CORAL_ASSIST_KP = 3.0;
-  private static final double ALGAE_ASSIST_KP = 3.0;
+  private static final double CORAL_ASSIST_KP = 2.0;
+  private static final double ALGAE_ASSIST_KP = 2.0;
 
   public static ChassisSpeeds getCoralAssistSpeeds(
       Optional<GamePieceResult> coral, double robotHeading, boolean greedyIntake) {
@@ -32,10 +32,10 @@ public class IntakeAssistUtil {
     }
 
     var gamePiecePoseRobotRelative =
-        GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get(), 0.8);
+        GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get(), 0.9);
     DogLog.log("IntakeAssist/InitialPose", gamePiecePoseRobotRelative);
 
-    if (greedyIntake && gamePiecePoseRobotRelative.getDistance(new Translation2d(0, 0)) < 0.1) {
+    if (greedyIntake && gamePiecePoseRobotRelative.getDistance(new Translation2d(0, 0)) < 0.05) {
       var gamePiecePoseForwardRobotRelative =
           GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get(), 0.5);
       DogLog.log("IntakeAssist/ForcedForwardPose", gamePiecePoseForwardRobotRelative);
