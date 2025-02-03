@@ -11,9 +11,9 @@ import frc.robot.vision.limelight.Limelight;
 public class Purple {
   private final Limelight purpleCamera;
   private final Limelight frontTagCamera;
-  private static final double PURPLE_SIDEWAYS_KP = 3.0;
-  private static final double TAG_FORWARDS_KP = 3.0;
-  private static final double ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE = 0.6;
+  private static final double PURPLE_SIDEWAYS_KP = 2.0;
+  private static final double TAG_KP = 2.5;
+  private static final double ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE = 0.55;
 
   public Purple(Limelight purpleCamera, Limelight frontTagCamera) {
     this.purpleCamera = purpleCamera;
@@ -35,14 +35,18 @@ public class Purple {
     return PurpleState.VISIBLE_NOT_CENTERED;
   }
 
-  public ChassisSpeeds getTagAlignChassisSpeeds(double robotHeading) {
+  public ChassisSpeeds getTagAlignForwardsChassisSpeeds(double robotHeading) {
     var maybePose = frontTagCamera.getRobotRelativePoseToTag();
     if (maybePose.isEmpty()) {
       return new ChassisSpeeds();
     }
     DogLog.log("PurpleAlignment/Tag/Pose", maybePose.get());
 
-    var forwardOffset = (-1 * maybePose.get().getX()) - ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE;
+    var rawForwardOffset = -1 * maybePose.get().getZ();
+    var forwardOffset = rawForwardOffset - ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE;
+    DogLog.log("PurpleAlignment/Tag/RawForwardError", rawForwardOffset);
+    DogLog.log("PurpleAlignment/Tag/ForwardError", forwardOffset);
+
     var forwardOffsetTranslation = new Translation2d(forwardOffset, 0.0);
     var forwardOffsetTranslationRotated =
         forwardOffsetTranslation.rotateBy(Rotation2d.fromDegrees(robotHeading));
@@ -51,33 +55,36 @@ public class Purple {
     DogLog.log("PurpleAlignment/Tag/XError", xError);
     DogLog.log("PurpleAlignment/Tag/YError", yError);
 
-    var xEffort = xError * TAG_FORWARDS_KP;
-    var yEffort = yError * TAG_FORWARDS_KP;
+    var xEffort = xError * TAG_KP;
+    var yEffort = yError * TAG_KP;
     DogLog.log("PurpleAlignment/Tag/XEffort", xEffort);
     DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
     return new ChassisSpeeds(xEffort, yEffort, 0.0);
   }
 
-  // public ChassisSpeeds getPoseAlignChassisSpeeds(Pose2d robotPose, ReefPipeLevel level) {
-  //   var pipePose = AutoAlign.getClosestReefPipe(robotPose, level);
-  //   var pipePoseRobotRelative =
-  // pipePose.getTranslation().rotateBy(Rotation2d.fromDegrees(360-robotPose.getRotation().getDegrees())).minus(robotPose.getTranslation());
-  //   var forwardOffset = pipePoseRobotRelative.getX();
-  //   var forwardOffsetTranslation = new Translation2d(forwardOffset, 0.0);
-  //   var forwardOffsetTranslationRotated =
-  //
-  // forwardOffsetTranslation.rotateBy(Rotation2d.fromDegrees(robotPose.getRotation().getDegrees()));
-  //   var xError = forwardOffsetTranslationRotated.getX();
-  //   var yError = forwardOffsetTranslationRotated.getY();
-  //   DogLog.log("PurpleAlignment/Tag/XError", xError);
-  //   DogLog.log("PurpleAlignment/Tag/YError", yError);
+  public ChassisSpeeds getTagAlignForwardsSidewaysChassisSpeeds(double robotHeading) {
+    var maybePose = frontTagCamera.getRobotRelativePoseToTag();
+    if (maybePose.isEmpty()) {
+      return new ChassisSpeeds();
+    }
+    DogLog.log("PurpleAlignment/Tag/Pose", maybePose.get());
 
-  //   var xEffort = xError * TAG_FORWARDS_KP;
-  //   var yEffort = yError * TAG_FORWARDS_KP;
-  //   DogLog.log("PurpleAlignment/Tag/XEffort", xEffort);
-  //   DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
-  //   return new ChassisSpeeds(xEffort, yEffort, 0.0);
-  // }
+    var forwardOffset = maybePose.get().getX() - ROBOT_FORWARDS_OFFSET_FROM_REEF_SIDE;
+    var sidewaysOffset = -1 * maybePose.get().getY();
+    var forwardOffsetTranslation = new Translation2d(forwardOffset, sidewaysOffset);
+    var forwardOffsetTranslationRotated =
+        forwardOffsetTranslation.rotateBy(Rotation2d.fromDegrees(robotHeading));
+    var xError = forwardOffsetTranslationRotated.getX();
+    var yError = forwardOffsetTranslationRotated.getY();
+    DogLog.log("PurpleAlignment/Tag/XError", xError);
+    DogLog.log("PurpleAlignment/Tag/YError", yError);
+
+    var xEffort = xError * TAG_KP;
+    var yEffort = yError * TAG_KP;
+    DogLog.log("PurpleAlignment/Tag/XEffort", xEffort);
+    DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
+    return new ChassisSpeeds(xEffort, yEffort, 0.0);
+  }
 
   public ChassisSpeeds getPurpleAlignChassisSpeeds(double robotHeading) {
     var maybeResult = purpleCamera.getPurpleResult();
@@ -101,7 +108,7 @@ public class Purple {
   }
 
   public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds(double robotHeading) {
-    var tagSpeeds = getTagAlignChassisSpeeds(robotHeading);
+    var tagSpeeds = getTagAlignForwardsChassisSpeeds(robotHeading);
     var purpleSpeeds = getPurpleAlignChassisSpeeds(robotHeading);
     var combinedSpeeds = tagSpeeds.plus(purpleSpeeds);
     DogLog.log("PurpleAlignment/Combined/XEffort", combinedSpeeds.vxMetersPerSecond);

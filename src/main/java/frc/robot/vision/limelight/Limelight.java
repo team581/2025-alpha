@@ -1,7 +1,7 @@
 package frc.robot.vision.limelight;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.fms.FmsSubsystem;
@@ -152,12 +152,12 @@ public class Limelight extends StateMachine<LimelightState> {
     return Optional.of(new PurpleResult(purpleTX, purpleTY, timestamp));
   }
 
-  public Optional<Pose2d> getRobotRelativePoseToTag() {
-    if (getState() != LimelightState.TAGS || getState() != LimelightState.REEF_TAGS) {
+  public Optional<Pose3d> getRobotRelativePoseToTag() {
+    if (getState() != LimelightState.TAGS && getState() != LimelightState.REEF_TAGS) {
       return Optional.empty();
     }
 
-    var pose = LimelightHelpers.getBotPose3d_TargetSpace(limelightTableName).toPose2d();
+    var pose = LimelightHelpers.getBotPose3d_TargetSpace(limelightTableName);
     if (pose == null) {
       return Optional.empty();
     }
