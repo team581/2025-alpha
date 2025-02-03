@@ -144,7 +144,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
             ? collisionAvoidanceGoal
             : getState().height;
 
-    if (MathUtil.isNear(0, usedHeight, 1.0) && MathUtil.isNear(0, getHeight(), 1.0) && getState() != ElevatorState.MID_MATCH_HOMING) {
+    if (MathUtil.isNear(0, usedHeight, 1.0)
+        && MathUtil.isNear(0, getHeight(), 1.0)
+        && getState() != ElevatorState.MID_MATCH_HOMING) {
       leftMotor.disable();
       rightMotor.disable();
     }
