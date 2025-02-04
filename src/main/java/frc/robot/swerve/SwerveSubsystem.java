@@ -236,7 +236,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                     teleopSpeeds.vxMetersPerSecond + assistSpeedsOffset.vxMetersPerSecond)
                 .withVelocityY(
                     teleopSpeeds.vyMetersPerSecond + assistSpeedsOffset.vyMetersPerSecond)
-                .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond + assistSpeedsOffset.omegaRadiansPerSecond)
+                .withRotationalRate(
+                    teleopSpeeds.omegaRadiansPerSecond + assistSpeedsOffset.omegaRadiansPerSecond)
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
       case REEF_MAGNETISM_TELEOP -> {
