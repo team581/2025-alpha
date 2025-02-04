@@ -209,7 +209,9 @@ public class RobotManager extends StateMachine<RobotState> {
         yield currentState;
       }
 
-      case INTAKE_CORAL_FLOOR_HORIZONTAL, INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL, INTAKE_CORAL_FLOOR_UPRIGHT -> {
+      case INTAKE_CORAL_FLOOR_HORIZONTAL,
+          INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL,
+          INTAKE_CORAL_FLOOR_UPRIGHT -> {
         if (intake.getHasGP()) {
           rumbleController.rumbleRequest();
           yield RobotState.IDLE_CORAL;
@@ -788,7 +790,8 @@ public class RobotManager extends StateMachine<RobotState> {
     nearestReefSidePose = AutoAlign.getClosestReefSide(localization.getPose()).getPose();
     reefSnapAngle = nearestReefSidePose.getRotation().getDegrees();
 
-    if (getState() == RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL || getState() == RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL
+    if (getState() == RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL
+        || getState() == RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL
         || getState() == RobotState.INTAKE_CORAL_FLOOR_UPRIGHT) {
       ChassisSpeeds coralAssistSpeeds =
           IntakeAssistUtil.getCoralAssistSpeeds(
@@ -852,7 +855,9 @@ public class RobotManager extends StateMachine<RobotState> {
           stowRequest();
         }
       }
-      case INTAKE_CORAL_FLOOR_UPRIGHT, INTAKE_CORAL_FLOOR_HORIZONTAL, INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
+      case INTAKE_CORAL_FLOOR_UPRIGHT,
+          INTAKE_CORAL_FLOOR_HORIZONTAL,
+          INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
         if (newMode == GamePieceMode.ALGAE) {
           intakeFloorAlgaeRequest();
         }
