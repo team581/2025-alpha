@@ -9,8 +9,12 @@ import frc.robot.vision.results.GamePieceResult;
 import java.util.Optional;
 
 public class IntakeAssistUtil {
+  private static final double INITIAL_LINEUP_DISTANCE_THRESHOLD = 0.05;
+  private static final double INITIAL_LINEUP_DISTANCE_FROM_CORAL = 0.9;
+  private static final double FINAL_SHOVE_DISTANCE_FROM_CORAL = 0.5;
   private static final double CORAL_ASSIST_KP = 2.0;
   private static final double ALGAE_ASSIST_KP = 2.0;
+
 
   public static ChassisSpeeds getCoralAssistSpeeds(
       Optional<GamePieceResult> coral, double robotHeading, boolean greedyIntake) {
@@ -32,12 +36,12 @@ public class IntakeAssistUtil {
     }
 
     var gamePiecePoseRobotRelative =
-        GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get(), 0.9);
+        GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get(), INITIAL_LINEUP_DISTANCE_FROM_CORAL);
     DogLog.log("IntakeAssist/InitialPose", gamePiecePoseRobotRelative);
 
-    if (greedyIntake && gamePiecePoseRobotRelative.getDistance(new Translation2d(0, 0)) < 0.05) {
+    if (greedyIntake && gamePiecePoseRobotRelative.getDistance(new Translation2d(0, 0)) < INITIAL_LINEUP_DISTANCE_THRESHOLD) {
       var gamePiecePoseForwardRobotRelative =
-          GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get(), 0.5);
+          GamePieceDetectionUtil.calculateRobotRelativePoseToIntake(visionResult.get(), FINAL_SHOVE_DISTANCE_FROM_CORAL);
       DogLog.log("IntakeAssist/ForcedForwardPose", gamePiecePoseForwardRobotRelative);
       var gamePiecePoseForwardRotatedRobot =
           gamePiecePoseForwardRobotRelative.rotateBy(Rotation2d.fromDegrees(robotHeading));
