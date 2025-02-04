@@ -11,11 +11,16 @@ import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
 
-public class FourPiece2IJKAuto extends BaseAuto {
+public class FourPiece2IJKLAuto extends BaseAuto {
   private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(1, 50, 4, 30);
 
-  public FourPiece2IJKAuto(RobotManager robotManager, Trailblazer trailblazer) {
+  public FourPiece2IJKLAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
+  }
+
+  @Override
+  protected Pose2d getBlueStartingPose() {
+    return Pose2d.kZero;
   }
 
   @Override
@@ -24,36 +29,37 @@ public class FourPiece2IJKAuto extends BaseAuto {
   }
 
   @Override
+  protected Pose2d getRedStartingPose() {
+    return new Pose2d(10.289, 1.903, Rotation2d.kZero);
+  }
+
+  @Override
   protected Command getRedAutoCommand() {
     return Commands.sequence(
         Commands.print("Red Three Piece 2 IJK Auto"),
-        Commands.runOnce(
-            () ->
-                robotManager.localization.resetPose(
-                    new Pose2d(10.289, 1.903, Rotation2d.fromDegrees(0.0)))),
         actions.rehomeRollCommand(),
         autoCommands.preloadCoralCommand(),
         trailblazer.followSegment(
             new AutoSegment(
                 CONSTRAINTS,
-                new AutoPoint(new Pose2d(10.289, 1.903, Rotation2d.fromDegrees(0.0))),
+                new AutoPoint(getRedStartingPose()),
                 new AutoPoint(
-                    new Pose2d(11.171, 2.443, Rotation2d.fromDegrees(23.844)),
-                    autoCommands.l4LineupCommand()),
-                new AutoPoint(new Pose2d(12.212, 2.932, Rotation2d.fromDegrees(58.446))))),
+                    new Pose2d(11.785, 2.622, Rotation2d.fromDegrees(40)),
+                    Commands.runOnce(() -> robotManager.l4CoralLineupRequest())),
+                new AutoPoint(new Pose2d(12.246, 2.952, Rotation2d.fromDegrees(58.446))))),
         autoCommands.l4ScoreAndReleaseCommand(),
         trailblazer.followSegment(
             new AutoSegment(
                 CONSTRAINTS,
                 new AutoPoint(new Pose2d(13.301, 1.971, Rotation2d.fromDegrees(135.88))),
                 new AutoPoint(new Pose2d(15.81, 0.6, Rotation2d.fromDegrees(127.71))))),
-        autoCommands.intakeStationWaitUntilCommand(),
+        autoCommands.intakeStationWithTimeoutCommand(),
         trailblazer.followSegment(
             new AutoSegment(
                 CONSTRAINTS,
                 new AutoPoint(
                     new Pose2d(13.982, 1.637, Rotation2d.fromDegrees(135.878)),
-                    autoCommands.l4LineupCommand()),
+                    Commands.runOnce(() -> robotManager.l4CoralLineupRequest())),
                 // REEF PIPE J
                 new AutoPoint(new Pose2d(12.497, 2.768, Rotation2d.fromDegrees(59.1))))),
         autoCommands.l4ScoreAndReleaseCommand(),
@@ -62,13 +68,13 @@ public class FourPiece2IJKAuto extends BaseAuto {
                 CONSTRAINTS,
                 new AutoPoint(new Pose2d(13.872, 1.903, Rotation2d.fromDegrees(135.88))),
                 new AutoPoint(new Pose2d(15.81, 0.6, Rotation2d.fromDegrees(127.71))))),
-        autoCommands.intakeStationWaitUntilCommand(),
+        autoCommands.intakeStationWithTimeoutCommand(),
         trailblazer.followSegment(
             new AutoSegment(
                 CONSTRAINTS,
                 new AutoPoint(
-                    new Pose2d(14.506, 1.903, Rotation2d.fromDegrees(0)),
-                    autoCommands.l4LineupCommand()),
+                    new Pose2d(14.506, 1.903, Rotation2d.kZero),
+                    Commands.runOnce(() -> robotManager.l4CoralLineupRequest())),
                 new AutoPoint(
                     // REEF PIPE K
                     new Pose2d(13.593, 2.760, Rotation2d.fromDegrees(121.252))))),
@@ -78,13 +84,13 @@ public class FourPiece2IJKAuto extends BaseAuto {
                 CONSTRAINTS,
                 new AutoPoint(new Pose2d(14.506, 1.903, Rotation2d.fromDegrees(133.277))),
                 new AutoPoint(new Pose2d(15.81, 0.6, Rotation2d.fromDegrees(123.819))))),
-        autoCommands.intakeStationWaitUntilCommand(),
+        autoCommands.intakeStationWithTimeoutCommand(),
         trailblazer.followSegment(
             new AutoSegment(
                 CONSTRAINTS,
                 new AutoPoint(
                     new Pose2d(14.954, 1.971, Rotation2d.fromDegrees(134.931)),
-                    autoCommands.l4LineupCommand()),
+                    Commands.runOnce(() -> robotManager.l4CoralLineupRequest())),
                 // REEF PIPE L
                 new AutoPoint(new Pose2d(13.877, 2.932, Rotation2d.fromDegrees(120.471))))),
         autoCommands.l4ScoreAndReleaseCommand(),
