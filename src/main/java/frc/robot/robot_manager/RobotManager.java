@@ -316,9 +316,8 @@ public class RobotManager extends StateMachine<RobotState> {
       case INTAKE_CORAL_FLOOR_UPRIGHT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
-        swerve.setSnapsEnabled(false);
-        swerve.setSnapToAngle(0);
         swerve.enableCoralIntakeAssist();
+        swerve.setSnapToAngle(0);
         roll.setState(RollState.STOWED);
         frontCoralLimelight.setState(LimelightState.CORAL);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
@@ -329,9 +328,8 @@ public class RobotManager extends StateMachine<RobotState> {
       case INTAKE_CORAL_FLOOR_HORIZONTAL -> {
         intake.setState(IntakeState.INTAKING_CORAL);
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
-        swerve.setSnapsEnabled(false);
-        swerve.setSnapToAngle(0);
         swerve.enableCoralIntakeAssist();
+        swerve.setSnapToAngle(0);
         roll.setState(RollState.INTAKING_CORAL_HORIZONTAL);
         frontCoralLimelight.setState(LimelightState.CORAL);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
