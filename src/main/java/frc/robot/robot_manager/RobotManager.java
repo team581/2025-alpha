@@ -209,7 +209,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield currentState;
       }
 
-      case INTAKE_CORAL_FLOOR_HORIZONTAL, INTAKE_CORAL_FLOOR_UPRIGHT -> {
+      case INTAKE_CORAL_FLOOR_HORIZONTAL, INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL, INTAKE_CORAL_FLOOR_UPRIGHT -> {
         if (intake.getHasGP()) {
           rumbleController.rumbleRequest();
           yield RobotState.IDLE_CORAL;
@@ -316,7 +316,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case INTAKE_CORAL_FLOOR_UPRIGHT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
-        swerve.enableCoralIntakeAssist();
+        swerve.setSnapsEnabled(false);
         swerve.setSnapToAngle(0);
         roll.setState(RollState.STOWED);
         frontCoralLimelight.setState(LimelightState.CORAL);
@@ -326,6 +326,18 @@ public class RobotManager extends StateMachine<RobotState> {
         climber.setState(ClimberState.STOWED);
       }
       case INTAKE_CORAL_FLOOR_HORIZONTAL -> {
+        intake.setState(IntakeState.INTAKING_CORAL);
+        moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
+        swerve.setSnapsEnabled(false);
+        swerve.setSnapToAngle(0);
+        roll.setState(RollState.INTAKING_CORAL_HORIZONTAL);
+        frontCoralLimelight.setState(LimelightState.CORAL);
+        elevatorPurpleLimelight.setState(LimelightState.PURPLE);
+        backTagLimelight.setState(LimelightState.TAGS);
+        lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
+        climber.setState(ClimberState.STOWED);
+      }
+      case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
         intake.setState(IntakeState.INTAKING_CORAL);
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
         swerve.enableCoralIntakeAssist();
@@ -776,7 +788,7 @@ public class RobotManager extends StateMachine<RobotState> {
     nearestReefSidePose = AutoAlign.getClosestReefSide(localization.getPose()).getPose();
     reefSnapAngle = nearestReefSidePose.getRotation().getDegrees();
 
-    if (getState() == RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL
+    if (getState() == RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL || getState() == RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL
         || getState() == RobotState.INTAKE_CORAL_FLOOR_UPRIGHT) {
       ChassisSpeeds coralAssistSpeeds =
           IntakeAssistUtil.getCoralAssistSpeeds(
@@ -840,7 +852,7 @@ public class RobotManager extends StateMachine<RobotState> {
           stowRequest();
         }
       }
-      case INTAKE_CORAL_FLOOR_UPRIGHT, INTAKE_CORAL_FLOOR_HORIZONTAL -> {
+      case INTAKE_CORAL_FLOOR_UPRIGHT, INTAKE_CORAL_FLOOR_HORIZONTAL, INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
         if (newMode == GamePieceMode.ALGAE) {
           intakeFloorAlgaeRequest();
         }
@@ -909,6 +921,14 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
+  public void intakeAssistFloorRequest() {
+    if (gamePieceMode == GamePieceMode.ALGAE) {
+      intakeFloorAlgaeRequest();
+    } else {
+      intakeAssistFloorCoralHorizontalRequest();
+    }
+  }
+
   public void intakeFloorAlgaeRequest() {
     gamePieceMode = GamePieceMode.ALGAE;
     switch (getState()) {
@@ -922,6 +942,14 @@ public class RobotManager extends StateMachine<RobotState> {
     switch (getState()) {
       case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
       default -> setStateFromRequest(RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL);
+    }
+  }
+
+  public void intakeAssistFloorCoralHorizontalRequest() {
+    gamePieceMode = GamePieceMode.CORAL;
+    switch (getState()) {
+      case CLIMBING_1_LINEUP, CLIMBING_2_HANGING, REHOME_ELEVATOR, REHOME_ROLL, REHOME_WRIST -> {}
+      default -> setStateFromRequest(RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL);
     }
   }
 
@@ -1082,6 +1110,7 @@ public class RobotManager extends StateMachine<RobotState> {
           DISLODGE_ALGAE_L2_PUSHING,
           DISLODGE_ALGAE_L3_PUSHING,
           INTAKE_CORAL_FLOOR_HORIZONTAL,
+          INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL,
           INTAKE_CORAL_FLOOR_UPRIGHT,
           INTAKE_CORAL_STATION -> {}
 
