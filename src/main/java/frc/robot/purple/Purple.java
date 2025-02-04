@@ -106,8 +106,8 @@ public class Purple {
       case CENTERED -> {
         seenPurple = true;
         lastTimeSeen = Timer.getFPGATimestamp();
-        yield
-        getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true);}
+        yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true);
+      }
     };
   }
 }
