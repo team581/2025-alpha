@@ -103,7 +103,11 @@ public class Purple {
         yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true)
             .plus(getPurpleAlignChassisSpeeds(robotPose.getRotation().getDegrees()));
       }
-      case CENTERED -> getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true);
+      case CENTERED -> {
+        seenPurple = true;
+        lastTimeSeen = Timer.getFPGATimestamp();
+        yield
+        getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true);}
     };
   }
 }
