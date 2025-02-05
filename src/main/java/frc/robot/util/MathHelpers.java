@@ -24,6 +24,7 @@ public class MathHelpers {
   public static double angleModulus(double angleDegrees) {
     return MathUtil.inputModulus(angleDegrees, -180, 180);
   }
+
   public static Translation2d chassisSpeedsToTranslation2d(ChassisSpeeds speeds) {
     return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
   }
