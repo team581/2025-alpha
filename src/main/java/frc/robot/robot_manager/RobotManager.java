@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.ReefAlignState;
 import frc.robot.auto_align.ReefPipeLevel;
