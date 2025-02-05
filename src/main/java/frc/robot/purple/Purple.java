@@ -14,8 +14,8 @@ import frc.robot.vision.limelight.Limelight;
 
 public class Purple {
   private final Limelight purpleCamera;
-  private static final double PURPLE_SIDEWAYS_KP = 2.0;
-  private static final double TAG_KP = 2.5;
+  private static final double PURPLE_SIDEWAYS_KP = 1.0;
+  private static final double TAG_KP = 0.5;
 
   private static final double SEEN_PURPLE_TIMEOUT = 3.0;
   private double lastTimeSeen = 0.0;
@@ -33,7 +33,7 @@ public class Purple {
 
     var result = maybeResult.get();
 
-    if (MathUtil.isNear(0, result.ty(), 1)) {
+    if (MathUtil.isNear(0, result.ty(), 0.5)) {
       return PurpleState.CENTERED;
     }
 
@@ -44,7 +44,12 @@ public class Purple {
       Pose2d robotPose, ReefPipeLevel level, boolean forwardOnly) {
     var scoringTranslationFieldRelative =
         AutoAlign.getClosestReefPipe(robotPose, level).getTranslation();
-
+        if (robotPose.getTranslation().getDistance(scoringTranslationFieldRelative)>0.8){
+          return new ChassisSpeeds();
+        }
+    DogLog.log(
+        "PurpleAlignment/Tag/TargetPose",
+        new Pose2d(scoringTranslationFieldRelative, new Rotation2d()));
     var scoringTranslationRobotRelative =
         scoringTranslationFieldRelative
             .minus(robotPose.getTranslation())
@@ -60,6 +65,10 @@ public class Purple {
 
     var xEffort = goalTranslation.getX() * TAG_KP;
     var yEffort = goalTranslation.getY() * TAG_KP;
+
+    DogLog.log("PurpleAlignment/Tag/XEffort", xEffort);
+    DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
+    DogLog.log("PurpleAlignment/Tag/ForwardOnly", forwardOnly);
 
     return new ChassisSpeeds(xEffort, yEffort, 0.0);
   }
@@ -89,25 +98,31 @@ public class Purple {
       Pose2d robotPose, ReefPipeLevel reefPipeLevel) {
     DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
     DogLog.log("PurpleAlignment/LastSeenTimestamp", lastTimeSeen);
+    DogLog.log("PurpleAlignment/PurpleState", getPurpleState());
 
-    return switch (getPurpleState()) {
-      case NO_PURPLE -> {
-        if (Timer.getFPGATimestamp() - lastTimeSeen >= SEEN_PURPLE_TIMEOUT) {
-          seenPurple = false;
-        }
-        yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, seenPurple);
-      }
-      case VISIBLE_NOT_CENTERED -> {
-        seenPurple = true;
-        lastTimeSeen = Timer.getFPGATimestamp();
-        yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true)
-            .plus(getPurpleAlignChassisSpeeds(robotPose.getRotation().getDegrees()));
-      }
-      case CENTERED -> {
-        seenPurple = true;
-        lastTimeSeen = Timer.getFPGATimestamp();
-        yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true);
-      }
-    };
+    var speeds =
+        switch (getPurpleState()) {
+          case NO_PURPLE -> {
+            if (Timer.getFPGATimestamp() - lastTimeSeen >= SEEN_PURPLE_TIMEOUT) {
+              seenPurple = false;
+            }
+            yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, seenPurple);
+          }
+          case VISIBLE_NOT_CENTERED -> {
+            seenPurple = true;
+            lastTimeSeen = Timer.getFPGATimestamp();
+            yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true)
+                .plus(getPurpleAlignChassisSpeeds(robotPose.getRotation().getDegrees()));
+          }
+          case CENTERED -> {
+            seenPurple = true;
+            lastTimeSeen = Timer.getFPGATimestamp();
+            yield getPoseAlignmentChassisSpeeds(robotPose, reefPipeLevel, true);
+          }
+        };
+    DogLog.log("PurpleAlignment/CombinedSpeeds/x", speeds.vxMetersPerSecond);
+    DogLog.log("PurpleAlignment/CombinedSpeeds/y", speeds.vyMetersPerSecond);
+    DogLog.log("PurpleAlignment/CombinedSpeeds/omega", speeds.omegaRadiansPerSecond);
+    return speeds;
   }
 }

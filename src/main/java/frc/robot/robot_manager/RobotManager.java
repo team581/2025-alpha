@@ -396,6 +396,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(ElevatorState.STOWED, WristState.STOWED);
         // swerve.enabledReefMagnetism();
         swerve.setSnapToAngle(reefSnapAngle);
+        swerve.setSnapsEnabled(true);
         roll.setState(RollState.CORAL_SCORE);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
         frontCoralLimelight.setState(LimelightState.REEF_TAGS);
@@ -1153,7 +1154,14 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L4_2_LINEUP -> setStateFromRequest(RobotState.CORAL_L4_3_PLACE);
       case CORAL_L4_3_PLACE -> setStateFromRequest(RobotState.CORAL_L4_4_RELEASE);
 
-      default -> setStateFromRequest(RobotState.CORAL_L1_1_APPROACH);
+      case IDLE_CORAL-> setStateFromRequest(RobotState.CORAL_L1_1_APPROACH);
+  default -> {
+    if (gamePieceMode == GamePieceMode.ALGAE) {
+      processorWaitingRequest();
+    } else {
+      l1CoralLineupRequest();
+    }
+  }
     }
   }
 

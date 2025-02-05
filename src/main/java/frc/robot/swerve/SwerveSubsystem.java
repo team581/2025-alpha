@@ -252,7 +252,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case PURPLE_ALIGN_TELEOP -> {
-        if (purpleSpeeds.omegaRadiansPerSecond == 0) {
+        if (teleopSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(teleopSpeeds.vxMetersPerSecond + purpleSpeeds.vxMetersPerSecond)
@@ -322,11 +322,11 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public void enablePurpleAlign() {
-    if (DriverStation.isTeleop()) {
-      setStateFromRequest(SwerveState.PURPLE_ALIGN_TELEOP);
-    } else {
-      setState(SwerveState.PURPLE_ALIGN_AUTO);
-    }
+    // if (DriverStation.isTeleop()) {
+    //   setStateFromRequest(SwerveState.PURPLE_ALIGN_TELEOP);
+    // } else {
+    //   setState(SwerveState.PURPLE_ALIGN_AUTO);
+    // }
   }
 
   public void setSnapsEnabled(boolean newValue) {
