@@ -72,7 +72,7 @@ class PracticeConfig {
                           .withGravityType(GravityTypeValue.Elevator_Static))
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicAcceleration(250.0)
+                          .withMotionMagicAcceleration(250)
                           .withMotionMagicCruiseVelocity(250.0))
                   .withFeedback(
                       new FeedbackConfigs()
@@ -83,7 +83,7 @@ class PracticeConfig {
                                       * (2.0 / 1.0)
                                       * (Math.PI * 1.274)))),
               0,
-              20,
+              25,
               0,
               58,
               0.5),
@@ -162,7 +162,7 @@ class PracticeConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicAcceleration(5)
-                          .withMotionMagicCruiseVelocity(10))
+                          .withMotionMagicCruiseVelocity(10.0))
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio((64 / 8) * (50 / 18) * (36 / 12)))
@@ -192,7 +192,7 @@ class PracticeConfig {
                           .withStatorCurrentLimit(10)
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(10)),
-              10,
+              9,
               101),
           new ClimberConfig(
               CANIVORE_NAME,
