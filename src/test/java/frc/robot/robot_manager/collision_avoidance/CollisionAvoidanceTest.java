@@ -124,7 +124,7 @@ public class CollisionAvoidanceTest {
   }
 
   @Test
-  void testOutToL4UnSafe() {
+  void testOutToL4Unsafe() {
     SuperstructurePosition current = new SuperstructurePosition(0, 0);
     SuperstructurePosition goal = new SuperstructurePosition(100, 50);
     var result = CollisionAvoidance.plan(current, goal);
@@ -133,7 +133,7 @@ public class CollisionAvoidanceTest {
   }
 
   @Test
-  void testStraigthUpToL4() {
+  void testStraightUpToL4() {
     SuperstructurePosition current = new SuperstructurePosition(0, 90);
     SuperstructurePosition goal = new SuperstructurePosition(100, 50);
     var result = CollisionAvoidance.plan(current, goal);
