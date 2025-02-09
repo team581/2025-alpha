@@ -37,8 +37,7 @@ public class Hardware {
       new CANdle(RobotConfig.get().lights().candleID(), RobotConfig.get().lights().canBusName());
 
   public final TalonFX climberMotor =
-      new TalonFX(RobotConfig.get().climber().motorID(),
-  RobotConfig.get().climber().canBusName());
+      new TalonFX(RobotConfig.get().climber().motorID(), RobotConfig.get().climber().canBusName());
 
   public final CANcoder climberCANcoder =
       new CANcoder(
