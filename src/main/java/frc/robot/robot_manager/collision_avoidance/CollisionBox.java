@@ -29,7 +29,7 @@ public enum CollisionBox {
           new Translation2d(6, -11), new Translation2d(24, 27)),
       // angle is too in
       new SuperstructurePosition(0, 40)),
-//54 is the straight out top // 80 max
+  // 54 is the straight out top // 80 max
   BOX_5(
       5,
       new Rectangle2d( // forwards middle
