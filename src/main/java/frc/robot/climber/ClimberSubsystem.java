@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
@@ -32,7 +33,10 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
                     new CurrentLimitsConfigs()
                         .withStatorCurrentLimit(70)
                         .withSupplyCurrentLimit(50))
-                .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)));
+                .withMotorOutput(
+                    new MotorOutputConfigs()
+                        .withInverted(InvertedValue.Clockwise_Positive)
+                        .withNeutralMode(NeutralModeValue.Brake)));
     encoder.getConfigurator().apply(RobotConfig.get().climber().cancoderConfig());
 
     this.motor = motor;
