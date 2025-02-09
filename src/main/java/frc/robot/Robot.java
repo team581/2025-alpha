@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.autos.Autos;
 import frc.robot.autos.Trailblazer;
 import frc.robot.climber.ClimberSubsystem;
+import frc.robot.climber.TempClimberState;
 import frc.robot.config.RobotConfig;
 import frc.robot.controller.RumbleControllerSubsystem;
 import frc.robot.elevator.ElevatorSubsystem;
@@ -232,8 +234,18 @@ public class Robot extends TimedRobot {
     hardware.driverController.x().onTrue(robotCommands.l3LineupCommand());
     hardware.driverController.b().onTrue(robotCommands.l2LineupCommand());
     hardware.driverController.a().onTrue(robotCommands.lowLineupCommand());
-    hardware.driverController.povUp().onTrue(robotCommands.climbUpCommand());
-    hardware.driverController.povDown().onTrue(robotCommands.climbDownCommand());
+    // hardware.driverController.povUp().onTrue(robotCommands.climbUpCommand());
+    // hardware.driverController.povDown().onTrue(robotCommands.climbDownCommand());
+    hardware
+        .driverController
+        .povUp()
+        .onTrue(Commands.runOnce(() -> climber.setState(TempClimberState.UP)))
+        .onFalse(Commands.runOnce(() -> climber.setState(TempClimberState.STOPPED)));
+    hardware
+        .driverController
+        .povDown()
+        .onTrue(Commands.runOnce(() -> climber.setState(TempClimberState.DOWN)))
+        .onFalse(Commands.runOnce(() -> climber.setState(TempClimberState.STOPPED)));
     hardware
         .driverController
         .povLeft()
