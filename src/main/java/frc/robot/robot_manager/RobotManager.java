@@ -515,7 +515,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case CORAL_L1_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
-        moveSuperstructure(ElevatorState.CORAL_L1_PLACE, WristState.CORAL_SCORE_PLACING_L1);
+        moveSuperstructure(ElevatorState.CORAL_L1_PLACE, WristState.CORAL_SCORE_PLACING_L1, true);
         swerve.setSnapToAngle(reefSnapAngle);
         roll.setState(RollState.STOWED);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
@@ -527,7 +527,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case CORAL_L1_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
-        moveSuperstructure(ElevatorState.CORAL_L1_RELEASE, WristState.CORAL_SCORE_PLACING_L1);
+        moveSuperstructure(ElevatorState.CORAL_L1_RELEASE, WristState.CORAL_SCORE_PLACING_L1, true);
         swerve.setSnapToAngle(reefSnapAngle);
         roll.setState(RollState.STOWED);
         elevatorPurpleLimelight.setState(LimelightState.PURPLE);
@@ -555,7 +555,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L2_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
         moveSuperstructure(
-            ElevatorState.CORAL_L2_PLACE, WristState.CORAL_SCORE_CENTERED_PLACING_L2);
+            ElevatorState.CORAL_L2_PLACE, WristState.CORAL_SCORE_CENTERED_PLACING_L2, true);
         swerve.enableScoringAlignment();
 
         backTagLimelight.setState(LimelightState.REEF_TAGS);
@@ -565,7 +565,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L2_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
         moveSuperstructure(
-            ElevatorState.CORAL_L2_RELEASE, WristState.CORAL_SCORE_CENTERED_PLACING_L2);
+            ElevatorState.CORAL_L2_RELEASE, WristState.CORAL_SCORE_CENTERED_PLACING_L2, true);
         swerve.enableScoringAlignment();
 
         swerve.setSnapToAngle(reefSnapAngle);
@@ -595,7 +595,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L3_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
         moveSuperstructure(
-            ElevatorState.CORAL_L3_PLACE, WristState.CORAL_SCORE_CENTERED_PLACING_L3);
+            ElevatorState.CORAL_L3_PLACE, WristState.CORAL_SCORE_CENTERED_PLACING_L3, true);
         swerve.enableScoringAlignment();
 
         swerve.setSnapToAngle(reefSnapAngle);
@@ -610,7 +610,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L3_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
         moveSuperstructure(
-            ElevatorState.CORAL_L3_RELEASE, WristState.CORAL_SCORE_CENTERED_PLACING_L3);
+            ElevatorState.CORAL_L3_RELEASE, WristState.CORAL_SCORE_CENTERED_PLACING_L3, true);
         swerve.enableScoringAlignment();
 
         swerve.setSnapToAngle(reefSnapAngle);
@@ -639,8 +639,9 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case CORAL_L4_3_PLACE_THEN_RELEASE, CORAL_L4_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
+
         moveSuperstructure(
-            ElevatorState.CORAL_L4_PLACE, WristState.CORAL_SCORE_CENTERED_PLACING_L4);
+            ElevatorState.CORAL_L4_PLACE, WristState.CORAL_SCORE_CENTERED_LINEUP_L4, true);
         swerve.enableScoringAlignment();
 
         swerve.setSnapToAngle(reefSnapAngle);
@@ -655,7 +656,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_L4_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
         moveSuperstructure(
-            ElevatorState.CORAL_L4_RELEASE, WristState.CORAL_SCORE_CENTERED_PLACING_L4);
+            ElevatorState.CORAL_L4_RELEASE, WristState.CORAL_SCORE_CENTERED_PLACING_L4, true);
         swerve.enableScoringAlignment();
 
         swerve.setSnapToAngle(reefSnapAngle);
@@ -838,7 +839,7 @@ public class RobotManager extends StateMachine<RobotState> {
         "RobotManager/ShouldIntakeForward",
         AutoAlign.shouldIntakeStationFront(localization.getPose()));
 
-    moveSuperstructure(latestElevatorGoal, latestWristGoal);
+    moveSuperstructure(latestElevatorGoal, latestWristGoal, latestUnsafe);
     // Continuous state actions
 
     // Update snaps
@@ -1363,18 +1364,24 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private ElevatorState latestElevatorGoal = ElevatorState.STOWED;
   private WristState latestWristGoal = WristState.PRE_MATCH_HOMING;
+  private boolean latestUnsafe = false;
 
   private void moveSuperstructure(ElevatorState elevatorGoal, WristState wristGoal) {
+    moveSuperstructure(elevatorGoal, wristGoal, false);
+  }
+
+  private void moveSuperstructure(
+      ElevatorState elevatorGoal, WristState wristGoal, boolean unsafe) {
     latestElevatorGoal = elevatorGoal;
     latestWristGoal = wristGoal;
+    latestUnsafe = unsafe;
 
     var maybeIntermediaryPosition =
         CollisionAvoidance.plan(
             new SuperstructurePosition(elevator.getHeight(), wrist.getAngle()),
             new SuperstructurePosition(elevatorGoal.height, wristGoal.angle));
 
-    // TODO: Turn collision avoidance back on once it's fixed
-    if (0 > 1 && maybeIntermediaryPosition.isPresent()) {
+    if (!unsafe && maybeIntermediaryPosition.isPresent()) {
       var intermediaryPosition = maybeIntermediaryPosition.get();
 
       // A collision was detected, so we need to go to an intermediary point
@@ -1384,7 +1391,7 @@ public class RobotManager extends StateMachine<RobotState> {
       wrist.setCollisionAvoidanceGoal(intermediaryPosition.wristAngle());
       wrist.setState(WristState.COLLISION_AVOIDANCE);
     } else {
-      // No collision, go straight to goal state
+      // No collision, go straight to goal state or unsafe mode
       elevator.setState(elevatorGoal);
       wrist.setState(wristGoal);
     }
