@@ -592,7 +592,7 @@ public class LimelightHelpers {
   static boolean profileJSON = false;
 
   static final String sanitizeName(String name) {
-    if (name == "" || name == null) {
+    if ("".equals(name) || name == null) {
       return "limelight";
     }
     return name;
@@ -1600,7 +1600,7 @@ public class LimelightHelpers {
     try {
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
-      if (snapshotName != null && snapshotName != "") {
+      if (snapshotName != null && !"".equals(snapshotName)) {
         connection.setRequestProperty("snapname", snapshotName);
       }
 
