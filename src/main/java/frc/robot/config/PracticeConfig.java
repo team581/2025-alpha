@@ -25,7 +25,6 @@ import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
 import frc.robot.config.RobotConfig.WristConfig;
 import frc.robot.generated.PracticeBotTunerConstants;
-import frc.robot.util.VelocityDetector;
 import frc.robot.vision.interpolation.InterpolatedVisionDataset;
 
 class PracticeConfig {
@@ -95,8 +94,6 @@ class PracticeConfig {
               26,
               new Debouncer(0.1, DebounceType.kBoth),
               new Debouncer(0.1, DebounceType.kBoth),
-              new VelocityDetector(71.0, 70.0, 0).inSlot(1, 21.0, 20.0),
-              new VelocityDetector(71.0, 70.0, 0).inSlot(1, 21.0, 20.0),
               new TalonFXConfiguration()
                   .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
                   .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
@@ -146,7 +143,7 @@ class PracticeConfig {
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
-          new VisionConfig(4, 0.4, 0.4, InterpolatedVisionDataset.HOME),
+          new VisionConfig(4, 0.4, Double.MAX_VALUE, InterpolatedVisionDataset.HOME),
           new WristConfig(
               RIO_CAN_NAME,
               22,

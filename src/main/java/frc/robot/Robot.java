@@ -34,6 +34,7 @@ import frc.robot.util.Stopwatch;
 import frc.robot.util.scheduling.LifecycleSubsystemManager;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.limelight.Limelight;
+import frc.robot.vision.limelight.LimelightModel;
 import frc.robot.vision.limelight.LimelightState;
 import frc.robot.wrist.WristSubsystem;
 
@@ -49,22 +50,26 @@ public class Robot extends TimedRobot {
       new Limelight(
           "elev",
           LimelightState.PURPLE,
-          RobotConfig.get().vision().interpolatedVisionSet().elevatorPurpleSet);
+          RobotConfig.get().vision().interpolatedVisionSet().elevatorPurpleSet,
+          LimelightModel.THREE);
   private final Limelight frontCoralLimelight =
       new Limelight(
           "front",
           LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().frontCoralSet);
+          RobotConfig.get().vision().interpolatedVisionSet().frontCoralSet,
+          LimelightModel.FOUR);
   private final Limelight backTagLimelight =
       new Limelight(
           "back",
           LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().backTagSet);
+          RobotConfig.get().vision().interpolatedVisionSet().backTagSet,
+          LimelightModel.THREEG);
   private final Limelight baseTagLimelight =
       new Limelight(
           "base",
           LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().baseTagSet);
+          RobotConfig.get().vision().interpolatedVisionSet().baseTagSet,
+          LimelightModel.THREEG);
 
   private final VisionSubsystem vision =
       new VisionSubsystem(
@@ -222,7 +227,20 @@ public class Robot extends TimedRobot {
               }
             }));
 
-    hardware.driverController.rightTrigger().onTrue(robotCommands.confirmScoreCommand());
+    hardware
+        .driverController
+        .rightTrigger()
+        .onTrue(
+            Commands.runOnce(
+                    () -> {
+                      robotManager.setConfirmScoreActive(true);
+                    })
+                .alongWith(robotCommands.confirmScoreCommand()))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  robotManager.setConfirmScoreActive(false);
+                }));
     hardware
         .driverController
         .leftTrigger()

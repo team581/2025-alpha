@@ -33,7 +33,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final boolean MAGNETISM_ENABLED = false;
   private static final boolean PURPLE_ALIGN_ENABLED = true;
 
-  private static final boolean INTAKE_ASSIST_CORAL_ENABLED = false;
+  private static final boolean INTAKE_ASSIST_CORAL_ENABLED = true;
 
   public static final double MaxSpeed = 4.75;
   private static final double MaxAngularRate = Units.rotationsToRadians(4);
@@ -151,6 +151,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setPurpleSpeeds(ChassisSpeeds speeds) {
     purpleSpeeds = speeds;
+    if (PURPLE_ALIGN_ENABLED) {
+      sendSwerveRequest();
+    }
   }
 
   @Override
@@ -197,6 +200,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
     DogLog.log("Swerve/LeftX", leftX);
     DogLog.log("Swerve/LeftY", leftY);
+    DogLog.log("Swerve/RightX", rightX);
     Translation2d mappedpose = ControllerHelpers.fromCircularDiscCoordinates(leftX, leftY);
     double mappedX = mappedpose.getX();
     double mappedY = mappedpose.getY();
@@ -207,7 +211,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         new ChassisSpeeds(
             -1.0 * mappedY * MaxSpeed * slowModePercent,
             mappedX * MaxSpeed * slowModePercent,
-            rightX * TELEOP_MAX_ANGULAR_RATE.getRadians());
+            rightX * TELEOP_MAX_ANGULAR_RATE.getRadians() * slowModePercent);
 
     sendSwerveRequest();
   }
@@ -293,20 +297,30 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         }
       }
       case REEF_ALIGN_AUTO -> {
-        var alignSpeeds = getScoringAlignChassisSpeeds();
-        var wantedSpeeds = alignSpeeds.plus(autoSpeeds);
+        var wantedSpeeds = getScoringAlignChassisSpeeds();
+        DogLog.log("AutoDebug/Alignment/RawWantedSpeeds", wantedSpeeds);
+        //  var wantedSpeeds = alignSpeeds.plus(autoSpeeds);
         var currentTimestamp = Timer.getFPGATimestamp();
         if (previousTimestamp == 0.0) {
           previousTimestamp = currentTimestamp - 0.02;
         }
+        DogLog.log("AutoDebug/Alignment/CurrentTimestamp", currentTimestamp);
+        DogLog.log("AutoDebug/Alignment/PreviousTimestamp", previousTimestamp);
         var constrainedWantedSpeeds =
             AutoConstraintCalculator.constrainVelocityGoal(
                 wantedSpeeds,
                 previousSpeeds,
                 currentTimestamp - previousTimestamp,
-                AutoConstraintCalculator.getLastUsedConstraints());
+                // Our acceleration limit math is slightly wonky
+                // So we turn it off here since velocity limiting is the good enough
+                AutoConstraintCalculator.getLastUsedConstraints()
+                    .withMaxAngularAcceleration(0)
+                    .withMaxLinearAcceleration(0));
+        DogLog.log("AutoDebug/Alignment/ConstrainedWantedSpeeds", constrainedWantedSpeeds);
 
-        if (alignSpeeds.omegaRadiansPerSecond == 0) {
+        if (constrainedWantedSpeeds.omegaRadiansPerSecond == 0) {
+          DogLog.timestamp("AutoDebug/Alignment/ConstrainedWantedSpeedsZeroOmega");
+
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(constrainedWantedSpeeds.vxMetersPerSecond)
@@ -314,6 +328,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
                   .withDriveRequestType(DriveRequestType.Velocity));
         } else {
+          DogLog.timestamp("AutoDebug/Alignment/ConstrainedWantedSpeedsNonZeroOmega");
+
           drivetrain.setControl(
               drive
                   .withVelocityX(constrainedWantedSpeeds.vxMetersPerSecond)
@@ -402,19 +418,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/ModuleStates", drivetrainState.ModuleStates);
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
-
-    DogLog.log(
-        "Swerve/OutputVoltageModule0",
-        drivetrain.getModule(0).getDriveMotor().getMotorVoltage().getValueAsDouble());
-    DogLog.log(
-        "Swerve/OutputVoltageModule1",
-        drivetrain.getModule(1).getDriveMotor().getMotorVoltage().getValueAsDouble());
-    DogLog.log(
-        "Swerve/OutputVoltageModule2",
-        drivetrain.getModule(2).getDriveMotor().getMotorVoltage().getValueAsDouble());
-    DogLog.log(
-        "Swerve/OutputVoltageModule3",
-        drivetrain.getModule(3).getDriveMotor().getMotorVoltage().getValueAsDouble());
   }
 
   private void startSimThread() {
