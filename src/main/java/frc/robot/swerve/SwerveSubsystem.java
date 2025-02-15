@@ -15,14 +15,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.MagnetismUtil;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
+import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.CompBotTunerConstants;
 import frc.robot.generated.PracticeBotTunerConstants;
 import frc.robot.generated.PracticeBotTunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.ControllerHelpers;
+import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import java.util.Map;
@@ -44,6 +47,15 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final double leftYDeadband = 0.05;
 
   private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
+
+  private static final double MAX_SCORING_SPEED = 2.5;
+  private static final AutoConstraintOptions SCORING_VELOCITY_CONSTRAINTS =
+      new AutoConstraintOptions()
+          .withCollisionAvoidance(false)
+          .withMaxAngularAcceleration(0)
+          .withMaxAngularVelocity(0)
+          .withMaxLinearAcceleration(0)
+          .withMaxLinearVelocity(MAX_SCORING_SPEED);
 
   private static final InterpolatingDoubleTreeMap ELEVATOR_HEIGHT_TO_SLOW_MODE =
       InterpolatingDoubleTreeMap.ofEntries(Map.entry(40.0, 1.0), Map.entry(40.1, 0.5));
@@ -175,11 +187,11 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   public void driveTeleop(double x, double y, double theta) {
     double leftY =
         -1.0
-            * ControllerHelpers.getExponent(ControllerHelpers.getDeadbanded(y, leftYDeadband), 1.5);
+            * MathHelpers.signedExp(ControllerHelpers.deadbandJoystickValue(y, leftYDeadband), 2.0);
     double leftX =
-        ControllerHelpers.getExponent(ControllerHelpers.getDeadbanded(x, leftXDeadband), 1.5);
+        MathHelpers.signedExp(ControllerHelpers.deadbandJoystickValue(x, leftXDeadband), 2.0);
     double rightX =
-        ControllerHelpers.getExponent(ControllerHelpers.getDeadbanded(theta, rightXDeadband), 2);
+        MathHelpers.signedExp(ControllerHelpers.deadbandJoystickValue(theta, rightXDeadband), 2.0);
 
     if (RobotConfig.get().swerve().invertRotation()) {
       rightX *= -1.0;
@@ -276,12 +288,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
       case REEF_ALIGN_TELEOP -> {
-        var alignSpeeds = getScoringAlignChassisSpeeds();
+        var constrained =
+            AutoAlign.calculateTeleopAndAlignSpeeds(teleopSpeeds, purpleSpeeds, 2.0, 0.75);
         if (teleopSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
-                  .withVelocityX(teleopSpeeds.vxMetersPerSecond + alignSpeeds.vxMetersPerSecond)
-                  .withVelocityY(teleopSpeeds.vyMetersPerSecond + alignSpeeds.vyMetersPerSecond)
+                  .withVelocityX(constrained.vxMetersPerSecond)
+                  .withVelocityY(constrained.vyMetersPerSecond)
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
 
@@ -289,23 +302,19 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
           drivetrain.setControl(
               drive
-                  .withVelocityX(teleopSpeeds.vxMetersPerSecond + alignSpeeds.vxMetersPerSecond)
-                  .withVelocityY(teleopSpeeds.vyMetersPerSecond + alignSpeeds.vyMetersPerSecond)
-                  .withRotationalRate(
-                      teleopSpeeds.omegaRadiansPerSecond + alignSpeeds.omegaRadiansPerSecond)
+                  .withVelocityX(constrained.vxMetersPerSecond)
+                  .withVelocityY(constrained.vyMetersPerSecond)
+                  .withRotationalRate(constrained.omegaRadiansPerSecond)
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
       case REEF_ALIGN_AUTO -> {
         var wantedSpeeds = getScoringAlignChassisSpeeds();
-        DogLog.log("AutoDebug/Alignment/RawWantedSpeeds", wantedSpeeds);
         //  var wantedSpeeds = alignSpeeds.plus(autoSpeeds);
         var currentTimestamp = Timer.getFPGATimestamp();
         if (previousTimestamp == 0.0) {
           previousTimestamp = currentTimestamp - 0.02;
         }
-        DogLog.log("AutoDebug/Alignment/CurrentTimestamp", currentTimestamp);
-        DogLog.log("AutoDebug/Alignment/PreviousTimestamp", previousTimestamp);
         var constrainedWantedSpeeds =
             AutoConstraintCalculator.constrainVelocityGoal(
                 wantedSpeeds,
@@ -316,11 +325,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                 AutoConstraintCalculator.getLastUsedConstraints()
                     .withMaxAngularAcceleration(0)
                     .withMaxLinearAcceleration(0));
-        DogLog.log("AutoDebug/Alignment/ConstrainedWantedSpeeds", constrainedWantedSpeeds);
 
         if (constrainedWantedSpeeds.omegaRadiansPerSecond == 0) {
-          DogLog.timestamp("AutoDebug/Alignment/ConstrainedWantedSpeedsZeroOmega");
-
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(constrainedWantedSpeeds.vxMetersPerSecond)
@@ -328,8 +334,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
                   .withDriveRequestType(DriveRequestType.Velocity));
         } else {
-          DogLog.timestamp("AutoDebug/Alignment/ConstrainedWantedSpeedsNonZeroOmega");
-
           drivetrain.setControl(
               drive
                   .withVelocityX(constrainedWantedSpeeds.vxMetersPerSecond)

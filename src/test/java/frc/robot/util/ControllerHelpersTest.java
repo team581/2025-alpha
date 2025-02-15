@@ -13,4 +13,11 @@ public class ControllerHelpersTest {
 
     assertEquals(expected, MathHelpers.roundTo(result, 0.01));
   }
+
+  @Test
+  void deadbandJoystickValueTest() {
+    var result = MathHelpers.roundTo(ControllerHelpers.deadbandJoystickValue(0.5, 0.05), 3);
+
+    assertEquals(result, 0.474);
+  }
 }

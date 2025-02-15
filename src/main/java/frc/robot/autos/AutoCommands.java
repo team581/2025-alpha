@@ -32,15 +32,17 @@ public class AutoCommands {
 
   public Command l4ScoreAndReleaseCommand() {
     return Commands.runOnce(robotManager::l4coralPlaceAndReleaseRequest, requirements)
-        .andThen(robotManager.waitForState(RobotState.IDLE_NO_GP).withTimeout(3))
-        .andThen(robotCommands.stowCommand().withTimeout(2))
+        .andThen(robotManager.waitForState(RobotState.IDLE_NO_GP).withTimeout(1))
+        .andThen(robotCommands.stowCommand().withTimeout(1))
         .withName("L4ScoreAndReleaseCommand");
   }
 
   public Command intakeStationWithTimeoutCommand() {
-    return robotCommands
-        .intakeStationCommand()
-        .withTimeout(4)
+    return Commands.runOnce(robotManager::intakeStationRequest, requirements)
+        .andThen(
+            robotManager.waitForStates(
+                RobotState.SMART_STOW_1, RobotState.SMART_STOW_2, RobotState.IDLE_CORAL))
+        .withTimeout(3)
         .withName("IntakeStationWithTimeoutCommand");
   }
 

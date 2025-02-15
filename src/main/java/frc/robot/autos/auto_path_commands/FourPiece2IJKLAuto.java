@@ -6,13 +6,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.ReefPipe;
-import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.autos.AutoPoint;
 import frc.robot.autos.AutoSegment;
 import frc.robot.autos.BaseAuto;
 import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
+import frc.robot.robot_manager.RobotState;
 
 public class FourPiece2IJKLAuto extends BaseAuto {
   private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(3, 57, 4, 30);
@@ -56,9 +56,9 @@ public class FourPiece2IJKLAuto extends BaseAuto {
                               AutoAlign.setAutoReefPipeOverride(ReefPipe.PIPE_I);
                               robotManager.l4CoralApproachRequest();
                             })),
-                    new AutoPoint(() -> ReefPipe.PIPE_I.getPose(ReefPipeLevel.L4))),
+                    new AutoPoint(() -> robotManager.purple.getUsedScoringPose())),
                 false)
-            .until(() -> robotManager.purpleAligned()),
+            .until(() -> robotManager.purple.isTagAligned()),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -70,6 +70,7 @@ public class FourPiece2IJKLAuto extends BaseAuto {
                     new Pose2d(16.01, 0.9, Rotation2d.fromDegrees(127.71)),
                     Commands.runOnce(() -> robotManager.intakeStationRequest())))),
         autoCommands.intakeStationWithTimeoutCommand(),
+
         // SCORE L4 ON J
         trailblazer
             .followSegment(
@@ -78,14 +79,17 @@ public class FourPiece2IJKLAuto extends BaseAuto {
                     new AutoPoint(new Pose2d(14.103, 1.0, Rotation2d.fromDegrees(90.5))),
                     new AutoPoint(
                         new Pose2d(12.246, 1.244, Rotation2d.fromDegrees(60.0)),
-                        Commands.runOnce(
-                            () -> {
-                              AutoAlign.setAutoReefPipeOverride(ReefPipe.PIPE_J);
-                              robotManager.l4CoralApproachRequest();
-                            })),
-                    new AutoPoint(() -> ReefPipe.PIPE_J.getPose(ReefPipeLevel.L4))),
+                        robotManager
+                            .waitForState(RobotState.IDLE_CORAL)
+                            .andThen(
+                                Commands.runOnce(
+                                    () -> {
+                                      AutoAlign.setAutoReefPipeOverride(ReefPipe.PIPE_J);
+                                      robotManager.l4CoralApproachRequest();
+                                    }))),
+                    new AutoPoint(() -> robotManager.purple.getUsedScoringPose())),
                 false)
-            .until(() -> robotManager.purpleAligned()),
+            .until(() -> robotManager.purple.isTagAligned()),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -99,21 +103,26 @@ public class FourPiece2IJKLAuto extends BaseAuto {
         autoCommands.intakeStationWithTimeoutCommand(),
 
         // SCORE L4 ON K
-        Commands.runOnce(
-            () -> {
-              AutoAlign.setAutoReefPipeOverride(ReefPipe.PIPE_K);
-              robotManager.l4CoralApproachRequest();
-            }),
-        trailblazer
-            .followSegment(
-                new AutoSegment(
-                    CONSTRAINTS,
-                    new AutoPoint(new Pose2d(14.506, 1.903, Rotation2d.fromDegrees(133.277))),
-                    new AutoPoint(
-                        // REEF PIPE K
-                        () -> ReefPipe.PIPE_K.getPose(ReefPipeLevel.L4))),
-                false)
-            .until(() -> robotManager.purpleAligned()),
+        robotManager
+            .waitForState(RobotState.IDLE_CORAL)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      AutoAlign.setAutoReefPipeOverride(ReefPipe.PIPE_K);
+                      robotManager.l4CoralApproachRequest();
+                    }))
+            .alongWith(
+                trailblazer
+                    .followSegment(
+                        new AutoSegment(
+                            CONSTRAINTS,
+                            new AutoPoint(
+                                new Pose2d(14.506, 1.903, Rotation2d.fromDegrees(133.277))),
+                            new AutoPoint(
+                                // REEF PIPE K
+                                () -> robotManager.purple.getUsedScoringPose())),
+                        false)
+                    .until(() -> robotManager.purple.isTagAligned())),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -127,20 +136,25 @@ public class FourPiece2IJKLAuto extends BaseAuto {
         autoCommands.intakeStationWithTimeoutCommand(),
 
         // SCORE L4 ON L
-        Commands.runOnce(
-            () -> {
-              AutoAlign.setAutoReefPipeOverride(ReefPipe.PIPE_L);
-              robotManager.l4CoralApproachRequest();
-            }),
-        trailblazer
-            .followSegment(
-                new AutoSegment(
-                    CONSTRAINTS,
-                    new AutoPoint(new Pose2d(14.954, 1.971, Rotation2d.fromDegrees(134.931))),
-                    // REEF PIPE L
-                    new AutoPoint(() -> ReefPipe.PIPE_L.getPose(ReefPipeLevel.L4))),
-                false)
-            .until(() -> robotManager.purpleAligned()),
+        robotManager
+            .waitForState(RobotState.IDLE_CORAL)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      AutoAlign.setAutoReefPipeOverride(ReefPipe.PIPE_L);
+                      robotManager.l4CoralApproachRequest();
+                    }))
+            .alongWith(
+                trailblazer
+                    .followSegment(
+                        new AutoSegment(
+                            CONSTRAINTS,
+                            new AutoPoint(
+                                new Pose2d(14.954, 1.971, Rotation2d.fromDegrees(134.931))),
+                            // REEF PIPE L
+                            new AutoPoint(() -> robotManager.purple.getUsedScoringPose())),
+                        false)
+                    .until(() -> robotManager.purple.isTagAligned())),
         autoCommands.l4ScoreAndReleaseCommand());
   }
 }

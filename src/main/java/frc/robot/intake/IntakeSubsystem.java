@@ -1,5 +1,6 @@
 package frc.robot.intake;
 
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.S1StateValue;
@@ -7,6 +8,7 @@ import com.ctre.phoenix6.signals.S2StateValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
 import frc.robot.config.RobotConfig;
+import frc.robot.util.MathHelpers;
 import frc.robot.util.VelocityDetector;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
@@ -18,14 +20,16 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   private final Debouncer rightDebouncer = RobotConfig.get().intake().rightDebouncer();
   private final Debouncer leftDebouncer = RobotConfig.get().intake().leftDebouncer();
 
+  private final TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(65).withMaxAbsDutyCycle(0.66);
+
   private boolean rightSensorRaw = false;
   private boolean leftSensorRaw = false;
   private boolean rightSensorDebounced = false;
   private boolean leftSensorDebounced = false;
   private boolean sensorsHaveGP = false;
 
-  private final VelocityDetector topMotorDetection = new VelocityDetector(35, 0.2);
-  private final VelocityDetector bottomMotorDetection = new VelocityDetector(35, 0.2);
+  private final VelocityDetector topMotorDetection = new VelocityDetector(32, 0.2);
+  private final VelocityDetector bottomMotorDetection = new VelocityDetector(30, 0.2);
   private double topMotorVelocity = 0.0;
   private double bottomMotorVelocity = 0.0;
   private boolean topMotorAlgaeVelocityGp = false;
@@ -43,8 +47,8 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
 
   @Override
   protected void collectInputs() {
-    topMotorVelocity = topMotor.getVelocity().getValueAsDouble();
-    bottomMotorVelocity = bottomMotor.getVelocity().getValueAsDouble();
+    topMotorVelocity = MathHelpers.roundTo(topMotor.getVelocity().getValueAsDouble(), 0.1);
+    bottomMotorVelocity = MathHelpers.roundTo(bottomMotor.getVelocity().getValueAsDouble(), 0.1);
     topMotorAlgaeVelocityGp = topMotorDetection.hasGamePiece(topMotorVelocity, 20);
     bottomMotorAlgaeVelocityGp = bottomMotorDetection.hasGamePiece(bottomMotorVelocity, 20);
 
@@ -95,16 +99,16 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
         bottomMotor.disable();
       }
       case IDLE_W_ALGAE -> {
-        topMotor.setVoltage(2.0);
-        bottomMotor.setVoltage(2.0);
+        topMotor.setControl(torqueRequest);
+        bottomMotor.setControl(torqueRequest);
       }
       case IDLE_W_CORAL -> {
         topMotor.setVoltage(0.25);
         bottomMotor.setVoltage(0.25);
       }
       case INTAKING_ALGAE -> {
-        topMotor.setVoltage(4.0);
-        bottomMotor.setVoltage(4.0);
+        topMotor.setVoltage(6.0);
+        bottomMotor.setVoltage(6.0);
         topMotorDetection.reset();
         bottomMotorDetection.reset();
       }

@@ -1,13 +1,24 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class MathHelpers {
-  public static double roundTo(double value, double precision) {
-    return Math.round(value / precision) * precision;
+  private static final double EPSILON = Math.ulp(1.0);
+
+  /**
+   * Returns a value rounded to the specified number of decimal places.
+   *
+   * @param value The value
+   * @param numDigits The number of digits after the decimal point to include
+   */
+  public static double roundTo(double value, double numDigits) {
+    var factor = Math.pow(10, numDigits);
+
+    return Math.round(value * factor * (1 + EPSILON)) / factor;
   }
 
   public static Translation2d roundTo(Translation2d input, double precision) {
@@ -48,6 +59,25 @@ public class MathHelpers {
 
   public static Rotation2d angleAbs(Rotation2d a) {
     return Rotation2d.fromDegrees(Math.abs(a.getDegrees()));
+  }
+
+  public static Pose2d poseLookahead(Pose2d current, ChassisSpeeds velocity, double lookahead) {
+    var x = current.getX() + velocity.vxMetersPerSecond * lookahead;
+    var y = current.getY() + velocity.vyMetersPerSecond * lookahead;
+    var theta =
+        current
+            .getRotation()
+            .plus(Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * lookahead));
+
+    return new Pose2d(x, y, theta);
+  }
+
+  public static double signedExp(double value, double exponent) {
+    return Math.copySign(Math.pow(Math.abs(value), exponent), value);
+  }
+
+  public static double signedSqrt(double value) {
+    return Math.copySign(Math.sqrt(Math.abs(value)), value);
   }
 
   private MathHelpers() {}

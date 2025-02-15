@@ -15,7 +15,7 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
 public class ClimberSubsystem extends StateMachine<ClimberState> {
-  private static final double TOLERANCE = 1;
+  private static final double TOLERANCE = 3;
   private final TalonFX motor;
   private final CANcoder encoder;
   private double currentAngle;
@@ -69,7 +69,8 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
 
   @Override
   protected void collectInputs() {
-    currentAngle = Units.rotationsToDegrees(encoder.getPosition().getValueAsDouble());
+    currentAngle = Units.rotationsToDegrees(encoder.getAbsolutePosition().getValueAsDouble());
+    DogLog.log("Climber/CurrentAngle", currentAngle);
   }
 
   public boolean atGoal() {
