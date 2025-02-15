@@ -48,8 +48,8 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
 
     switch (tempState) {
       case STOPPED -> motor.disable();
-      case UP -> motor.setVoltage(8);
-      case DOWN -> motor.setVoltage(-8);
+      case UP -> motor.setVoltage(12);
+      case DOWN -> motor.setVoltage(-12);
     }
 
     DogLog.log("Climber/TempState", tempState);
