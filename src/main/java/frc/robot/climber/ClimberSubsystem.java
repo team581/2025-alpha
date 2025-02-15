@@ -24,7 +24,6 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   public ClimberSubsystem(TalonFX motor, CANcoder encoder) {
     super(SubsystemPriority.CLIMBER, ClimberState.STOWED);
 
-    // motor.getConfigurator().apply(RobotConfig.get().climber().motorConfig());
     motor
         .getConfigurator()
         .apply(
