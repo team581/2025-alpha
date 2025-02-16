@@ -64,8 +64,10 @@ public enum CollisionBox {
       default -> false;
     };
   }
-  public static boolean shortCutPossibleSuperStructureDown(SuperstructurePosition currentPosition, SuperstructurePosition goalPosition){
-    if(MathUtil.isNear(goalPosition.elevatorHeight(), currentPosition.elevatorHeight(), 0.5)){
+
+  public static boolean shortCutPossibleSuperStructureDown(
+      SuperstructurePosition currentPosition, SuperstructurePosition goalPosition) {
+    if (MathUtil.isNear(goalPosition.elevatorHeight(), currentPosition.elevatorHeight(), 0.5)) {
       return true;
     }
     return false;
