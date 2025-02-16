@@ -147,6 +147,9 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     DogLog.log("Intake/TopMotor/AppliedVoltage", topMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log(
         "Intake/BottomMotor/AppliedVoltage", bottomMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log("Intake/TopMotor/StatorCurrent", topMotor.getStatorCurrent().getValueAsDouble());
+    DogLog.log(
+        "Intake/BottomMotor/StatorCurrent", bottomMotor.getStatorCurrent().getValueAsDouble());
     DogLog.log("Intake/Sensors/RightSensorRaw", rightSensorRaw);
     DogLog.log("Intake/Sensors/LeftSensorRaw", leftSensorRaw);
     DogLog.log("Intake/Sensors/RightSensorDebounced", rightSensorDebounced);
