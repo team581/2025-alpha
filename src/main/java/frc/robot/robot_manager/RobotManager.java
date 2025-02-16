@@ -1297,19 +1297,32 @@ public class RobotManager extends StateMachine<RobotState> {
 
     switch (getState()) {
       // If we are actively placing a game piece, or climbing, etc. then don't change mode
-      case CORAL_L1_4_RELEASE,
-          CORAL_CENTERED_L2_4_RELEASE,
-          CORAL_CENTERED_L3_4_RELEASE,
-          CORAL_DISPLACED_L2_4_RELEASE,
-          CORAL_DISPLACED_L3_4_RELEASE,
-          CLIMBING_1_LINEUP,
+      case CLIMBING_1_LINEUP,
           NET_BACK_SCORING,
           NET_FORWARD_SCORING,
           PROCESSOR_SCORING,
           ALGAE_OUTTAKE,
           CLIMBING_2_HANGING,
           UNJAM,
-          REHOME_ELEVATOR -> {}
+          REHOME_ELEVATOR,
+          CORAL_L1_3_PLACE,
+          CORAL_L1_4_RELEASE,
+          CORAL_CENTERED_L2_2_LINEUP,
+          CORAL_CENTERED_L2_3_PLACE,
+          CORAL_CENTERED_L2_4_RELEASE,
+          CORAL_DISPLACED_L2_2_LINEUP,
+          CORAL_DISPLACED_L2_3_PLACE,
+          CORAL_DISPLACED_L2_4_RELEASE,
+          CORAL_CENTERED_L3_2_LINEUP,
+          CORAL_CENTERED_L3_3_PLACE,
+          CORAL_CENTERED_L3_4_RELEASE,
+          CORAL_DISPLACED_L3_2_LINEUP,
+          CORAL_DISPLACED_L3_3_PLACE,
+          CORAL_DISPLACED_L3_4_RELEASE,
+          CORAL_CENTERED_L4_2_LINEUP,
+          CORAL_CENTERED_L4_3_PLACE,
+          CORAL_DISPLACED_L4_2_LINEUP,
+          CORAL_DISPLACED_L4_3_PLACE -> {}
       case IDLE_NO_GP, IDLE_ALGAE, IDLE_CORAL -> {
         stowRequest();
       }
@@ -1340,34 +1353,22 @@ public class RobotManager extends StateMachine<RobotState> {
           intakeFloorAlgaeRequest();
         }
       }
-      case CORAL_L1_1_APPROACH, CORAL_L1_3_PLACE -> {
+      case CORAL_L1_1_APPROACH -> {
         if (newMode == GamePieceMode.ALGAE) {
           processorWaitingRequest();
         }
       }
-      case CORAL_L2_1_APPROACH,
-          CORAL_CENTERED_L2_2_LINEUP,
-          CORAL_CENTERED_L2_3_PLACE,
-          CORAL_DISPLACED_L2_2_LINEUP,
-          CORAL_DISPLACED_L2_3_PLACE -> {
+      case CORAL_L2_1_APPROACH -> {
         if (newMode == GamePieceMode.ALGAE) {
           intakeAlgaeL2Request();
         }
       }
-      case CORAL_L3_1_APPROACH,
-          CORAL_CENTERED_L3_2_LINEUP,
-          CORAL_CENTERED_L3_3_PLACE,
-          CORAL_DISPLACED_L3_2_LINEUP,
-          CORAL_DISPLACED_L3_3_PLACE -> {
+      case CORAL_L3_1_APPROACH -> {
         if (newMode == GamePieceMode.ALGAE) {
           intakeAlgaeL3Request();
         }
       }
-      case CORAL_L4_1_APPROACH,
-          CORAL_CENTERED_L4_2_LINEUP,
-          CORAL_CENTERED_L4_3_PLACE,
-          CORAL_DISPLACED_L4_2_LINEUP,
-          CORAL_DISPLACED_L4_3_PLACE -> {
+      case CORAL_L4_1_APPROACH -> {
         if (newMode == GamePieceMode.ALGAE) {
           algaeNetRequest();
         }
