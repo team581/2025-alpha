@@ -35,7 +35,9 @@ public record RobotConfig(
       Debouncer rightDebouncer,
       Debouncer leftDebouncer,
       TalonFXConfiguration topMotorConfig,
-      TalonFXConfiguration bottomMotorConfig) {}
+      TalonFXConfiguration bottomMotorConfig,
+      double algaeTorqueCurrent,
+      double maxOutput) {}
 
   public record SwerveConfig(
       ProfiledPhoenixPIDController snapController,

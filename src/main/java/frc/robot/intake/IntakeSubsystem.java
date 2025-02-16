@@ -20,8 +20,9 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   private final Debouncer rightDebouncer = RobotConfig.get().intake().rightDebouncer();
   private final Debouncer leftDebouncer = RobotConfig.get().intake().leftDebouncer();
 
-  private final TorqueCurrentFOC torqueRequest = new TorqueCurrentFOC(65).withMaxAbsDutyCycle(0.66);
-
+  private final TorqueCurrentFOC torqueRequest =
+      new TorqueCurrentFOC(RobotConfig.get().intake().algaeTorqueCurrent())
+          .withMaxAbsDutyCycle(RobotConfig.get().intake().maxOutput());
   private boolean rightSensorRaw = false;
   private boolean leftSensorRaw = false;
   private boolean rightSensorDebounced = false;
