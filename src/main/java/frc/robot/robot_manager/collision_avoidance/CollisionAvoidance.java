@@ -57,7 +57,7 @@ public class CollisionAvoidance {
         "CollisionAvoidance/CurrentPosition", positionToTranslation(currentSuperstructurePosition));
 
     // if(currentZone.id==3||currentZone.id==4||currentZone.id==5&&goalZone.id==3||goalZone.id==4||goalZone.id==5){
-    if (currentZone.shortCutPossible(goalZone)) {
+    if (currentZone.shortCutPossible456(goalZone)||CollisionBox.shortCutPossibleSuperStructureDown(currentSuperstructurePosition, goalSuperstructurePosition)) {
       return Optional.empty();
     }
     if (currentZone.id < goalZone.id) {

@@ -3,6 +3,8 @@ package frc.robot.robot_manager.collision_avoidance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import frc.robot.robot_manager.SuperstructurePosition;
+
+import java.lang.StackWalker.Option;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -155,6 +157,22 @@ public class CollisionAvoidanceTest {
     SuperstructurePosition goal = new SuperstructurePosition(100, 50);
     var result = CollisionAvoidance.plan(current, goal);
     var expectedResult = CollisionBox.BOX_4.safeZone;
+    assertEquals(expectedResult, result.get());
+  }
+  @Test
+  void testSuperstructureDownShortCut() {
+    SuperstructurePosition current = new SuperstructurePosition(0, 80);
+    SuperstructurePosition goal = new SuperstructurePosition(0, 50);
+    var result = CollisionAvoidance.plan(current, goal);
+    var expectedResult = Optional.empty();
+    assertEquals(expectedResult, result);
+  }
+  @Test
+  void testNoSuperstructureDownShortCut() {
+    SuperstructurePosition current = new SuperstructurePosition(0, 125);
+    SuperstructurePosition goal = new SuperstructurePosition(1, 0);
+    var result = CollisionAvoidance.plan(current, goal);
+    var expectedResult = CollisionBox.BOX_3.safeZone;
     assertEquals(expectedResult, result.get());
   }
 }
