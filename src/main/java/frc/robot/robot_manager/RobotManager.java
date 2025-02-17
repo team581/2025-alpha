@@ -1279,8 +1279,8 @@ public class RobotManager extends StateMachine<RobotState> {
 
     if (vision.isAnyScoringTagLimelightOnline()) {
       var idealAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(false);
-        swerve.setAutoAlignAutoSpeeds(idealAlignSpeeds);
-        swerve.setAutoAlignSpeeds(autoAlign.calculateConstrainedAndWeightedSpeeds(idealAlignSpeeds));
+      swerve.setAutoAlignAutoSpeeds(idealAlignSpeeds);
+      swerve.setAutoAlignSpeeds(autoAlign.calculateConstrainedAndWeightedSpeeds(idealAlignSpeeds));
     } else {
       swerve.setAutoAlignAutoSpeeds(new ChassisSpeeds());
     }

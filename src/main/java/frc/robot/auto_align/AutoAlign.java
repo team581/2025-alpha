@@ -167,7 +167,8 @@ public class AutoAlign {
       Limelight purpleLimelight,
       Limelight frontLimelight,
       Limelight baseLimelight,
-      LocalizationSubsystem localization, SwerveSubsystem swerve) {
+      LocalizationSubsystem localization,
+      SwerveSubsystem swerve) {
     this.purple = purple;
     this.purpleLimelight = purpleLimelight;
     this.frontLimelight = frontLimelight;
@@ -180,6 +181,7 @@ public class AutoAlign {
   public void setTeleopSpeeds(ChassisSpeeds speeds) {
     teleopSpeeds = speeds;
   }
+
   private ChassisSpeeds constrainLinearVelocity(ChassisSpeeds speeds, double maxSpeed) {
     var options =
         new AutoConstraintOptions()
@@ -190,6 +192,7 @@ public class AutoAlign {
             .withMaxLinearVelocity(maxSpeed);
     return AutoConstraintCalculator.constrainLinearVelocity(speeds, options);
   }
+
   public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(ChassisSpeeds alignSpeeds) {
     var addedSpeeds = teleopSpeeds.plus(alignSpeeds);
     var constrainedSpeeds = constrainLinearVelocity(addedSpeeds, MAX_CONSTRAINT);
