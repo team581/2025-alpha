@@ -210,7 +210,7 @@ public class AutoAlign {
             distanceToReef / REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD, LOWEST_TELEOP_SPEED_SCALAR, 1.0);
     DogLog.log("Debug/Progress", progress);
     var newTeleopSpeeds = teleopSpeeds.times(progress);
-    if (progress <= LOWEST_TELEOP_SPEED_SCALAR) {
+    if (progress == LOWEST_TELEOP_SPEED_SCALAR) {
       progress = 0.0;
     }
     var newAlignSpeeds = alignSpeeds.times(1.0 - progress);
@@ -232,22 +232,12 @@ public class AutoAlign {
     }
     DogLog.log("PurpleAlignment/TagAligned", true);
 
-    var speeds =
-        switch (purpleState) {
-          case NO_PURPLE -> {
-            yield tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
-          }
-          case VISIBLE_NOT_CENTERED -> {
-            yield tagAlign
-                .getPoseAlignmentChassisSpeeds(seenPurple)
-                .plus(
-                    purple.getPurpleAlignChassisSpeeds(
-                        localization.getPose().getRotation().getDegrees()));
-          }
-          case CENTERED -> {
-            yield tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
-          }
-        };
+    var speeds = switch (purpleState) {
+      case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+      case VISIBLE_NOT_CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple)
+        .plus(purple.getPurpleAlignChassisSpeeds(localization.getPose().getRotation().getDegrees()));
+      case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+    };
     DogLog.log("PurpleAlignment/CombinedSpeeds/x", speeds.vxMetersPerSecond);
     DogLog.log("PurpleAlignment/CombinedSpeeds/y", speeds.vyMetersPerSecond);
     DogLog.log("PurpleAlignment/CombinedSpeeds/omega", speeds.omegaRadiansPerSecond);
