@@ -232,20 +232,13 @@ public class AutoAlign {
     }
     DogLog.log("PurpleAlignment/TagAligned", true);
 
-    var speeds =
-        switch (purpleState) {
-          case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
-          case VISIBLE_NOT_CENTERED ->
-              tagAlign
-                  .getPoseAlignmentChassisSpeeds(seenPurple)
-                  .plus(
-                      purple.getPurpleAlignChassisSpeeds(
-                          localization.getPose().getRotation().getDegrees()));
-          case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
-        };
-    DogLog.log("PurpleAlignment/CombinedSpeeds/x", speeds.vxMetersPerSecond);
-    DogLog.log("PurpleAlignment/CombinedSpeeds/y", speeds.vyMetersPerSecond);
-    DogLog.log("PurpleAlignment/CombinedSpeeds/omega", speeds.omegaRadiansPerSecond);
+    var speeds = switch (purpleState) {
+      case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+      case VISIBLE_NOT_CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple)
+        .plus(purple.getPurpleAlignChassisSpeeds(localization.getPose().getRotation().getDegrees()));
+      case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+    };
+    DogLog.log("PurpleAlignment/CombinedSpeeds", speeds);
     return speeds;
   }
 
