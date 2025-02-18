@@ -7,7 +7,6 @@ public class ReefState {
   private EnumSet<ReefPipe> scoredL3Pipes = EnumSet.noneOf(ReefPipe.class);
   private EnumSet<ReefPipe> scoredL4Pipes = EnumSet.noneOf(ReefPipe.class);
 
-
   public void clear() {
     scoredL2Pipes.clear();
     scoredL3Pipes.clear();
