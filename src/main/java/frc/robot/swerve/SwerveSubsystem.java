@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.auto_align.MagnetismUtil;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
+import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.CompBotTunerConstants;
@@ -33,13 +34,6 @@ import java.util.Map;
 public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final ProfiledPhoenixPIDController SNAP_CONTROLLER =
       RobotConfig.get().swerve().snapController();
-
-  // TODO: Remove this once magnetism is stable, with current way robot manager is, having both of
-  // these enabled doesn't work
-  private static final boolean MAGNETISM_ENABLED = false;
-  private static final boolean AUTO_ALIGN_ENABLED = true;
-
-  private static final boolean INTAKE_ASSIST_CORAL_ENABLED = true;
 
   public static final double MaxSpeed = 4.75;
   private static final double MaxAngularRate = Units.rotationsToRadians(4);
@@ -166,14 +160,14 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setAutoAlignAutoSpeeds(ChassisSpeeds speeds) {
     autoAlignAutoSpeeds = speeds;
-    if (AUTO_ALIGN_ENABLED) {
+    if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
       sendSwerveRequest();
     }
   }
 
   public void setAutoAlignSpeeds(ChassisSpeeds speeds) {
     autoAlignSpeeds = speeds;
-    if (AUTO_ALIGN_ENABLED) {
+    if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
       sendSwerveRequest();
     }
   }
@@ -243,7 +237,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
     magnetizedSpeeds =
-        MAGNETISM_ENABLED
+        FeatureFlags.MAGNETISM.getAsBoolean()
             ? MagnetismUtil.getReefMagnetizedChassisSpeeds(teleopSpeeds, drivetrainState.Pose)
             : teleopSpeeds;
     teleopSlowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
@@ -399,7 +393,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public void enableScoringAlignment() {
-    if (MAGNETISM_ENABLED || AUTO_ALIGN_ENABLED) {
+    if (FeatureFlags.MAGNETISM.getAsBoolean() || FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
       if (DriverStation.isAutonomous()) {
         // No magnetism in auto, use regular snaps
         setStateFromRequest(SwerveState.REEF_ALIGN_AUTO);
@@ -411,10 +405,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public ChassisSpeeds getAutoAlignAutoChassisSpeeds() {
-    if (MAGNETISM_ENABLED) {
+    if (FeatureFlags.MAGNETISM.getAsBoolean()) {
       // TODO: Magnetism should be a no-op in auto >:(
       return magnetizedSpeeds;
-    } else if (AUTO_ALIGN_ENABLED) {
+    } else if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
       return autoAlignAutoSpeeds;
     }
 
@@ -422,10 +416,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public ChassisSpeeds getAutoAlignChassisSpeeds() {
-    if (MAGNETISM_ENABLED) {
+    if (FeatureFlags.MAGNETISM.getAsBoolean()) {
       // TODO: Magnetism should be a no-op in auto >:(
       return magnetizedSpeeds;
-    } else if (AUTO_ALIGN_ENABLED) {
+    } else if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
       return autoAlignSpeeds;
     }
 
@@ -434,7 +428,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void enableCoralIntakeAssist() {
     if (DriverStation.isTeleop()) {
-      if (INTAKE_ASSIST_CORAL_ENABLED) {
+      if (FeatureFlags.CORAL_INTAKE_ASSIST.getAsBoolean()) {
         setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
       } else {
         setStateFromRequest(SwerveState.TELEOP);
