@@ -5,12 +5,15 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.auto_align.purple_align.PurpleAlign;
+import frc.robot.auto_align.purple_align.PurpleAlignState;
+import frc.robot.auto_align.tag_align.TagAlign;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.fms.FmsSubsystem;
-import frc.robot.purple.Purple;
-import frc.robot.purple.PurpleState;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SnapUtil;
+import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.vision.CameraHealth;
 import frc.robot.vision.limelight.Limelight;
 import java.util.List;
@@ -23,8 +26,9 @@ public class AutoAlign {
 
   private static final double REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD = 1.5;
   private static final double LOWEST_TELEOP_SPEED_SCALAR = 0.4;
-  private static final double MIN_CONSTRAINT = 0.2;
+  private static final double MIN_CONSTRAINT = 1.5;
   private static final double MAX_CONSTRAINT = 3.5;
+  private static final double BASE_TELEOP_SPEED = 2.0;
 
   public static void setAutoReefPipeOverride(ReefPipe override) {
     autoReefPipeOverride = Optional.of(override);
@@ -126,13 +130,13 @@ public class AutoAlign {
   }
 
   public static ChassisSpeeds calculateTeleopAndAlignSpeeds(
-      ChassisSpeeds teleopSpeeds, ChassisSpeeds alignSpeeds, double baseTeleopSpeed) {
+      ChassisSpeeds teleopSpeeds, ChassisSpeeds alignSpeeds) {
     double teleopVelocity =
         Math.hypot(teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond);
     double alignVelocity = Math.hypot(alignSpeeds.vxMetersPerSecond, alignSpeeds.vyMetersPerSecond);
     var wantedSpeeds = teleopSpeeds.plus(alignSpeeds);
 
-    var teleopVelocityMax = Math.max(baseTeleopSpeed, teleopVelocity);
+    var teleopVelocityMax = Math.max(BASE_TELEOP_SPEED, teleopVelocity);
 
     var minSpeed = Math.min(alignVelocity, teleopVelocityMax);
     var clampedConstraint = MathUtil.clamp(minSpeed, MIN_CONSTRAINT, MAX_CONSTRAINT);
@@ -148,28 +152,56 @@ public class AutoAlign {
     return AutoConstraintCalculator.constrainLinearVelocity(wantedSpeeds, options);
   }
 
-  private final Purple purple;
+  private final PurpleAlign purple;
   private final Limelight purpleLimelight;
   private final Limelight frontLimelight;
   private final Limelight baseLimelight;
+  private final LocalizationSubsystem localization;
+  private final TagAlign tagAlign;
+  private final SwerveSubsystem swerve;
+
+  private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
 
   public AutoAlign(
-      Purple purple, Limelight purpleLimelight, Limelight frontLimelight, Limelight baseLimelight) {
+      PurpleAlign purple,
+      TagAlign tagAlign,
+      Limelight purpleLimelight,
+      Limelight frontLimelight,
+      Limelight baseLimelight,
+      LocalizationSubsystem localization,
+      SwerveSubsystem swerve) {
     this.purple = purple;
     this.purpleLimelight = purpleLimelight;
     this.frontLimelight = frontLimelight;
     this.baseLimelight = baseLimelight;
+    this.tagAlign = tagAlign;
+    this.localization = localization;
+    this.swerve = swerve;
   }
 
-  public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(
-      Pose2d robotPose,
-      ChassisSpeeds teleopSpeeds,
-      ChassisSpeeds alignSpeeds,
-      double baseTeleopSpeed) {
-    var constrainedSpeeds =
-        calculateTeleopAndAlignSpeeds(teleopSpeeds, alignSpeeds, baseTeleopSpeed);
+  public void setTeleopSpeeds(ChassisSpeeds speeds) {
+    teleopSpeeds = speeds;
+  }
+
+  private ChassisSpeeds constrainLinearVelocity(ChassisSpeeds speeds, double maxSpeed) {
+    var options =
+        new AutoConstraintOptions()
+            .withCollisionAvoidance(false)
+            .withMaxAngularAcceleration(0)
+            .withMaxAngularVelocity(0)
+            .withMaxLinearAcceleration(0)
+            .withMaxLinearVelocity(maxSpeed);
+    return AutoConstraintCalculator.constrainLinearVelocity(speeds, options);
+  }
+
+  public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(ChassisSpeeds alignSpeeds) {
+    var addedSpeeds = teleopSpeeds.plus(alignSpeeds);
+    var constrainedSpeeds = constrainLinearVelocity(addedSpeeds, MAX_CONSTRAINT);
+
+    var robotPose = localization.getPose();
     var distanceToReef =
-        robotPose.getTranslation().getDistance(purple.getUsedScoringPose().getTranslation());
+        robotPose.getTranslation().getDistance(tagAlign.getUsedScoringPose().getTranslation());
+
     if (distanceToReef > REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD) {
       return constrainedSpeeds;
     }
@@ -179,19 +211,47 @@ public class AutoAlign {
             distanceToReef / REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD, LOWEST_TELEOP_SPEED_SCALAR, 1.0);
     DogLog.log("Debug/Progress", progress);
     var newTeleopSpeeds = teleopSpeeds.times(progress);
-    if (progress <= LOWEST_TELEOP_SPEED_SCALAR) {
+    if (progress == LOWEST_TELEOP_SPEED_SCALAR) {
       progress = 0.0;
     }
     var newAlignSpeeds = alignSpeeds.times(1.0 - progress);
-    var newConstrainedSpeeds =
-        calculateTeleopAndAlignSpeeds(newTeleopSpeeds, newAlignSpeeds, baseTeleopSpeed);
+    var newAddedSpeeds = newTeleopSpeeds.plus(newAlignSpeeds);
+    var newConstrainedSpeeds = constrainLinearVelocity(newAddedSpeeds, MAX_CONSTRAINT);
     DogLog.log("Debug/NewConstrainedSpeeds", newConstrainedSpeeds);
     return newConstrainedSpeeds;
+  }
+
+  public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds() {
+    var seenPurple = purple.seenPurple();
+    var isTagAligned = tagAlign.isTagAligned();
+    var purpleState = purple.getPurpleState();
+    DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
+    DogLog.log("PurpleAlignment/PurpleState", purpleState);
+    if (!seenPurple && !isTagAligned) {
+      DogLog.log("PurpleAlignment/TagAligned", false);
+      return tagAlign.getPoseAlignmentChassisSpeeds(purple.seenPurple());
+    }
+    DogLog.log("PurpleAlignment/TagAligned", true);
+
+    var speeds =
+        switch (purpleState) {
+          case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+          case VISIBLE_NOT_CENTERED ->
+              tagAlign
+                  .getPoseAlignmentChassisSpeeds(seenPurple)
+                  .plus(
+                      purple.getPurpleAlignChassisSpeeds(
+                          localization.getPose().getRotation().getDegrees()));
+          case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+        };
+    DogLog.log("PurpleAlignment/CombinedSpeeds", speeds);
+    return speeds;
   }
 
   public ReefAlignState getReefAlignState() {
 
     var tagResult = frontLimelight.getTagResult().or(baseLimelight::getTagResult);
+    var tagAligned = tagAlign.isTagAligned();
     var purpleState = purple.getPurpleState();
     var purpleHealth = purpleLimelight.getCameraHealth();
     var combinedTagHealth =
@@ -210,22 +270,22 @@ public class AutoAlign {
 
     if (purple.canUsePurple()) {
       // We can't trust purple unless we are near the reef, to avoid false positives
-      if (purpleState == PurpleState.CENTERED) {
+      if (purpleState == PurpleAlignState.CENTERED) {
         return ReefAlignState.HAS_PURPLE_ALIGNED;
       }
-      if (purpleState == PurpleState.VISIBLE_NOT_CENTERED) {
+      if (purpleState == PurpleAlignState.VISIBLE_NOT_CENTERED) {
         return ReefAlignState.HAS_PURPLE_NOT_ALIGNED;
       }
     }
 
     if (tagResult.isEmpty()) {
-      if (purple.isTagAligned()) {
+      if (tagAligned) {
         return ReefAlignState.NO_TAGS_IN_POSITION;
       }
       return ReefAlignState.NO_TAGS_WRONG_POSITION;
     }
 
-    if (purple.isTagAligned()) {
+    if (tagAligned) {
       return ReefAlignState.HAS_TAGS_IN_POSITION;
     }
 

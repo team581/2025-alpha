@@ -32,12 +32,13 @@ public record RobotConfig(
       int topMotorID,
       int bottomMotorID,
       int candiID,
+      boolean sensorFlipped,
       Debouncer rightDebouncer,
       Debouncer leftDebouncer,
       TalonFXConfiguration topMotorConfig,
       TalonFXConfiguration bottomMotorConfig,
-      double algaeTorqueCurrent,
-      double maxOutput) {}
+      double algaeHoldCurrent,
+      double algaeHoldMaxDutyCycle) {}
 
   public record SwerveConfig(
       ProfiledPhoenixPIDController snapController,
@@ -63,6 +64,8 @@ public record RobotConfig(
       String canBusName,
       int motorID,
       int cancoderID,
+      double minAngle,
+      double maxAngle,
       TalonFXConfiguration motorConfig,
       CANcoderConfiguration cancoderConfig) {}
 

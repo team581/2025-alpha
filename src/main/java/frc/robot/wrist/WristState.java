@@ -12,9 +12,6 @@ public enum WristState {
   CORAL_SCORE_PLACING_L1(0.0),
   CORAL_SCORE_RELEASE_L1(0.0),
 
-  // TODO: Check why CORAL_SCORE_CENTERED_PLACING_L2 and CORAL_SCORE_CENTERED_PLACING_L3 have
-  // different angles when theoretically they could be the same, and find out if it matters
-
   // Centered coral positions
   CORAL_SCORE_CENTERED_LINEUP_L2(25.6),
   CORAL_SCORE_CENTERED_PLACING_L2(10),
@@ -46,7 +43,7 @@ public enum WristState {
 
   ALGAE_FORWARD_NET(50),
   ALGAE_BACKWARD_NET(110),
-  ALGAE_PROCESSOR(-5.0),
+  ALGAE_PROCESSOR(-15.0),
 
   DISLODGE_L2_LOW(UNTUNED),
   DISLODGE_L2_HIGH(UNTUNED),
@@ -56,10 +53,11 @@ public enum WristState {
   GROUND_CORAL_INTAKE(-54.0),
   GROUND_ALGAE_INTAKE(-54.0),
 
-  INTAKING_CORAL_STATION_BACK(125),
+  INTAKING_CORAL_STATION_BACK(120),
   INTAKING_CORAL_STATION_FRONT(50),
 
-  COLLISION_AVOIDANCE(0.0);
+  COLLISION_AVOIDANCE(0.0),
+  CLIMBING(-10.0);
 
   public final double angle;
 

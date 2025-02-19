@@ -14,7 +14,6 @@ import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.config.RobotConfig.ClimberConfig;
@@ -93,6 +92,7 @@ class PracticeConfig {
               20,
               21,
               26,
+              true,
               new Debouncer(0.1, DebounceType.kBoth),
               new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
@@ -117,7 +117,7 @@ class PracticeConfig {
                       new TorqueCurrentConfigs()
                           .withPeakForwardTorqueCurrent(70.0)
                           .withPeakReverseTorqueCurrent(70.0)),
-              68.0,
+              68,
               0.66),
           new SwerveConfig(
               new ProfiledPhoenixPIDController(10, 0, 1, Double.MAX_VALUE),
@@ -210,8 +210,11 @@ class PracticeConfig {
               CANIVORE_NAME,
               24,
               25,
+              -20.0,
+              170.0,
               new TalonFXConfiguration()
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+                  .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(125.0))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
@@ -219,10 +222,7 @@ class PracticeConfig {
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(60)),
               new CANcoderConfiguration()
-                  .withMagnetSensor(
-                      new MagnetSensorConfigs()
-                          .withMagnetOffset(0.076416)
-                          .withSensorDirection(SensorDirectionValue.Clockwise_Positive))),
+                  .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0.3798828125))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private PracticeConfig() {}

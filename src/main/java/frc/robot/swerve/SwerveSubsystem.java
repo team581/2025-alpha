@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.MagnetismUtil;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.config.RobotConfig;
@@ -38,7 +37,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   // TODO: Remove this once magnetism is stable, with current way robot manager is, having both of
   // these enabled doesn't work
   private static final boolean MAGNETISM_ENABLED = false;
-  private static final boolean PURPLE_ALIGN_ENABLED = true;
+  private static final boolean AUTO_ALIGN_ENABLED = true;
 
   private static final boolean INTAKE_ASSIST_CORAL_ENABLED = true;
 
@@ -106,10 +105,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   private ChassisSpeeds magnetizedSpeeds = new ChassisSpeeds();
   private ChassisSpeeds coralAssistSpeedsOffset = new ChassisSpeeds();
-  private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
+
+  private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds autoAlignAutoSpeeds = new ChassisSpeeds();
 
   private ChassisSpeeds previousSpeeds = new ChassisSpeeds();
   private double previousTimestamp = 0.0;
+  private double teleopSlowModePercent = 0.0;
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return robotRelativeSpeeds;
@@ -162,9 +164,16 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     coralAssistSpeedsOffset = speeds;
   }
 
-  public void setPurpleSpeeds(ChassisSpeeds speeds) {
-    purpleSpeeds = speeds;
-    if (PURPLE_ALIGN_ENABLED) {
+  public void setAutoAlignAutoSpeeds(ChassisSpeeds speeds) {
+    autoAlignAutoSpeeds = speeds;
+    if (AUTO_ALIGN_ENABLED) {
+      sendSwerveRequest();
+    }
+  }
+
+  public void setAutoAlignSpeeds(ChassisSpeeds speeds) {
+    autoAlignSpeeds = speeds;
+    if (AUTO_ALIGN_ENABLED) {
       sendSwerveRequest();
     }
   }
@@ -219,13 +228,11 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     double mappedX = mappedpose.getX();
     double mappedY = mappedpose.getY();
 
-    var slowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
-
     teleopSpeeds =
         new ChassisSpeeds(
-            -1.0 * mappedY * MaxSpeed * slowModePercent,
-            mappedX * MaxSpeed * slowModePercent,
-            rightX * TELEOP_MAX_ANGULAR_RATE.getRadians() * slowModePercent);
+            -1.0 * mappedY * MaxSpeed * teleopSlowModePercent,
+            mappedX * MaxSpeed * teleopSlowModePercent,
+            rightX * TELEOP_MAX_ANGULAR_RATE.getRadians() * teleopSlowModePercent);
 
     sendSwerveRequest();
   }
@@ -239,6 +246,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
         MAGNETISM_ENABLED
             ? MagnetismUtil.getReefMagnetizedChassisSpeeds(teleopSpeeds, drivetrainState.Pose)
             : teleopSpeeds;
+    teleopSlowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
   }
 
   public ChassisSpeeds getTeleopSpeeds() {
@@ -261,7 +269,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       case TELEOP_SNAPS -> {
         if (teleopSpeeds.omegaRadiansPerSecond == 0) {
-          // TODO: Use SNAP_CONTROLLER.setMaxOutput() to constrain angular velocity
+          SNAP_CONTROLLER.setMaxOutput(
+              TELEOP_MAX_ANGULAR_RATE.getRadians() * teleopSlowModePercent);
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(teleopSpeeds.vxMetersPerSecond)
@@ -291,13 +300,13 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
       case REEF_ALIGN_TELEOP -> {
-        // TODO: Use SNAP_CONTROLLER.setMaxOutput() to constrain angular velocity
-        var constrained = AutoAlign.calculateTeleopAndAlignSpeeds(teleopSpeeds, purpleSpeeds, 2.0);
         if (teleopSpeeds.omegaRadiansPerSecond == 0) {
+          SNAP_CONTROLLER.setMaxOutput(
+              TELEOP_MAX_ANGULAR_RATE.getRadians() * teleopSlowModePercent);
           drivetrain.setControl(
               driveToAngle
-                  .withVelocityX(constrained.vxMetersPerSecond)
-                  .withVelocityY(constrained.vyMetersPerSecond)
+                  .withVelocityX(autoAlignSpeeds.vxMetersPerSecond)
+                  .withVelocityY(autoAlignSpeeds.vyMetersPerSecond)
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
 
@@ -305,14 +314,15 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
           drivetrain.setControl(
               drive
-                  .withVelocityX(constrained.vxMetersPerSecond)
-                  .withVelocityY(constrained.vyMetersPerSecond)
-                  .withRotationalRate(constrained.omegaRadiansPerSecond)
+                  .withVelocityX(autoAlignSpeeds.vxMetersPerSecond)
+                  .withVelocityY(autoAlignSpeeds.vyMetersPerSecond)
+                  .withRotationalRate(autoAlignSpeeds.omegaRadiansPerSecond)
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
       case REEF_ALIGN_AUTO -> {
-        var wantedSpeeds = getScoringAlignChassisSpeeds();
+        SNAP_CONTROLLER.setMaxOutput(Double.POSITIVE_INFINITY);
+        var wantedSpeeds = getAutoAlignAutoChassisSpeeds();
         //  var wantedSpeeds = alignSpeeds.plus(autoSpeeds);
         var currentTimestamp = Timer.getFPGATimestamp();
         if (previousTimestamp == 0.0) {
@@ -355,14 +365,17 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withVelocityY(autoSpeeds.vyMetersPerSecond)
                   .withRotationalRate(autoSpeeds.omegaRadiansPerSecond)
                   .withDriveRequestType(DriveRequestType.Velocity));
-      case AUTO_SNAPS ->
-          drivetrain.setControl(
-              driveToAngle
-                  .withVelocityX(autoSpeeds.vxMetersPerSecond)
-                  .withVelocityY(autoSpeeds.vyMetersPerSecond)
-                  .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
-                  .withDriveRequestType(DriveRequestType.Velocity));
+      case AUTO_SNAPS -> {
+        SNAP_CONTROLLER.setMaxOutput(Double.POSITIVE_INFINITY);
+        drivetrain.setControl(
+            driveToAngle
+                .withVelocityX(autoSpeeds.vxMetersPerSecond)
+                .withVelocityY(autoSpeeds.vyMetersPerSecond)
+                .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
+                .withDriveRequestType(DriveRequestType.Velocity));
+      }
       case CLIMBING -> {
+        SNAP_CONTROLLER.setMaxOutput(TELEOP_MAX_ANGULAR_RATE.getRadians() * teleopSlowModePercent);
         if (teleopSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
@@ -387,7 +400,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public void enableScoringAlignment() {
-    if (MAGNETISM_ENABLED || PURPLE_ALIGN_ENABLED) {
+    if (MAGNETISM_ENABLED || AUTO_ALIGN_ENABLED) {
       if (DriverStation.isAutonomous()) {
         // No magnetism in auto, use regular snaps
         setStateFromRequest(SwerveState.REEF_ALIGN_AUTO);
@@ -398,12 +411,23 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     }
   }
 
-  public ChassisSpeeds getScoringAlignChassisSpeeds() {
+  public ChassisSpeeds getAutoAlignAutoChassisSpeeds() {
     if (MAGNETISM_ENABLED) {
       // TODO: Magnetism should be a no-op in auto >:(
       return magnetizedSpeeds;
-    } else if (PURPLE_ALIGN_ENABLED) {
-      return purpleSpeeds;
+    } else if (AUTO_ALIGN_ENABLED) {
+      return autoAlignAutoSpeeds;
+    }
+
+    return new ChassisSpeeds();
+  }
+
+  public ChassisSpeeds getAutoAlignChassisSpeeds() {
+    if (MAGNETISM_ENABLED) {
+      // TODO: Magnetism should be a no-op in auto >:(
+      return magnetizedSpeeds;
+    } else if (AUTO_ALIGN_ENABLED) {
+      return autoAlignSpeeds;
     }
 
     return new ChassisSpeeds();
@@ -448,18 +472,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     DogLog.log("Swerve/ModuleStates", drivetrainState.ModuleStates);
     DogLog.log("Swerve/ModuleTargets", drivetrainState.ModuleTargets);
     DogLog.log("Swerve/RobotRelativeSpeeds", drivetrainState.Speeds);
-
-    // if (getState() == SwerveState.TELEOP_SNAPS || getState() == SwerveState.REEF_ALIGN_TELEOP) {
-    //   var slowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
-
-    //   if (slowModePercent < 1) {
-    //     driveToAngle.HeadingController.setP(ORIGINAL_HEADING_PID.getP() * slowModePercent);
-    //   } else {
-    //     driveToAngle.HeadingController.setP(ORIGINAL_HEADING_PID.getP());
-    //   }
-    // } else {
-    //   driveToAngle.HeadingController.setP(ORIGINAL_HEADING_PID.getP());
-    // }
   }
 
   private void startSimThread() {

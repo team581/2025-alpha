@@ -97,6 +97,7 @@ class CompConfig {
               20,
               21,
               26,
+              false,
               new Debouncer(0.1, DebounceType.kBoth),
               new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
@@ -121,7 +122,7 @@ class CompConfig {
                       new TorqueCurrentConfigs()
                           .withPeakForwardTorqueCurrent(70.0)
                           .withPeakReverseTorqueCurrent(70.0)),
-              65.0,
+              65,
               0.66),
           new SwerveConfig(
               new ProfiledPhoenixPIDController(5.75, 0, 0, Double.MAX_VALUE),
@@ -214,8 +215,11 @@ class CompConfig {
               CANIVORE_NAME,
               24,
               25,
+              -17.0,
+              170.0,
               new TalonFXConfiguration()
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+                  .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(125.0))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
@@ -223,7 +227,7 @@ class CompConfig {
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(10)),
               new CANcoderConfiguration()
-                  .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0))),
+                  .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0.425537109375))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private CompConfig() {}
