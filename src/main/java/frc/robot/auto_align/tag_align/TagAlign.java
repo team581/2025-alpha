@@ -6,23 +6,29 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.auto_align.AutoAlign;
+import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.localization.LocalizationSubsystem;
+import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
+import java.util.List;
 
 public class TagAlign {
+  private static final List<ReefPipe> ALL_REEF_PIPES = List.of(ReefPipe.values());
+
   private static final PIDController TAG_PID = new PIDController(3.2, 0.0, 0.03);
   private static final double BEFORE_RAISED_INITIAL_DISTANCE_OFFSET = 0.35;
   private static final double TAG_ALIGNMENT_FINISHED_DISTANCE_THRESHOLD = 0.05;
 
+  private final AlignmentCostUtil alignmentCostUtil;
   private final LocalizationSubsystem localization;
   private boolean beforeRaisedOffsetEnabled = false;
   private ReefPipeLevel level = ReefPipeLevel.L1;
   private ChassisSpeeds rawTeleopSpeeds = new ChassisSpeeds();
 
-  public TagAlign(LocalizationSubsystem localization) {
+  public TagAlign(SwerveSubsystem swerve, LocalizationSubsystem localization) {
     this.localization = localization;
+    alignmentCostUtil = new AlignmentCostUtil(localization, swerve);
   }
 
   public void setBeforeRaisedOffsetEnabled(boolean offsetOn) {
@@ -39,7 +45,7 @@ public class TagAlign {
 
   public boolean isTagAligned() {
     var robotPose = localization.getPose();
-    var scoringPoseFieldRelative = AutoAlign.getClosestReefPipe(robotPose, level).getPose(level);
+    var scoringPoseFieldRelative = getBestPipe().getPose(level);
     return robotPose.getTranslation().getDistance(scoringPoseFieldRelative.getTranslation())
         <= TAG_ALIGNMENT_FINISHED_DISTANCE_THRESHOLD;
   }
@@ -48,10 +54,8 @@ public class TagAlign {
     var rawRobotPose = localization.getPose();
     var lookaheadPose = MathHelpers.poseLookahead(rawRobotPose, rawTeleopSpeeds, 0.4);
     DogLog.log("PurpleAlignment/LookaheadPose", lookaheadPose);
-    var rawPose = AutoAlign.getClosestReefPipe(rawRobotPose, level).getPose(level);
-    if (rawRobotPose.getTranslation().getDistance(rawPose.getTranslation()) < 0.2) {
-      rawPose = AutoAlign.getClosestReefPipe(lookaheadPose, level).getPose(level);
-    }
+    var rawPose = getBestPipe().getPose(level);
+
     if (beforeRaisedOffsetEnabled) {
       var robotRelative =
           rawPose.rotateBy(
@@ -63,6 +67,13 @@ public class TagAlign {
           .rotateBy(localization.getPose().getRotation());
     }
     return rawPose;
+  }
+
+  /** Returns the best reef pipe for scoring, based on the robot's current state. */
+  public ReefPipe getBestPipe() {
+    return ALL_REEF_PIPES.stream()
+        .min(alignmentCostUtil.getReefPipeComparator(level))
+        .orElseThrow();
   }
 
   public ChassisSpeeds getPoseAlignmentChassisSpeeds(boolean forwardOnly) {

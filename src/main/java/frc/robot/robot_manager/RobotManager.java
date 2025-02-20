@@ -29,7 +29,6 @@ import frc.robot.roll.RollState;
 import frc.robot.roll.RollSubsystem;
 import frc.robot.swerve.SnapUtil;
 import frc.robot.swerve.SwerveSubsystem;
-import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.CameraHealth;
@@ -1240,10 +1239,7 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   protected void collectInputs() {
     super.collectInputs();
-    var lookaheadRobotPose =
-        MathHelpers.poseLookahead(localization.getPose(), swerve.getFieldRelativeSpeeds(), 0.6);
-    DogLog.log("RobotManager/LookaheadPose", lookaheadRobotPose);
-    nearestReefSide = AutoAlign.getClosestReefSide(lookaheadRobotPose);
+    nearestReefSide = autoAlign.getClosestReefSide();
     reefSnapAngle = nearestReefSide.getPose().getRotation().getDegrees();
     scoringLevel =
         switch (getState()) {

@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.auto_align.MagnetismUtil;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
@@ -34,9 +33,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final ProfiledPhoenixPIDController SNAP_CONTROLLER =
       RobotConfig.get().swerve().snapController();
 
-  // TODO: Remove this once magnetism is stable, with current way robot manager is, having both of
-  // these enabled doesn't work
-  private static final boolean MAGNETISM_ENABLED = false;
   private static final boolean AUTO_ALIGN_ENABLED = true;
 
   private static final boolean INTAKE_ASSIST_CORAL_ENABLED = true;
@@ -242,10 +238,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     drivetrainState = drivetrain.getState();
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
-    magnetizedSpeeds =
-        MAGNETISM_ENABLED
-            ? MagnetismUtil.getReefMagnetizedChassisSpeeds(teleopSpeeds, drivetrainState.Pose)
-            : teleopSpeeds;
     teleopSlowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
   }
 
@@ -399,9 +391,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public void enableScoringAlignment() {
-    if (MAGNETISM_ENABLED || AUTO_ALIGN_ENABLED) {
+    if (AUTO_ALIGN_ENABLED) {
       if (DriverStation.isAutonomous()) {
-        // No magnetism in auto, use regular snaps
         setStateFromRequest(SwerveState.REEF_ALIGN_AUTO);
 
       } else {
@@ -411,10 +402,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public ChassisSpeeds getAutoAlignAutoChassisSpeeds() {
-    if (MAGNETISM_ENABLED) {
-      // TODO: Magnetism should be a no-op in auto >:(
-      return magnetizedSpeeds;
-    } else if (AUTO_ALIGN_ENABLED) {
+    if (AUTO_ALIGN_ENABLED) {
       return autoAlignAutoSpeeds;
     }
 
@@ -422,10 +410,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public ChassisSpeeds getAutoAlignChassisSpeeds() {
-    if (MAGNETISM_ENABLED) {
-      // TODO: Magnetism should be a no-op in auto >:(
-      return magnetizedSpeeds;
-    } else if (AUTO_ALIGN_ENABLED) {
+    if (AUTO_ALIGN_ENABLED) {
       return autoAlignSpeeds;
     }
 
