@@ -16,12 +16,10 @@ import frc.robot.swerve.SnapUtil;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.vision.CameraHealth;
 import frc.robot.vision.limelight.Limelight;
-import java.util.List;
 import java.util.Optional;
 
 public class AutoAlign {
   private static Optional<ReefPipe> autoReefPipeOverride = Optional.empty();
-  private static final List<ReefSide> ALL_REEF_SIDES = List.of(ReefSide.values());
 
   private static final double REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD = 1.5;
   private static final double LOWEST_TELEOP_SPEED_SCALAR = 0.5;
