@@ -28,7 +28,7 @@ public class TagAlign {
   private ChassisSpeeds rawTeleopSpeeds = new ChassisSpeeds();
 
   public ReefState reefState = new ReefState();
-  
+
   public TagAlign(SwerveSubsystem swerve, LocalizationSubsystem localization) {
     this.localization = localization;
     alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState);
