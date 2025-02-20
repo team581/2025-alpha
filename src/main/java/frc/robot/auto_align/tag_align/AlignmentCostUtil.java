@@ -23,8 +23,10 @@ public class AlignmentCostUtil {
    */
   private static double getAlignCost(Pose2d target, Pose2d robotPose, ChassisSpeeds robotVelocity) {
     var lookaheadPose = MathHelpers.poseLookahead(robotPose, robotVelocity, LOOKAHEAD);
-    return target.getTranslation().getDistance(robotPose.getTranslation())
-        + Math.abs(
+
+    var distanceCost = target.getTranslation().getDistance(robotPose.getTranslation());
+    var driveAngleCost =
+        Math.abs(
             target
                     .getTranslation()
                     .minus(robotPose.getTranslation())
@@ -32,6 +34,7 @@ public class AlignmentCostUtil {
                     .minus(lookaheadPose.minus(robotPose).getTranslation().getAngle())
                     .getRadians()
                 * ANGLE_DIFFERENCE_SCALAR);
+    return distanceCost + driveAngleCost;
   }
 
   public final Comparator<Pose2d> ALIGN_COST_COMPARATOR;
