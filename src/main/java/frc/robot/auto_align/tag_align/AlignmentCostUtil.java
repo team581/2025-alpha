@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
+import frc.robot.auto_align.ReefState;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
@@ -41,14 +42,17 @@ public class AlignmentCostUtil {
 
   private final LocalizationSubsystem localization;
   private final SwerveSubsystem swerve;
+  private final ReefState reefState;
 
   private final Comparator<ReefPipe> pipeL4Comparator = createReefPipeComparator(ReefPipeLevel.L4);
   private final Comparator<ReefPipe> pipeL3Comparator = createReefPipeComparator(ReefPipeLevel.L3);
   private final Comparator<ReefPipe> pipeL2Comparator = createReefPipeComparator(ReefPipeLevel.L2);
 
-  public AlignmentCostUtil(LocalizationSubsystem localization, SwerveSubsystem swerve) {
+  public AlignmentCostUtil(
+      LocalizationSubsystem localization, SwerveSubsystem swerve, ReefState reefState) {
     this.localization = localization;
     this.swerve = swerve;
+    this.reefState = reefState;
 
     ALIGN_COST_COMPARATOR =
         Comparator.comparingDouble(
@@ -70,6 +74,7 @@ public class AlignmentCostUtil {
     return Comparator.comparingDouble(
         pipe ->
             getAlignCost(
-                pipe.getPose(level), localization.getPose(), swerve.getFieldRelativeSpeeds()));
+                    pipe.getPose(level), localization.getPose(), swerve.getFieldRelativeSpeeds())
+                + (reefState.isScored(pipe, level) ? 1.0 : 0));
   }
 }

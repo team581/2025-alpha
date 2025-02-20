@@ -273,6 +273,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
         if (done) {
           rumbleController.rumbleRequest();
+          tagAlign.markScored();
           yield RobotState.IDLE_NO_GP;
         }
 

@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
+import frc.robot.auto_align.ReefState;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.MathHelpers;
@@ -25,10 +26,11 @@ public class TagAlign {
   private boolean beforeRaisedOffsetEnabled = false;
   private ReefPipeLevel level = ReefPipeLevel.L1;
   private ChassisSpeeds rawTeleopSpeeds = new ChassisSpeeds();
+  private ReefState reefState = new ReefState();
 
   public TagAlign(SwerveSubsystem swerve, LocalizationSubsystem localization) {
     this.localization = localization;
-    alignmentCostUtil = new AlignmentCostUtil(localization, swerve);
+    alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState);
   }
 
   public void setBeforeRaisedOffsetEnabled(boolean offsetOn) {
@@ -48,6 +50,10 @@ public class TagAlign {
     var scoringPoseFieldRelative = getBestPipe().getPose(level);
     return robotPose.getTranslation().getDistance(scoringPoseFieldRelative.getTranslation())
         <= TAG_ALIGNMENT_FINISHED_DISTANCE_THRESHOLD;
+  }
+
+  public void markScored() {
+    reefState.markScored(getBestPipe(), level);
   }
 
   public Pose2d getUsedScoringPose() {
