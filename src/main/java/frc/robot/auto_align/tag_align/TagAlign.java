@@ -26,8 +26,9 @@ public class TagAlign {
   private boolean beforeRaisedOffsetEnabled = false;
   private ReefPipeLevel level = ReefPipeLevel.L1;
   private ChassisSpeeds rawTeleopSpeeds = new ChassisSpeeds();
-  private ReefState reefState = new ReefState();
 
+  public ReefState reefState = new ReefState();
+  
   public TagAlign(SwerveSubsystem swerve, LocalizationSubsystem localization) {
     this.localization = localization;
     alignmentCostUtil = new AlignmentCostUtil(localization, swerve, reefState);
