@@ -12,6 +12,7 @@ import java.util.Comparator;
 public class AlignmentCostUtil {
   private static final double LOOKAHEAD = 0.5;
   private static final double ANGLE_DIFFERENCE_SCALAR = 0.3;
+
   /**
    * Returns the "cost" (a dimensionless number) of aligning to a given pose based on the robot's
    * current state.
@@ -25,11 +26,12 @@ public class AlignmentCostUtil {
     return target.getTranslation().getDistance(robotPose.getTranslation())
         + Math.abs(
             target
-                .getTranslation()
-                .minus(robotPose.getTranslation())
-                .getAngle()
-                .minus(lookaheadPose.minus(robotPose).getTranslation().getAngle())
-                .getRadians()*ANGLE_DIFFERENCE_SCALAR);
+                    .getTranslation()
+                    .minus(robotPose.getTranslation())
+                    .getAngle()
+                    .minus(lookaheadPose.minus(robotPose).getTranslation().getAngle())
+                    .getRadians()
+                * ANGLE_DIFFERENCE_SCALAR);
   }
 
   public final Comparator<Pose2d> ALIGN_COST_COMPARATOR;
