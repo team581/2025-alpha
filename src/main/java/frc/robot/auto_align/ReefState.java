@@ -1,11 +1,17 @@
 package frc.robot.auto_align;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.EnumSet;
 
 public class ReefState {
   private final EnumSet<ReefPipe> scoredL2Pipes = EnumSet.noneOf(ReefPipe.class);
   private final EnumSet<ReefPipe> scoredL3Pipes = EnumSet.noneOf(ReefPipe.class);
   private final EnumSet<ReefPipe> scoredL4Pipes = EnumSet.noneOf(ReefPipe.class);
+
+  public ReefState() {
+    SmartDashboard.putData("Debug/Clear reef state", Commands.runOnce(this::clear));
+  }
 
   public void clear() {
     scoredL2Pipes.clear();
