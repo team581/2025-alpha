@@ -10,7 +10,6 @@ import frc.robot.auto_align.purple_align.PurpleAlignState;
 import frc.robot.auto_align.tag_align.TagAlign;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.autos.constraints.AutoConstraintOptions;
-import frc.robot.fms.FmsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SnapUtil;
 import frc.robot.swerve.SwerveSubsystem;
@@ -124,16 +123,12 @@ public class AutoAlign {
     this.swerve = swerve;
   }
 
-  public ReefSide getClosestReefSide(boolean isRedAlliance) {
+  public ReefSide getClosestReefSide() {
     if (DriverStation.isAutonomous() && autoReefPipeOverride.isPresent()) {
       return ReefSide.fromPipe(autoReefPipeOverride.orElseThrow());
     }
 
     return ReefSide.fromPipe(tagAlign.getBestPipe());
-  }
-
-  public ReefSide getClosestReefSide() {
-    return getClosestReefSide(FmsSubsystem.isRedAlliance());
   }
 
   public void setTeleopSpeeds(ChassisSpeeds speeds) {
