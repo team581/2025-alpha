@@ -141,7 +141,7 @@ public class FourPiece2IJKLAuto extends BaseAuto {
                                     new Pose2d(14.954, 1.971, Rotation2d.fromDegrees(134.931)))
                                 .pathflipped(),
                             // REEF PIPE L
-                            new AutoPoint(robotManager.tagAlign::getUsedScoringPose)),
+                            new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                         false)
                     .until(robotManager.autoAlign::isTagAlignedDebounced)),
         autoCommands.l4ScoreAndReleaseCommand());

@@ -61,8 +61,6 @@ public class Robot extends TimedRobot {
       new VisionSubsystem(
           imu, elevatorPurpleLimelight, frontCoralLimelight, backTagLimelight, baseTagLimelight);
   private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
-  private final PurpleAlign purpleAlign = new PurpleAlign(elevatorPurpleLimelight);
-  private final TagAlign tagAlign = new TagAlign(swerve, localization);
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
   private final RumbleControllerSubsystem rumbleController =
@@ -79,8 +77,6 @@ public class Robot extends TimedRobot {
       new ClimberSubsystem(hardware.climberMotor, hardware.climberCANcoder);
   private final AutoAlign autoAlign =
       new AutoAlign(
-          purpleAlign,
-          tagAlign,
           elevatorPurpleLimelight,
           frontCoralLimelight,
           baseTagLimelight,
@@ -101,8 +97,6 @@ public class Robot extends TimedRobot {
           backTagLimelight,
           baseTagLimelight,
           lights,
-          purpleAlign,
-          tagAlign,
           autoAlign,
           climber,
           rumbleController);

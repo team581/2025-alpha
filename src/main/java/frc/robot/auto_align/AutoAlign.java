@@ -24,11 +24,6 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private static final double MIN_CONSTRAINT = 0.7;
   private static final double MAX_CONSTRAINT = 1.5;
   private static final double BASE_TELEOP_SPEED = 2.0;
-  private final Debouncer isAlignedDebouncer = new Debouncer(1.0);
-
-  public void setAutoReefPipeOverride(ReefPipe override) {
-    tagAlign.setPipeOveride(override);
-  }
 
   public static boolean shouldNetScoreForwards(Pose2d robotPose) {
     double robotX = robotPose.getX();
@@ -72,30 +67,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
         LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KS
             + LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KP * linearVelocity);
   }
-
-  public static ChassisSpeeds calculateTeleopAndAlignSpeeds(
-      ChassisSpeeds teleopSpeeds, ChassisSpeeds alignSpeeds) {
-    double teleopVelocity =
-        Math.hypot(teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond);
-    double alignVelocity = Math.hypot(alignSpeeds.vxMetersPerSecond, alignSpeeds.vyMetersPerSecond);
-    var wantedSpeeds = teleopSpeeds.plus(alignSpeeds);
-
-    var teleopVelocityMax = Math.max(BASE_TELEOP_SPEED, teleopVelocity);
-
-    var minSpeed = Math.min(alignVelocity, teleopVelocityMax);
-    var clampedConstraint = MathUtil.clamp(minSpeed, MIN_CONSTRAINT, MAX_CONSTRAINT);
-
-    DogLog.log("PurpleAlignment/Constraint", clampedConstraint);
-    var options =
-        new AutoConstraintOptions()
-            .withCollisionAvoidance(false)
-            .withMaxAngularAcceleration(0)
-            .withMaxAngularVelocity(0)
-            .withMaxLinearAcceleration(0)
-            .withMaxLinearVelocity(minSpeed);
-    return AutoConstraintCalculator.constrainLinearVelocity(wantedSpeeds, options);
-  }
-
+  private final Debouncer isAlignedDebouncer = new Debouncer(1.0);
   private final PurpleAlign purple;
   private final Limelight purpleLimelight;
   private final Limelight frontLimelight;
@@ -108,21 +80,25 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private boolean isAlignedDebounced = false;
 
   public AutoAlign(
-      PurpleAlign purple,
-      TagAlign tagAlign,
       Limelight purpleLimelight,
       Limelight frontLimelight,
       Limelight baseLimelight,
       LocalizationSubsystem localization,
       SwerveSubsystem swerve) {
     super(SubsystemPriority.AUTO_ALIGN, AutoAlignState.DEFAULT_STATE);
-    this.purple = purple;
+
+    this.tagAlign = new TagAlign(swerve, localization);
+    this.purple = new PurpleAlign(purpleLimelight);
+
     this.purpleLimelight = purpleLimelight;
     this.frontLimelight = frontLimelight;
     this.baseLimelight = baseLimelight;
-    this.tagAlign = tagAlign;
     this.localization = localization;
     this.swerve = swerve;
+  }
+
+  public void setAutoReefPipeOverride(ReefPipe override) {
+    tagAlign.setPipeOveride(override);
   }
 
   public ReefSide getClosestReefSide() {
@@ -144,13 +120,13 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     return AutoConstraintCalculator.constrainLinearVelocity(speeds, options);
   }
 
-  public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(ChassisSpeeds alignSpeeds) {
+  public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(ChassisSpeeds alignSpeeds, ReefPipe pipe) {
     var addedSpeeds = teleopSpeeds.plus(alignSpeeds);
     var constrainedSpeeds = constrainLinearVelocity(addedSpeeds, MAX_CONSTRAINT);
 
     var robotPose = localization.getPose();
     var distanceToReef =
-        robotPose.getTranslation().getDistance(tagAlign.getUsedScoringPose().getTranslation());
+        robotPose.getTranslation().getDistance(tagAlign.getUsedScoringPose(pipe).getTranslation());
 
     if (distanceToReef > REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD) {
       return constrainedSpeeds;

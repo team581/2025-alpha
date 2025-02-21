@@ -61,8 +61,6 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private final LightsSubsystem lights;
 
-  public final PurpleAlign purpleAlign;
-  public final TagAlign tagAlign;
   public final AutoAlign autoAlign;
 
   private GamePieceMode gamePieceMode = GamePieceMode.CORAL;
@@ -100,8 +98,6 @@ public class RobotManager extends StateMachine<RobotState> {
     this.backTagLimelight = backTagLimelight;
     this.baseTagLimelight = baseTagLimelight;
     this.lights = lights;
-    this.purpleAlign = purple;
-    this.tagAlign = tagAlign;
     this.climber = climber;
     this.autoAlign = autoAlign;
     this.rumbleController = rumbleController;
@@ -111,7 +107,6 @@ public class RobotManager extends StateMachine<RobotState> {
   private ReefSide nearestReefSide = ReefSide.SIDE_GH;
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
   private boolean isRollHomed = false;
-  private ChassisSpeeds purpleSpeeds = new ChassisSpeeds();
   private boolean confirmScoreActive = false;
 
   @Override
