@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.auto_align.AutoAlign;
+import frc.robot.auto_align.purple_align.PurpleAlign;
+import frc.robot.auto_align.tag_align.TagAlign;
 import frc.robot.autos.Autos;
 import frc.robot.autos.Trailblazer;
 import frc.robot.climber.ClimberSubsystem;
@@ -23,13 +26,13 @@ import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeSubsystem;
 import frc.robot.lights.LightsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
-import frc.robot.purple.Purple;
 import frc.robot.robot_manager.GamePieceMode;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.robot_manager.collision_avoidance.CollisionBox;
 import frc.robot.roll.RollSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+import frc.robot.util.ElasticLayoutUtil;
 import frc.robot.util.Stopwatch;
 import frc.robot.util.scheduling.LifecycleSubsystemManager;
 import frc.robot.vision.VisionSubsystem;
@@ -47,35 +50,20 @@ public class Robot extends TimedRobot {
   private final SwerveSubsystem swerve = new SwerveSubsystem();
   private final ImuSubsystem imu = new ImuSubsystem(swerve.drivetrainPigeon);
   private final Limelight elevatorPurpleLimelight =
-      new Limelight(
-          "elev",
-          LimelightState.PURPLE,
-          RobotConfig.get().vision().interpolatedVisionSet().elevatorPurpleSet,
-          LimelightModel.THREE);
+      new Limelight("elev", LimelightState.PURPLE, LimelightModel.THREE);
   private final Limelight frontCoralLimelight =
-      new Limelight(
-          "front",
-          LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().frontCoralSet,
-          LimelightModel.FOUR);
+      new Limelight("front", LimelightState.TAGS, LimelightModel.FOUR);
   private final Limelight backTagLimelight =
-      new Limelight(
-          "back",
-          LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().backTagSet,
-          LimelightModel.THREEG);
+      new Limelight("back", LimelightState.TAGS, LimelightModel.THREEG);
   private final Limelight baseTagLimelight =
-      new Limelight(
-          "base",
-          LimelightState.TAGS,
-          RobotConfig.get().vision().interpolatedVisionSet().baseTagSet,
-          LimelightModel.THREEG);
+      new Limelight("base", LimelightState.TAGS, LimelightModel.THREEG);
 
   private final VisionSubsystem vision =
       new VisionSubsystem(
           imu, elevatorPurpleLimelight, frontCoralLimelight, backTagLimelight, baseTagLimelight);
   private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
-  private final Purple purple = new Purple(elevatorPurpleLimelight, localization);
+  private final PurpleAlign purpleAlign = new PurpleAlign(elevatorPurpleLimelight);
+  private final TagAlign tagAlign = new TagAlign(swerve, localization);
 
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
   private final RumbleControllerSubsystem rumbleController =
@@ -90,6 +78,15 @@ public class Robot extends TimedRobot {
       new LightsSubsystem(hardware.candle, elevatorPurpleLimelight);
   private final ClimberSubsystem climber =
       new ClimberSubsystem(hardware.climberMotor, hardware.climberCANcoder);
+  private final AutoAlign autoAlign =
+      new AutoAlign(
+          purpleAlign,
+          tagAlign,
+          elevatorPurpleLimelight,
+          frontCoralLimelight,
+          baseTagLimelight,
+          localization,
+          swerve);
   private final RobotManager robotManager =
       new RobotManager(
           intake,
@@ -105,7 +102,9 @@ public class Robot extends TimedRobot {
           backTagLimelight,
           baseTagLimelight,
           lights,
-          purple,
+          purpleAlign,
+          tagAlign,
+          autoAlign,
           climber,
           rumbleController);
 
@@ -117,7 +116,7 @@ public class Robot extends TimedRobot {
     System.out.println("roboRIO serial number: " + RobotConfig.SERIAL_NUMBER);
 
     DogLog.setOptions(
-        new DogLogOptions().withCaptureNt(false).withNtPublish(RobotConfig.IS_DEVELOPMENT));
+        new DogLogOptions().withCaptureDs(true).withNtPublish(RobotConfig.IS_DEVELOPMENT));
     // DogLog.setPdh(hardware.pdh);
 
     // Record metadata
@@ -149,6 +148,8 @@ public class Robot extends TimedRobot {
     configureBindings();
 
     CollisionBox.visualize();
+
+    ElasticLayoutUtil.onBoot();
   }
 
   @Override
@@ -168,7 +169,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    ElasticLayoutUtil.onDisable();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -179,10 +182,12 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = autos.getAutoCommand();
-
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    ElasticLayoutUtil.onEnable();
+    tagAlign.clearReefState();
   }
 
   @Override
@@ -195,6 +200,10 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
+    }
+    ElasticLayoutUtil.onEnable();
+    if (RobotConfig.IS_DEVELOPMENT) {
+      tagAlign.clearReefState();
     }
   }
 

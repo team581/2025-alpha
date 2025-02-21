@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.config.RobotConfig;
 import frc.robot.intake.IntakeSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
@@ -26,7 +25,7 @@ public class RollSubsystem extends StateMachine<RollState> {
   private final IntakeSubsystem intake;
 
   private final PositionVoltage motionMagicRequest =
-      new PositionVoltage(RollState.STOWED.angle).withEnableFOC(false);
+      new PositionVoltage(RollState.CORAL_HORIZONTAL.angle).withEnableFOC(false);
 
   public RollSubsystem(TalonFX motor, IntakeSubsystem intake) {
     super(SubsystemPriority.ROLL, RollState.UNHOMED);
@@ -72,7 +71,7 @@ public class RollSubsystem extends StateMachine<RollState> {
     if (currentState == RollState.HOMING
         && averageMotorCurrent > RobotConfig.get().roll().homingCurrentThreshold()) {
       motor.setPosition(Units.degreesToRotations(RobotConfig.get().roll().homingPosition()));
-      return RollState.STOWED;
+      return RollState.CORAL_HORIZONTAL;
     }
 
     // Don't do anything
@@ -88,11 +87,11 @@ public class RollSubsystem extends StateMachine<RollState> {
 
   private double getSmartStowDirection() {
     if (intake.getLeftSensor() && intake.getRightSensor()) {
-      return 0;
+      return 45;
     } else if (intake.getLeftSensor()) {
-      return 90;
+      return 45;
     } else {
-      return -90;
+      return -45;
     }
   }
 
@@ -123,14 +122,11 @@ public class RollSubsystem extends StateMachine<RollState> {
     DogLog.log("Roll/AppliedVoltage", motor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Roll/Angle", motorAngle);
     DogLog.log("Roll/AtGoal", atGoal());
-    if (DriverStation.isEnabled()) {
-      if (getState() == RollState.HOMING) {
-        DogLog.logFault("Roll Unhomed", AlertType.kWarning);
-      }
+
+    if (getState() == RollState.UNHOMED) {
+      DogLog.logFault("Roll Unhomed", AlertType.kWarning);
     } else {
-      if (getState() != RollState.HOMING) {
-        DogLog.clearFault("Roll Unhomed");
-      }
+      DogLog.clearFault("Roll Unhomed");
     }
   }
 }

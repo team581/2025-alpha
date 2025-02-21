@@ -42,7 +42,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
 
   @Override
   protected void collectInputs() {
-    latestResult = vision.getInterpolatedVisionResult();
+    latestResult = vision.getTagResult();
   }
 
   public Pose2d getPose() {
@@ -51,7 +51,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
 
   public Pose2d getPose(double timestamp) {
     var newTimestamp = Utils.fpgaToCurrentTime(timestamp);
-    return swerve.drivetrain.samplePoseAt(newTimestamp).orElse(getPose());
+    return swerve.drivetrain.samplePoseAt(newTimestamp).orElseGet(this::getPose);
   }
 
   @Override

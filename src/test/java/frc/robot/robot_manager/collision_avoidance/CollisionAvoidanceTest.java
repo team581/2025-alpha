@@ -2,6 +2,7 @@ package frc.robot.robot_manager.collision_avoidance;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import frc.robot.config.FeatureFlags;
 import frc.robot.robot_manager.SuperstructurePosition;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,12 @@ public class CollisionAvoidanceTest {
 
   @Test
   void testSkipWorthyZone() {
-    SuperstructurePosition current = new SuperstructurePosition(0, 40);
-    CollisionBox box = CollisionBox.BOX_4;
-    var result = CollisionAvoidance.getZone(current);
-    assertEquals(box, result);
+    if (FeatureFlags.COLLISION_AVOIDANCE_BOX_SHORTCUTS.getAsBoolean()) {
+      SuperstructurePosition current = new SuperstructurePosition(0, 40);
+      CollisionBox box = CollisionBox.BOX_4;
+      var result = CollisionAvoidance.getZone(current);
+      assertEquals(box, result);
+    }
   }
 
   @Test
@@ -116,10 +119,12 @@ public class CollisionAvoidanceTest {
 
   @Test
   void testSkip345() {
-    SuperstructurePosition current = new SuperstructurePosition(0, 40);
-    SuperstructurePosition goal = new SuperstructurePosition(54, 40);
-    var result = CollisionAvoidance.plan(current, goal);
-    assertEquals(Optional.empty(), result);
+    if (FeatureFlags.COLLISION_AVOIDANCE_BOX_SHORTCUTS.getAsBoolean()) {
+      SuperstructurePosition current = new SuperstructurePosition(0, 40);
+      SuperstructurePosition goal = new SuperstructurePosition(54, 40);
+      var result = CollisionAvoidance.plan(current, goal);
+      assertEquals(Optional.empty(), result);
+    }
   }
 
   @Test

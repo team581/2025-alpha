@@ -7,10 +7,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.autos.AutoPoint;
 import frc.robot.autos.trackers.PathTracker;
+import frc.robot.config.FeatureFlags;
 import java.util.List;
 
 public class PurePursuitPathTracker implements PathTracker {
-  private static final boolean USE_DYNAMIC_LOOKAHEAD = true;
   private static final double NON_DYNAMIC_LOOKAHEAD_DISTANCE = 1.5;
   private static final double DYNAMIC_LOOKAHEAD_TRANSITION_TIME = 0.5;
 
@@ -30,7 +30,7 @@ public class PurePursuitPathTracker implements PathTracker {
   private Pose2d currentTargetWaypoint = Pose2d.kZero;
   private int currentLookaheadPointIndex = 0;
   private int currentRobotFollowedPointIndex = 0;
-  private Rotation2d currentInterpolatedRotation = new Rotation2d();
+  private Rotation2d currentInterpolatedRotation = Rotation2d.kZero;
 
   @Override
   public void resetAndSetPoints(List<AutoPoint> points) {
@@ -176,7 +176,7 @@ public class PurePursuitPathTracker implements PathTracker {
   }
 
   private void updateLookahead() {
-    if (USE_DYNAMIC_LOOKAHEAD && points.size() > 1) {
+    if (FeatureFlags.PURE_PURSUIT_USE_DYNAMIC_LOOKAHEAD.getAsBoolean() && points.size() > 1) {
 
       if (points.size() == 2) {
         requestNewLookaheadDistance(

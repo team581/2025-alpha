@@ -2,9 +2,8 @@ package frc.robot.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
-import frc.robot.vision.interpolation.InterpolatedVisionDataset;
+import frc.robot.util.ProfiledPhoenixPIDController;
 
 public record RobotConfig(
     String robotName,
@@ -33,13 +32,16 @@ public record RobotConfig(
       int topMotorID,
       int bottomMotorID,
       int candiID,
+      boolean sensorFlipped,
       Debouncer rightDebouncer,
       Debouncer leftDebouncer,
       TalonFXConfiguration topMotorConfig,
-      TalonFXConfiguration bottomMotorConfig) {}
+      TalonFXConfiguration bottomMotorConfig,
+      double algaeHoldCurrent,
+      double algaeHoldMaxDutyCycle) {}
 
   public record SwerveConfig(
-      PhoenixPIDController snapController,
+      ProfiledPhoenixPIDController snapController,
       boolean invertRotation,
       boolean invertX,
       boolean invertY,
@@ -47,10 +49,7 @@ public record RobotConfig(
       TalonFXConfiguration steerMotorConfig) {}
 
   public record VisionConfig(
-      int translationHistoryArraySize,
-      double xyStdDev,
-      double thetaStdDev,
-      InterpolatedVisionDataset interpolatedVisionSet) {}
+      int translationHistoryArraySize, double xyStdDev, double thetaStdDev) {}
 
   public record WristConfig(
       String canBusName,
@@ -65,6 +64,8 @@ public record RobotConfig(
       String canBusName,
       int motorID,
       int cancoderID,
+      double minAngle,
+      double maxAngle,
       TalonFXConfiguration motorConfig,
       CANcoderConfiguration cancoderConfig) {}
 

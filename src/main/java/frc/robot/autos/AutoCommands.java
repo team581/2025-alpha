@@ -3,6 +3,8 @@ package frc.robot.autos;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.auto_align.AutoAlign;
+import frc.robot.auto_align.ReefPipe;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.robot_manager.RobotState;
@@ -32,8 +34,13 @@ public class AutoCommands {
 
   public Command l4ScoreAndReleaseCommand() {
     return Commands.runOnce(robotManager::l4coralPlaceAndReleaseRequest, requirements)
-        .andThen(robotManager.waitForState(RobotState.IDLE_NO_GP).withTimeout(1))
-        .andThen(robotCommands.stowCommand().withTimeout(1))
+        .andThen(
+            robotManager
+                .waitForStates(
+                    RobotState.CORAL_DISPLACED_L4_4_RELEASE, RobotState.CORAL_CENTERED_L4_4_RELEASE)
+                .withTimeout(1))
+        .andThen(Commands.waitSeconds(0.5))
+        .finallyDo(robotManager::stowRequest)
         .withName("L4ScoreAndReleaseCommand");
   }
 
@@ -42,12 +49,30 @@ public class AutoCommands {
         .andThen(
             robotManager.waitForStates(
                 RobotState.SMART_STOW_1, RobotState.SMART_STOW_2, RobotState.IDLE_CORAL))
-        .withTimeout(3)
+        .withTimeout(2)
         .withName("IntakeStationWithTimeoutCommand");
   }
 
-  public Command preloadCoralCommand() {
-    return Commands.runOnce(robotManager::preloadCoralRequest, requirements)
-        .withName("PreloadCoralCommand");
+  public Command l4WarmupCommand(ReefPipe pipe) {
+    return Commands.waitUntil(
+            () ->
+                robotManager.getState() != RobotState.SMART_STOW_1
+                    && robotManager.getState() != RobotState.SMART_STOW_2)
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  AutoAlign.setAutoReefPipeOverride(pipe);
+                  robotManager.l4CoralApproachRequest();
+                }));
+  }
+
+  public Command intakeStationWarmupCommand() {
+    return Commands.runOnce(robotManager::intakeStationRequest);
+  }
+
+  public Command preloadCoralAfterRollHomed() {
+    return robotManager
+        .waitForRollHomedCommand()
+        .andThen(Commands.runOnce(robotManager::preloadCoralRequest));
   }
 }

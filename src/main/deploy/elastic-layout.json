@@ -1,0 +1,59 @@
+{
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Teleoperated",
+      "grid_layout": {
+        "containers": [
+          {
+            "x": 0,
+            "width": 384,
+            "y": 0,
+            "title": "SelectedAuto",
+            "type": "ComboBox Chooser",
+            "properties": {
+              "period": 0.06,
+              "topic": "/SmartDashboard/Autos/SelectedAuto",
+              "sort_options": false
+            },
+            "height": 256
+          },
+          {
+            "x": 512,
+            "width": 768,
+            "y": 0,
+            "title": "Alerts",
+            "type": "Alerts",
+            "properties": {
+              "period": 0.06,
+              "topic": "/SmartDashboard/Alerts"
+            },
+            "height": 384
+          },
+          {
+            "x": 256,
+            "width": 1152,
+            "y": 384,
+            "title": "State",
+            "type": "Large Text Display",
+            "properties": {
+              "period": 0.06,
+              "data_type": "string",
+              "topic": "/Robot/RobotManager/State"
+            },
+            "height": 256
+          }
+        ],
+        "layouts": []
+      }
+    },
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "containers": [],
+        "layouts": []
+      }
+    }
+  ],
+  "version": 1
+}

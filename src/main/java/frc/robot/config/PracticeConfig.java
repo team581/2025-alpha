@@ -9,12 +9,11 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.config.RobotConfig.ClimberConfig;
@@ -26,7 +25,7 @@ import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
 import frc.robot.config.RobotConfig.WristConfig;
 import frc.robot.generated.PracticeBotTunerConstants;
-import frc.robot.vision.interpolation.InterpolatedVisionDataset;
+import frc.robot.util.ProfiledPhoenixPIDController;
 
 class PracticeConfig {
   private static final String CANIVORE_NAME = PracticeBotTunerConstants.kCANBus.getName();
@@ -93,6 +92,7 @@ class PracticeConfig {
               20,
               21,
               26,
+              true,
               new Debouncer(0.1, DebounceType.kBoth),
               new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
@@ -101,16 +101,26 @@ class PracticeConfig {
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
-                          .withNeutralMode(NeutralModeValue.Coast)),
+                          .withNeutralMode(NeutralModeValue.Coast))
+                  .withTorqueCurrent(
+                      new TorqueCurrentConfigs()
+                          .withPeakForwardTorqueCurrent(70.0)
+                          .withPeakReverseTorqueCurrent(70.0)),
               new TalonFXConfiguration()
                   .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
                   .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.CounterClockwise_Positive)
-                          .withNeutralMode(NeutralModeValue.Coast))),
+                          .withNeutralMode(NeutralModeValue.Coast))
+                  .withTorqueCurrent(
+                      new TorqueCurrentConfigs()
+                          .withPeakForwardTorqueCurrent(70.0)
+                          .withPeakReverseTorqueCurrent(70.0)),
+              68,
+              0.66),
           new SwerveConfig(
-              new PhoenixPIDController(10, 0, 1),
+              new ProfiledPhoenixPIDController(10, 0, 1, Double.MAX_VALUE),
               true,
               true,
               true,
@@ -144,7 +154,7 @@ class PracticeConfig {
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
-          new VisionConfig(4, 0.4, Double.MAX_VALUE, InterpolatedVisionDataset.HOME),
+          new VisionConfig(4, 0.4, Double.MAX_VALUE),
           new WristConfig(
               RIO_CAN_NAME,
               22,
@@ -200,19 +210,19 @@ class PracticeConfig {
               CANIVORE_NAME,
               24,
               25,
+              -20.0,
+              170.0,
               new TalonFXConfiguration()
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+                  .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(125.0))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
-                          .withStatorCurrentLimit(10)
+                          .withStatorCurrentLimit(60)
                           .withSupplyCurrentLimitEnable(true)
-                          .withSupplyCurrentLimit(10)),
+                          .withSupplyCurrentLimit(60)),
               new CANcoderConfiguration()
-                  .withMagnetSensor(
-                      new MagnetSensorConfigs()
-                          .withMagnetOffset(0.076416)
-                          .withSensorDirection(SensorDirectionValue.Clockwise_Positive))),
+                  .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0.3798828125))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private PracticeConfig() {}

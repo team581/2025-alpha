@@ -4,77 +4,30 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.auto_align.purple_align.PurpleAlign;
+import frc.robot.auto_align.purple_align.PurpleAlignState;
+import frc.robot.auto_align.tag_align.TagAlign;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.autos.constraints.AutoConstraintOptions;
-import frc.robot.fms.FmsSubsystem;
-import frc.robot.purple.PurpleState;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SnapUtil;
+import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.vision.CameraHealth;
-import frc.robot.vision.results.TagResult;
-import java.util.List;
+import frc.robot.vision.limelight.Limelight;
 import java.util.Optional;
 
 public class AutoAlign {
   private static Optional<ReefPipe> autoReefPipeOverride = Optional.empty();
-  private static final List<ReefSide> ALL_REEF_SIDES = List.of(ReefSide.values());
-  private static final List<ReefPipe> ALL_REEF_PIPES = List.of(ReefPipe.values());
 
   private static final double REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD = 1.5;
+  private static final double LOWEST_TELEOP_SPEED_SCALAR = 0.5;
+  private static final double MIN_CONSTRAINT = 1.5;
+  private static final double MAX_CONSTRAINT = 3.5;
+  private static final double BASE_TELEOP_SPEED = 2.0;
 
   public static void setAutoReefPipeOverride(ReefPipe override) {
     autoReefPipeOverride = Optional.of(override);
-  }
-
-  public static ReefSide getClosestReefSide(Pose2d robotPose, boolean isRedAlliance) {
-    if (DriverStation.isAutonomous() && autoReefPipeOverride.isPresent()) {
-      return ReefSide.fromPipe(autoReefPipeOverride.orElseThrow());
-    }
-
-    var reefSide =
-        ALL_REEF_SIDES.stream()
-            .min(
-                (a, b) ->
-                    Double.compare(
-                        robotPose
-                            .getTranslation()
-                            .getDistance(a.getPose(isRedAlliance).getTranslation()),
-                        robotPose
-                            .getTranslation()
-                            .getDistance(b.getPose(isRedAlliance).getTranslation())))
-            .get();
-    return reefSide;
-  }
-
-  public static ReefSide getClosestReefSide(Pose2d robotPose) {
-    return getClosestReefSide(robotPose, FmsSubsystem.isRedAlliance());
-  }
-
-  public static Pose2d getClosestReefPipe(
-      Pose2d robotPose, ReefPipeLevel level, boolean isRedAlliance) {
-    if (DriverStation.isAutonomous() && autoReefPipeOverride.isPresent()) {
-      return autoReefPipeOverride.orElseThrow().getPose(level);
-    }
-
-    var reefPipe =
-        ALL_REEF_PIPES.stream()
-            .min(
-                (a, b) ->
-                    Double.compare(
-                        robotPose
-                            .getTranslation()
-                            .getDistance(a.getPose(level, isRedAlliance).getTranslation()),
-                        robotPose
-                            .getTranslation()
-                            .getDistance(b.getPose(level, isRedAlliance).getTranslation())))
-            .get();
-
-    return reefPipe.getPose(level, isRedAlliance);
-  }
-
-  public static Pose2d getClosestReefPipe(Pose2d robotPose, ReefPipeLevel level) {
-    return getClosestReefPipe(robotPose, level, FmsSubsystem.isRedAlliance());
   }
 
   public static boolean shouldNetScoreForwards(Pose2d robotPose) {
@@ -120,33 +73,19 @@ public class AutoAlign {
             + LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KP * linearVelocity);
   }
 
-  public static boolean isCloseToReefPipe(
-      Pose2d robotPose, Pose2d nearestReefPipe, double thresholdMeters) {
-    return robotPose.getTranslation().getDistance(nearestReefPipe.getTranslation())
-        < thresholdMeters;
-  }
-
-  public static boolean isCloseToReefPipe(Pose2d robotPose, Pose2d nearestReefPipe) {
-    return isCloseToReefPipe(robotPose, nearestReefPipe, Units.feetToMeters(1.5));
-  }
-
   public static ChassisSpeeds calculateTeleopAndAlignSpeeds(
-      ChassisSpeeds teleopSpeeds,
-      ChassisSpeeds alignSpeeds,
-      double baseTeleopSpeed,
-      double minConstraint) {
+      ChassisSpeeds teleopSpeeds, ChassisSpeeds alignSpeeds) {
     double teleopVelocity =
         Math.hypot(teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond);
     double alignVelocity = Math.hypot(alignSpeeds.vxMetersPerSecond, alignSpeeds.vyMetersPerSecond);
     var wantedSpeeds = teleopSpeeds.plus(alignSpeeds);
 
-    var teleopVelocityMax = Math.max(baseTeleopSpeed, teleopVelocity);
+    var teleopVelocityMax = Math.max(BASE_TELEOP_SPEED, teleopVelocity);
 
     var minSpeed = Math.min(alignVelocity, teleopVelocityMax);
-    if (alignVelocity < minConstraint) {
-      minSpeed = teleopVelocityMax;
-    }
-    DogLog.log("PurpleAlignment/Constraint", minSpeed);
+    var clampedConstraint = MathUtil.clamp(minSpeed, MIN_CONSTRAINT, MAX_CONSTRAINT);
+
+    DogLog.log("PurpleAlignment/Constraint", clampedConstraint);
     var options =
         new AutoConstraintOptions()
             .withCollisionAvoidance(false)
@@ -157,63 +96,148 @@ public class AutoAlign {
     return AutoConstraintCalculator.constrainLinearVelocity(wantedSpeeds, options);
   }
 
-  public static ChassisSpeeds calculateConstrainedAndWeightedSpeeds(
-      Pose2d robotPose,
-      ChassisSpeeds teleopSpeeds,
-      ChassisSpeeds alignSpeeds,
-      double baseTeleopSpeed,
-      double minConstraint) {
-    var constrainedSpeeds =
-        calculateTeleopAndAlignSpeeds(teleopSpeeds, alignSpeeds, baseTeleopSpeed, minConstraint);
+  private final PurpleAlign purple;
+  private final Limelight purpleLimelight;
+  private final Limelight frontLimelight;
+  private final Limelight baseLimelight;
+  private final LocalizationSubsystem localization;
+  private final TagAlign tagAlign;
+  private final SwerveSubsystem swerve;
+
+  private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
+
+  public AutoAlign(
+      PurpleAlign purple,
+      TagAlign tagAlign,
+      Limelight purpleLimelight,
+      Limelight frontLimelight,
+      Limelight baseLimelight,
+      LocalizationSubsystem localization,
+      SwerveSubsystem swerve) {
+    this.purple = purple;
+    this.purpleLimelight = purpleLimelight;
+    this.frontLimelight = frontLimelight;
+    this.baseLimelight = baseLimelight;
+    this.tagAlign = tagAlign;
+    this.localization = localization;
+    this.swerve = swerve;
+  }
+
+  public ReefSide getClosestReefSide() {
+    if (DriverStation.isAutonomous() && autoReefPipeOverride.isPresent()) {
+      return ReefSide.fromPipe(autoReefPipeOverride.orElseThrow());
+    }
+
+    return ReefSide.fromPipe(tagAlign.getBestPipe());
+  }
+
+  public void setTeleopSpeeds(ChassisSpeeds speeds) {
+    teleopSpeeds = speeds;
+  }
+
+  private ChassisSpeeds constrainLinearVelocity(ChassisSpeeds speeds, double maxSpeed) {
+    var options =
+        new AutoConstraintOptions()
+            .withCollisionAvoidance(false)
+            .withMaxAngularAcceleration(0)
+            .withMaxAngularVelocity(0)
+            .withMaxLinearAcceleration(0)
+            .withMaxLinearVelocity(maxSpeed);
+    return AutoConstraintCalculator.constrainLinearVelocity(speeds, options);
+  }
+
+  public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(ChassisSpeeds alignSpeeds) {
+    var addedSpeeds = teleopSpeeds.plus(alignSpeeds);
+    var constrainedSpeeds = constrainLinearVelocity(addedSpeeds, MAX_CONSTRAINT);
+
+    var robotPose = localization.getPose();
     var distanceToReef =
-        robotPose
-            .getTranslation()
-            .getDistance(getClosestReefPipe(robotPose, ReefPipeLevel.L1).getTranslation());
+        robotPose.getTranslation().getDistance(tagAlign.getUsedScoringPose().getTranslation());
+
     if (distanceToReef > REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD) {
       return constrainedSpeeds;
     }
 
-    var progress = MathUtil.clamp(distanceToReef / REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD, 0.1, 1.0);
+    var progress =
+        MathUtil.clamp(
+            distanceToReef / REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD, LOWEST_TELEOP_SPEED_SCALAR, 1.0);
     DogLog.log("Debug/Progress", progress);
     var newTeleopSpeeds = teleopSpeeds.times(progress);
-    var newAlignSpeeds = alignSpeeds.times(1 - progress);
-    var newConstrainedSpeeds =
-        calculateTeleopAndAlignSpeeds(
-            newTeleopSpeeds, newAlignSpeeds, baseTeleopSpeed, minConstraint);
+    if (progress == LOWEST_TELEOP_SPEED_SCALAR) {
+      progress = 0.0;
+    }
+    var newAlignSpeeds = alignSpeeds.times(1.0 - progress);
+    var newAddedSpeeds = newTeleopSpeeds.plus(newAlignSpeeds);
+    var newConstrainedSpeeds = constrainLinearVelocity(newAddedSpeeds, MAX_CONSTRAINT);
     DogLog.log("Debug/NewConstrainedSpeeds", newConstrainedSpeeds);
     return newConstrainedSpeeds;
   }
 
-  public static ReefAlignState getReefAlignState(
-      Pose2d robotPose,
-      PurpleState purpleState,
-      ReefPipeLevel scoringLevel,
-      Optional<TagResult> tagResult,
-      CameraHealth tagCameraHealth) {
-    var reefPipe = getClosestReefPipe(robotPose, scoringLevel);
-    var closeToReefPipe = isCloseToReefPipe(robotPose, reefPipe);
+  public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds() {
+    var seenPurple = purple.seenPurple();
+    var isTagAligned = tagAlign.isAligned();
+    var purpleState = purple.getPurpleState();
+    DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
+    DogLog.log("PurpleAlignment/PurpleState", purpleState);
+    if (!seenPurple && !isTagAligned) {
+      DogLog.log("PurpleAlignment/TagAligned", false);
+      return tagAlign.getPoseAlignmentChassisSpeeds(purple.seenPurple());
+    }
+    DogLog.log("PurpleAlignment/TagAligned", true);
 
-    if (closeToReefPipe) {
-      // We can't trust purple unless we are near the reef, to avoid false positives
-      if (tagCameraHealth == CameraHealth.OFFLINE) {
-        return ReefAlignState.CAMERA_DEAD;
+    var speeds =
+        switch (purpleState) {
+          case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+          case VISIBLE_NOT_CENTERED ->
+              tagAlign
+                  .getPoseAlignmentChassisSpeeds(seenPurple)
+                  .plus(
+                      purple.getPurpleAlignChassisSpeeds(
+                          localization.getPose().getRotation().getDegrees()));
+          case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+        };
+    DogLog.log("PurpleAlignment/CombinedSpeeds", speeds);
+    return speeds;
+  }
+
+  public ReefAlignState getReefAlignState() {
+
+    var tagResult = frontLimelight.getTagResult().or(baseLimelight::getTagResult);
+    var tagAligned = tagAlign.isAligned();
+    var purpleState = purple.getPurpleState();
+    var purpleHealth = purpleLimelight.getCameraHealth();
+    var combinedTagHealth =
+        CameraHealth.combine(frontLimelight.getCameraHealth(), baseLimelight.getCameraHealth());
+
+    if (combinedTagHealth == CameraHealth.OFFLINE) {
+      if (purpleHealth == CameraHealth.OFFLINE) {
+        return ReefAlignState.ALL_CAMERAS_DEAD;
       }
-      if (purpleState == PurpleState.CENTERED) {
+      return ReefAlignState.TAG_CAMERAS_DEAD;
+    }
+
+    if (purpleHealth == CameraHealth.OFFLINE) {
+      return ReefAlignState.PURPLE_CAMERA_DEAD;
+    }
+
+    if (purple.canUsePurple()) {
+      // We can't trust purple unless we are near the reef, to avoid false positives
+      if (purpleState == PurpleAlignState.CENTERED) {
         return ReefAlignState.HAS_PURPLE_ALIGNED;
       }
-      if (purpleState == PurpleState.VISIBLE_NOT_CENTERED) {
+      if (purpleState == PurpleAlignState.VISIBLE_NOT_CENTERED) {
         return ReefAlignState.HAS_PURPLE_NOT_ALIGNED;
       }
     }
 
     if (tagResult.isEmpty()) {
-      if (closeToReefPipe) {
+      if (tagAligned) {
         return ReefAlignState.NO_TAGS_IN_POSITION;
       }
       return ReefAlignState.NO_TAGS_WRONG_POSITION;
     }
 
-    if (closeToReefPipe) {
+    if (tagAligned) {
       return ReefAlignState.HAS_TAGS_IN_POSITION;
     }
 
