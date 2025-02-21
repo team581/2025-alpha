@@ -84,7 +84,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private boolean seenPurple = false;
   private boolean isAligned = false;
   private boolean isAlignedDebounced = false;
-  private ReefPipe bestReefPipe;
+  private ReefPipe bestReefPipe = ReefPipe.PIPE_A;
   private Pose2d usedScoringPose = Pose2d.kZero;
 
   public AutoAlign(
@@ -179,8 +179,8 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   @Override
   protected void collectInputs() {
     seenPurple = purple.seenPurple();
-    usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
     bestReefPipe = tagAlign.getBestPipe();
+    usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
     isAligned = tagAlign.isAligned(bestReefPipe);
     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
     tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, false);
