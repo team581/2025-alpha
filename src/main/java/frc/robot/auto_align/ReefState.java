@@ -1,5 +1,6 @@
 package frc.robot.auto_align;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.EnumSet;
@@ -17,6 +18,10 @@ public class ReefState {
     scoredL2Pipes.clear();
     scoredL3Pipes.clear();
     scoredL4Pipes.clear();
+    DogLog.timestamp("ReefState/Clear");
+    DogLog.log("ReefState/L2", scoredL2Pipes.toArray(ReefPipe[]::new));
+    DogLog.log("ReefState/L3", scoredL3Pipes.toArray(ReefPipe[]::new));
+    DogLog.log("ReefState/L4", scoredL4Pipes.toArray(ReefPipe[]::new));
   }
 
   public void markScored(ReefPipe pipe, ReefPipeLevel level) {
@@ -26,6 +31,10 @@ public class ReefState {
       case L4 -> scoredL4Pipes.add(pipe);
       default -> {}
     }
+
+    DogLog.log("ReefState/L2", scoredL2Pipes.toArray(ReefPipe[]::new));
+    DogLog.log("ReefState/L3", scoredL3Pipes.toArray(ReefPipe[]::new));
+    DogLog.log("ReefState/L4", scoredL4Pipes.toArray(ReefPipe[]::new));
   }
 
   public boolean isScored(ReefPipe pipe, ReefPipeLevel level) {

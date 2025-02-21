@@ -175,7 +175,7 @@ public class AutoAlign {
 
   public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds() {
     var seenPurple = purple.seenPurple();
-    var isTagAligned = tagAlign.isTagAligned();
+    var isTagAligned = tagAlign.isAligned();
     var purpleState = purple.getPurpleState();
     DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
     DogLog.log("PurpleAlignment/PurpleState", purpleState);
@@ -203,7 +203,7 @@ public class AutoAlign {
   public ReefAlignState getReefAlignState() {
 
     var tagResult = frontLimelight.getTagResult().or(baseLimelight::getTagResult);
-    var tagAligned = tagAlign.isTagAligned();
+    var tagAligned = tagAlign.isAligned();
     var purpleState = purple.getPurpleState();
     var purpleHealth = purpleLimelight.getCameraHealth();
     var combinedTagHealth =

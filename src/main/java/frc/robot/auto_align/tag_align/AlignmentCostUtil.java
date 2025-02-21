@@ -1,6 +1,7 @@
 package frc.robot.auto_align.tag_align;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
@@ -13,6 +14,7 @@ import java.util.Comparator;
 public class AlignmentCostUtil {
   private static final double LOOKAHEAD = 0.5;
   private static final double ANGLE_DIFFERENCE_SCALAR = 0.3;
+  private static final boolean USE_LOOKAHEAD_COST_FN = false;
 
   /**
    * Returns the "cost" (a dimensionless number) of aligning to a given pose based on the robot's
@@ -23,18 +25,28 @@ public class AlignmentCostUtil {
    * @param robotVelocity The robot's current velocity (field relative)
    */
   private static double getAlignCost(Pose2d target, Pose2d robotPose, ChassisSpeeds robotVelocity) {
-    var lookaheadPose = MathHelpers.poseLookahead(robotPose, robotVelocity, LOOKAHEAD);
+    if (USE_LOOKAHEAD_COST_FN) {
+      var lookahead = MathHelpers.poseLookahead(robotPose, robotVelocity, LOOKAHEAD);
+      return lookahead.getTranslation().getDistance(target.getTranslation());
+    }
 
     var distanceCost = target.getTranslation().getDistance(robotPose.getTranslation());
+    if (target.getTranslation().equals(Translation2d.kZero)
+        || robotPose.getTranslation().equals(Translation2d.kZero)) {
+      return distanceCost;
+    }
+
+    if (Math.hypot(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond) == 0.0) {
+      return distanceCost;
+    }
+
+    var targetRobotRelative = target.getTranslation().minus(robotPose.getTranslation());
+    var targetDirection = targetRobotRelative.getAngle();
+
     var driveAngleCost =
-        Math.abs(
-            target
-                    .getTranslation()
-                    .minus(robotPose.getTranslation())
-                    .getAngle()
-                    .minus(lookaheadPose.minus(robotPose).getTranslation().getAngle())
-                    .getRadians()
-                * ANGLE_DIFFERENCE_SCALAR);
+        ANGLE_DIFFERENCE_SCALAR
+            * Math.abs(
+                targetDirection.minus(MathHelpers.vectorDirection(robotVelocity)).getRadians());
     return distanceCost + driveAngleCost;
   }
 
@@ -73,8 +85,7 @@ public class AlignmentCostUtil {
   private Comparator<ReefPipe> createReefPipeComparator(ReefPipeLevel level) {
     return Comparator.comparingDouble(
         pipe ->
-            getAlignCost(
-                    pipe.getPose(level), localization.getPose(), swerve.getFieldRelativeSpeeds())
+            getAlignCost(pipe.getPose(level), localization.getPose(), swerve.getTeleopSpeeds())
                 + (reefState.isScored(pipe, level) ? 1.0 : 0));
   }
 }

@@ -1235,6 +1235,16 @@ public class RobotManager extends StateMachine<RobotState> {
     } else {
       lights.setDisabledState(LightsState.HEALTHY);
     }
+
+    // tagAlign.setDriverPoseOffset(swerve.getPoseOffset());
+    // switch (swerve.getState()) {
+    //   case REEF_ALIGN_TELEOP -> {
+    //     if (tagAlign.isAligned()) {
+    //       swerve.setState(SwerveState.REEF_ALIGN_TELEOP_FINE_ADJUST);
+    //     }
+    //   }
+    //   default -> {}
+    // }
   }
 
   @Override
