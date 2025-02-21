@@ -10,6 +10,7 @@ import frc.robot.vision.results.TagResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public class VisionSubsystem extends StateMachine<VisionState> {
   private final ImuSubsystem imu;
@@ -18,6 +19,7 @@ public class VisionSubsystem extends StateMachine<VisionState> {
   private final Limelight backTagLimelight;
   private final Limelight baseTagLimelight;
 
+  private OptionalInt maybeVipTagID = OptionalInt.empty();
   private final List<TagResult> tagResult = new ArrayList<>();
   private double robotHeading;
   private double pitch;
@@ -70,6 +72,14 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     if (maybeBaseResult.isPresent()) {
       tagResult.add(maybeBaseResult.get());
     }
+  }
+
+  public void setVipTagID(OptionalInt maybeVipTagID) {
+    this.maybeVipTagID = maybeVipTagID;
+    elevatorPurpleLimelight.setVipTagID(maybeVipTagID);
+    frontCoralLimelight.setVipTagID(maybeVipTagID);
+    backTagLimelight.setVipTagID(maybeVipTagID);
+    baseTagLimelight.setVipTagID(maybeVipTagID);
   }
 
   public List<TagResult> getTagResult() {

@@ -12,8 +12,11 @@ import frc.robot.vision.results.GamePieceResult;
 import frc.robot.vision.results.PurpleResult;
 import frc.robot.vision.results.TagResult;
 import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.stream.Stream;
 
 public class Limelight extends StateMachine<LimelightState> {
+  private static final int[] ANY_APRILTAGS = new int[] {};
   private static final int[] RED_REEF_TAGS = {6, 7, 8, 9, 10, 11};
   private static final int[] BLUE_REEF_TAGS = {17, 18, 19, 20, 21, 22};
 
@@ -25,6 +28,7 @@ public class Limelight extends StateMachine<LimelightState> {
 
   private final Timer limelightTimer = new Timer();
   private final Timer seedIMUTimer = new Timer();
+  private OptionalInt maybeVipTagID = OptionalInt.empty();
   private CameraHealth cameraHealth = CameraHealth.NO_TARGETS;
   private double limelightHeartbeat = -1;
 
@@ -60,6 +64,10 @@ public class Limelight extends StateMachine<LimelightState> {
 
   public void setState(LimelightState state) {
     setStateFromRequest(state);
+  }
+
+  public void setVipTagID(OptionalInt maybeVipTagID) {
+    this.maybeVipTagID = maybeVipTagID;
   }
 
   public Optional<GamePieceResult> getCoralResult() {
@@ -100,7 +108,11 @@ public class Limelight extends StateMachine<LimelightState> {
       return Optional.empty();
     }
 
-    return Optional.of(new TagResult(estimatePose.pose, estimatePose.timestampSeconds));
+    return Optional.of(
+        new TagResult(
+            estimatePose.pose,
+            estimatePose.timestampSeconds,
+            Stream.of(estimatePose.rawFiducials).mapToInt(fiducial -> fiducial.id).toArray()));
   }
 
   private Optional<GamePieceResult> getRawCoralResult() {
@@ -173,6 +185,23 @@ public class Limelight extends StateMachine<LimelightState> {
   }
 
   private int[] getAllianceBasedReefTagIDs() {
+    // If no VIP tag, just use regular reef tags
+    // Or, if the previous result was empty, allow any reef tags
+    if (maybeVipTagID.isEmpty() || tagResult.isEmpty()) {
+      return FmsSubsystem.isRedAlliance() ? RED_REEF_TAGS : BLUE_REEF_TAGS;
+    }
+
+    var vipTagID = maybeVipTagID.orElseThrow();
+    var previousResult = tagResult.orElseThrow();
+
+    // If we saw the VIP tag in the previous result, filter to that specific one
+    for (var id : previousResult.tagIDs()) {
+      if (id == vipTagID) {
+        return new int[] {vipTagID};
+      }
+    }
+
+    // If we can't see the VIP tag, accept any reef tags
     return FmsSubsystem.isRedAlliance() ? RED_REEF_TAGS : BLUE_REEF_TAGS;
   }
 
@@ -191,7 +220,7 @@ public class Limelight extends StateMachine<LimelightState> {
     LimelightHelpers.setPipelineIndex(limelightTableName, getState().pipelineIndex);
     switch (getState()) {
       case TAGS -> {
-        LimelightHelpers.SetFiducialIDFiltersOverride(limelightTableName, new int[] {});
+        LimelightHelpers.SetFiducialIDFiltersOverride(limelightTableName, ANY_APRILTAGS);
         updateHealth(tagResult);
       }
       case CORAL -> updateHealth(coralResult);
