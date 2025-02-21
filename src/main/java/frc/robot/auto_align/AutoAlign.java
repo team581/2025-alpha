@@ -80,6 +80,8 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds tagAlignSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds tagAlignSpeedsForwardForPurple = new ChassisSpeeds();
+  private boolean seenPurple = false;
   private boolean isAligned = false;
   private boolean isAlignedDebounced = false;
   private ReefPipe bestReefPipe;
@@ -108,7 +110,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   }
 
   public ReefSide getClosestReefSide() {
-    return ReefSide.fromPipe(tagAlign.getBestPipe());
+    return ReefSide.fromPipe(bestReefPipe);
   }
 
   public void setTeleopSpeeds(ChassisSpeeds speeds) {
@@ -132,9 +134,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
     var robotPose = localization.getPose();
     var distanceToReef =
-        robotPose
-            .getTranslation()
-            .getDistance(tagAlign.getUsedScoringPose(bestReefPipe).getTranslation());
+        robotPose.getTranslation().getDistance(usedScoringPose.getTranslation());
 
     if (distanceToReef > REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD) {
       return constrainedSpeeds;
@@ -156,27 +156,23 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   }
 
   public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds() {
-    var seenPurple = purple.seenPurple();
-    var isTagAligned = tagAlign.isAligned(bestReefPipe);
     var purpleState = purple.getPurpleState();
     DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
     DogLog.log("PurpleAlignment/PurpleState", purpleState);
-    if (!seenPurple && !isTagAligned) {
+    if (!seenPurple && !isAligned) {
       DogLog.log("PurpleAlignment/TagAligned", false);
-      return tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, purple.seenPurple());
+      return tagAlignSpeedsForwardForPurple;
     }
     DogLog.log("PurpleAlignment/TagAligned", true);
 
     var speeds =
         switch (purpleState) {
-          case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, seenPurple);
+          case NO_PURPLE, CENTERED -> tagAlignSpeedsForwardForPurple;
           case VISIBLE_NOT_CENTERED ->
-              tagAlign
-                  .getPoseAlignmentChassisSpeeds(bestReefPipe, seenPurple)
+              tagAlignSpeedsForwardForPurple
                   .plus(
                       purple.getPurpleAlignChassisSpeeds(
                           localization.getPose().getRotation().getDegrees()));
-          case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, seenPurple);
         };
     DogLog.log("PurpleAlignment/CombinedSpeeds", speeds);
     return speeds;
@@ -184,11 +180,14 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   @Override
   protected void collectInputs() {
-    bestReefPipe = tagAlign.getBestPipe();
-    isAligned = tagAlign.isAligned(bestReefPipe);
-    isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
-    usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
-    tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, false);
+     seenPurple = purple.seenPurple();
+     usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
+     bestReefPipe = tagAlign.getBestPipe();
+     isAligned = tagAlign.isAligned(bestReefPipe);
+     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
+     tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, false);
+     tagAlignSpeedsForwardForPurple =
+         tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, seenPurple);
   }
 
   public ChassisSpeeds getTagAlignSpeeds() {
@@ -226,7 +225,6 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   public ReefAlignState getReefAlignState() {
 
     var tagResult = frontLimelight.getTagResult().or(baseLimelight::getTagResult);
-    var tagAligned = tagAlign.isAligned(bestReefPipe);
     var purpleState = purple.getPurpleState();
     var purpleHealth = purpleLimelight.getCameraHealth();
     var combinedTagHealth =
@@ -254,13 +252,13 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     }
 
     if (tagResult.isEmpty()) {
-      if (tagAligned) {
+      if (isAligned) {
         return ReefAlignState.NO_TAGS_IN_POSITION;
       }
       return ReefAlignState.NO_TAGS_WRONG_POSITION;
     }
 
-    if (tagAligned) {
+    if (isAligned) {
       return ReefAlignState.HAS_TAGS_IN_POSITION;
     }
 

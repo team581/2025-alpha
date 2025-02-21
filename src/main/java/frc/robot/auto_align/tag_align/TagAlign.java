@@ -92,12 +92,11 @@ public class TagAlign {
         .orElseThrow();
   }
 
-  public ChassisSpeeds getPoseAlignmentChassisSpeeds(ReefPipe pipe, boolean forwardOnly) {
+  public ChassisSpeeds getPoseAlignmentChassisSpeeds(Pose2d usedScoringPose, boolean forwardOnly) {
     var robotPose = localization.getPose();
-    var scoringTranslationFieldRelative = getUsedScoringPose(pipe);
 
     var scoringTranslationRobotRelative =
-        scoringTranslationFieldRelative
+        usedScoringPose
             .getTranslation()
             .minus(robotPose.getTranslation())
             .rotateBy(Rotation2d.fromDegrees(360 - robotPose.getRotation().getDegrees()));
