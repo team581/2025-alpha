@@ -180,7 +180,7 @@ public class Robot extends TimedRobot {
     }
 
     ElasticLayoutUtil.onEnable();
-    tagAlign.clearReefState();
+    autoAlign.clearReefState();
   }
 
   @Override
@@ -196,7 +196,7 @@ public class Robot extends TimedRobot {
     }
     ElasticLayoutUtil.onEnable();
     if (RobotConfig.IS_DEVELOPMENT) {
-      tagAlign.clearReefState();
+      autoAlign.clearReefState();
     }
   }
 

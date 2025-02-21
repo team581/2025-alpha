@@ -4,6 +4,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.auto_align.purple_align.PurpleAlign;
 import frc.robot.auto_align.purple_align.PurpleAlignState;
@@ -77,7 +78,11 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private final SwerveSubsystem swerve;
 
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds tagAlignSpeeds = new ChassisSpeeds();
+  private boolean isAligned = false;
   private boolean isAlignedDebounced = false;
+  private ReefPipe bestReefPipe;
+  private Pose2d usedScoringPose = Pose2d.kZero;
 
   public AutoAlign(
       Limelight purpleLimelight,
@@ -120,13 +125,13 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     return AutoConstraintCalculator.constrainLinearVelocity(speeds, options);
   }
 
-  public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(ChassisSpeeds alignSpeeds, ReefPipe pipe) {
+  public ChassisSpeeds calculateConstrainedAndWeightedSpeeds(ChassisSpeeds alignSpeeds) {
     var addedSpeeds = teleopSpeeds.plus(alignSpeeds);
     var constrainedSpeeds = constrainLinearVelocity(addedSpeeds, MAX_CONSTRAINT);
 
     var robotPose = localization.getPose();
     var distanceToReef =
-        robotPose.getTranslation().getDistance(tagAlign.getUsedScoringPose(pipe).getTranslation());
+        robotPose.getTranslation().getDistance(tagAlign.getUsedScoringPose(bestReefPipe).getTranslation());
 
     if (distanceToReef > REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD) {
       return constrainedSpeeds;
@@ -149,26 +154,26 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds() {
     var seenPurple = purple.seenPurple();
-    var isTagAligned = tagAlign.isAligned();
+    var isTagAligned = tagAlign.isAligned(bestReefPipe);
     var purpleState = purple.getPurpleState();
     DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
     DogLog.log("PurpleAlignment/PurpleState", purpleState);
     if (!seenPurple && !isTagAligned) {
       DogLog.log("PurpleAlignment/TagAligned", false);
-      return tagAlign.getPoseAlignmentChassisSpeeds(purple.seenPurple());
+      return tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, purple.seenPurple());
     }
     DogLog.log("PurpleAlignment/TagAligned", true);
 
     var speeds =
         switch (purpleState) {
-          case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+          case NO_PURPLE -> tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, seenPurple);
           case VISIBLE_NOT_CENTERED ->
               tagAlign
-                  .getPoseAlignmentChassisSpeeds(seenPurple)
+                  .getPoseAlignmentChassisSpeeds(bestReefPipe, seenPurple)
                   .plus(
                       purple.getPurpleAlignChassisSpeeds(
                           localization.getPose().getRotation().getDegrees()));
-          case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(seenPurple);
+          case CENTERED -> tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, seenPurple);
         };
     DogLog.log("PurpleAlignment/CombinedSpeeds", speeds);
     return speeds;
@@ -176,17 +181,49 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   @Override
   protected void collectInputs() {
-    isAlignedDebounced = isAlignedDebouncer.calculate(tagAlign.isAligned());
+    bestReefPipe = tagAlign.getBestPipe();
+    isAligned = tagAlign.isAligned(bestReefPipe);
+    isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
+    usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
+    tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(bestReefPipe, false);
+  }
+
+  public ChassisSpeeds getTagAlignSpeeds() {
+    return tagAlignSpeeds;
+  }
+
+  public boolean isTagAligned() {
+    return isAligned;
+  }
+
+  public void markPipeScored() {
+    tagAlign.markScored(bestReefPipe);
+  }
+
+  public void setScoringLevel(ReefPipeLevel level) {
+    tagAlign.setLevel(level);
+  }
+
+  public void clearReefState() {
+    tagAlign.clearReefState();
   }
 
   public boolean isTagAlignedDebounced() {
     return isAlignedDebounced;
   }
 
+  public Pose2d getUsedScoringPose() {
+    return usedScoringPose;
+  }
+
+  public void setDriverPoseOffset(Translation2d offset) {
+    tagAlign.setDriverPoseOffset(offset);
+  }
+
   public ReefAlignState getReefAlignState() {
 
     var tagResult = frontLimelight.getTagResult().or(baseLimelight::getTagResult);
-    var tagAligned = tagAlign.isAligned();
+    var tagAligned = tagAlign.isAligned(bestReefPipe);
     var purpleState = purple.getPurpleState();
     var purpleHealth = purpleLimelight.getCameraHealth();
     var combinedTagHealth =

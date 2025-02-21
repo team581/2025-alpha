@@ -79,8 +79,6 @@ public class RobotManager extends StateMachine<RobotState> {
       Limelight backTagLimelight,
       Limelight baseTagLimelight,
       LightsSubsystem lights,
-      PurpleAlign purple,
-      TagAlign tagAlign,
       AutoAlign autoAlign,
       ClimberSubsystem climber,
       RumbleControllerSubsystem rumbleController) {
@@ -286,7 +284,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
         if (done) {
           rumbleController.rumbleRequest();
-          tagAlign.markScored();
+          autoAlign.markPipeScored();
           yield RobotState.IDLE_NO_GP;
         }
 
@@ -1279,10 +1277,10 @@ public class RobotManager extends StateMachine<RobotState> {
       lights.setDisabledState(LightsState.HEALTHY);
     }
     if (FeatureFlags.REEF_ALIGN_FINE_ADJUSTMENTS.getAsBoolean()) {
-      tagAlign.setDriverPoseOffset(swerve.getPoseOffset());
+      autoAlign.setDriverPoseOffset(swerve.getPoseOffset());
       switch (swerve.getState()) {
         case REEF_ALIGN_TELEOP -> {
-          if (tagAlign.isAligned()) {
+          if (autoAlign.isTagAligned()) {
             swerve.setState(SwerveState.REEF_ALIGN_TELEOP_FINE_ADJUST);
           }
         }
@@ -1339,13 +1337,13 @@ public class RobotManager extends StateMachine<RobotState> {
 
     // TODO: RobotManager should not interact with TagAlign or PurpleAlign directly ever, only via
     // AutoAlign
-    DogLog.log("PurpleAlignment/UsedPose", tagAlign.getUsedScoringPose());
+    DogLog.log("PurpleAlignment/UsedPose", autoAlign.getUsedScoringPose());
 
-    tagAlign.setLevel(scoringLevel);
+    autoAlign.setScoringLevel(scoringLevel);
     autoAlign.setTeleopSpeeds(swerve.getTeleopSpeeds());
 
     if (vision.isAnyScoringTagLimelightOnline()) {
-      var idealAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(false);
+      var idealAlignSpeeds = autoAlign.getTagAlignSpeeds();
       swerve.setAutoAlignAutoSpeeds(idealAlignSpeeds);
       swerve.setAutoAlignSpeeds(autoAlign.calculateConstrainedAndWeightedSpeeds(idealAlignSpeeds));
     } else {
