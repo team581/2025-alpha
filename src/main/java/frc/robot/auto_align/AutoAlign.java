@@ -68,6 +68,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
         LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KS
             + LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KP * linearVelocity);
   }
+
   private final Debouncer isAlignedDebouncer = new Debouncer(1.0);
   private final PurpleAlign purple;
   private final Limelight purpleLimelight;
@@ -131,7 +132,9 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
     var robotPose = localization.getPose();
     var distanceToReef =
-        robotPose.getTranslation().getDistance(tagAlign.getUsedScoringPose(bestReefPipe).getTranslation());
+        robotPose
+            .getTranslation()
+            .getDistance(tagAlign.getUsedScoringPose(bestReefPipe).getTranslation());
 
     if (distanceToReef > REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD) {
       return constrainedSpeeds;
