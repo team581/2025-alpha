@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
+import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.CompBotTunerConstants;
@@ -32,10 +33,6 @@ import java.util.Map;
 public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final ProfiledPhoenixPIDController SNAP_CONTROLLER =
       RobotConfig.get().swerve().snapController();
-
-  private static final boolean AUTO_ALIGN_ENABLED = true;
-
-  private static final boolean INTAKE_ASSIST_CORAL_ENABLED = true;
 
   public static final double MaxSpeed = 4.75;
   private static final double MaxAngularRate = Units.rotationsToRadians(4);
@@ -103,7 +100,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
 
-  private ChassisSpeeds magnetizedSpeeds = new ChassisSpeeds();
   private ChassisSpeeds coralAssistSpeedsOffset = new ChassisSpeeds();
 
   private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
@@ -167,16 +163,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setAutoAlignAutoSpeeds(ChassisSpeeds speeds) {
     autoAlignAutoSpeeds = speeds;
-    if (AUTO_ALIGN_ENABLED) {
-      sendSwerveRequest();
-    }
+    sendSwerveRequest();
   }
 
   public void setAutoAlignSpeeds(ChassisSpeeds speeds) {
     autoAlignSpeeds = speeds;
-    if (AUTO_ALIGN_ENABLED) {
-      sendSwerveRequest();
-    }
+    sendSwerveRequest();
   }
 
   @Override
@@ -326,7 +318,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       }
       case REEF_ALIGN_AUTO -> {
         SNAP_CONTROLLER.setMaxOutput(Double.POSITIVE_INFINITY);
-        var wantedSpeeds = getAutoAlignAutoChassisSpeeds();
+        var wantedSpeeds = autoAlignAutoSpeeds;
         //  var wantedSpeeds = alignSpeeds.plus(autoSpeeds);
         var currentTimestamp = Timer.getFPGATimestamp();
         if (previousTimestamp == 0.0) {
@@ -404,22 +396,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public void enableScoringAlignment() {
-    if (AUTO_ALIGN_ENABLED) {
       if (DriverStation.isAutonomous()) {
         setStateFromRequest(SwerveState.REEF_ALIGN_AUTO);
 
       } else {
         setStateFromRequest(SwerveState.REEF_ALIGN_TELEOP);
-      }
     }
-  }
-
-  public ChassisSpeeds getAutoAlignAutoChassisSpeeds() {
-    if (AUTO_ALIGN_ENABLED) {
-      return autoAlignAutoSpeeds;
-    }
-
-    return new ChassisSpeeds();
   }
 
   public Translation2d getPoseOffset() {
@@ -437,17 +419,9 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     return new Translation2d(scaledY, scaledX);
   }
 
-  public ChassisSpeeds getAutoAlignChassisSpeeds() {
-    if (AUTO_ALIGN_ENABLED) {
-      return autoAlignSpeeds;
-    }
-
-    return new ChassisSpeeds();
-  }
-
   public void enableCoralIntakeAssist() {
     if (DriverStation.isTeleop()) {
-      if (INTAKE_ASSIST_CORAL_ENABLED) {
+      if (FeatureFlags.CORAL_INTAKE_ASSIST.getAsBoolean()) {
         setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
       } else {
         setStateFromRequest(SwerveState.TELEOP);
