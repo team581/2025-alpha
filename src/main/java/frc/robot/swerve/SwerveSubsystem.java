@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.auto_align.MagnetismUtil;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
@@ -98,7 +97,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
 
-  private ChassisSpeeds magnetizedSpeeds = new ChassisSpeeds();
   private ChassisSpeeds coralAssistSpeedsOffset = new ChassisSpeeds();
 
   private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
@@ -160,16 +158,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setAutoAlignAutoSpeeds(ChassisSpeeds speeds) {
     autoAlignAutoSpeeds = speeds;
-    if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
-      sendSwerveRequest();
-    }
+    sendSwerveRequest();
   }
 
   public void setAutoAlignSpeeds(ChassisSpeeds speeds) {
     autoAlignSpeeds = speeds;
-    if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
-      sendSwerveRequest();
-    }
+    sendSwerveRequest();
   }
 
   @Override
@@ -236,10 +230,6 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     drivetrainState = drivetrain.getState();
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
-    magnetizedSpeeds =
-        FeatureFlags.MAGNETISM.getAsBoolean()
-            ? MagnetismUtil.getReefMagnetizedChassisSpeeds(teleopSpeeds, drivetrainState.Pose)
-            : teleopSpeeds;
     teleopSlowModePercent = ELEVATOR_HEIGHT_TO_SLOW_MODE.get(elevatorHeight);
   }
 
@@ -315,7 +305,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       }
       case REEF_ALIGN_AUTO -> {
         SNAP_CONTROLLER.setMaxOutput(Double.POSITIVE_INFINITY);
-        var wantedSpeeds = getAutoAlignAutoChassisSpeeds();
+        var wantedSpeeds = autoAlignAutoSpeeds;
         //  var wantedSpeeds = alignSpeeds.plus(autoSpeeds);
         var currentTimestamp = Timer.getFPGATimestamp();
         if (previousTimestamp == 0.0) {
@@ -393,37 +383,11 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   }
 
   public void enableScoringAlignment() {
-    if (FeatureFlags.MAGNETISM.getAsBoolean() || FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
-      if (DriverStation.isAutonomous()) {
-        // No magnetism in auto, use regular snaps
-        setStateFromRequest(SwerveState.REEF_ALIGN_AUTO);
-
-      } else {
-        setStateFromRequest(SwerveState.REEF_ALIGN_TELEOP);
-      }
+    if (DriverStation.isAutonomous()) {
+      setStateFromRequest(SwerveState.REEF_ALIGN_AUTO);
+    } else {
+      setStateFromRequest(SwerveState.REEF_ALIGN_TELEOP);
     }
-  }
-
-  public ChassisSpeeds getAutoAlignAutoChassisSpeeds() {
-    if (FeatureFlags.MAGNETISM.getAsBoolean()) {
-      // TODO: Magnetism should be a no-op in auto >:(
-      return magnetizedSpeeds;
-    } else if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
-      return autoAlignAutoSpeeds;
-    }
-
-    return new ChassisSpeeds();
-  }
-
-  public ChassisSpeeds getAutoAlignChassisSpeeds() {
-    if (FeatureFlags.MAGNETISM.getAsBoolean()) {
-      // TODO: Magnetism should be a no-op in auto >:(
-      return magnetizedSpeeds;
-    } else if (FeatureFlags.AUTO_ALIGN.getAsBoolean()) {
-      return autoAlignSpeeds;
-    }
-
-    return new ChassisSpeeds();
   }
 
   public void enableCoralIntakeAssist() {

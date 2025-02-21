@@ -4,8 +4,6 @@ import frc.robot.util.FeatureFlag;
 import java.util.function.BooleanSupplier;
 
 public class FeatureFlags {
-  public static final BooleanSupplier MAGNETISM = FeatureFlag.of("ReefAlign/Magnetism", false);
-  public static final BooleanSupplier AUTO_ALIGN = FeatureFlag.of("ReefAlign/AutoAlign", true);
   public static final BooleanSupplier CORAL_INTAKE_ASSIST =
       FeatureFlag.of("CoralIntakeAssist", true);
 
