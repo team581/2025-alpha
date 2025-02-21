@@ -133,8 +133,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     var constrainedSpeeds = constrainLinearVelocity(addedSpeeds, MAX_CONSTRAINT);
 
     var robotPose = localization.getPose();
-    var distanceToReef =
-        robotPose.getTranslation().getDistance(usedScoringPose.getTranslation());
+    var distanceToReef = robotPose.getTranslation().getDistance(usedScoringPose.getTranslation());
 
     if (distanceToReef > REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD) {
       return constrainedSpeeds;
@@ -169,10 +168,9 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
         switch (purpleState) {
           case NO_PURPLE, CENTERED -> tagAlignSpeedsForwardForPurple;
           case VISIBLE_NOT_CENTERED ->
-              tagAlignSpeedsForwardForPurple
-                  .plus(
-                      purple.getPurpleAlignChassisSpeeds(
-                          localization.getPose().getRotation().getDegrees()));
+              tagAlignSpeedsForwardForPurple.plus(
+                  purple.getPurpleAlignChassisSpeeds(
+                      localization.getPose().getRotation().getDegrees()));
         };
     DogLog.log("PurpleAlignment/CombinedSpeeds", speeds);
     return speeds;
@@ -180,14 +178,14 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   @Override
   protected void collectInputs() {
-     seenPurple = purple.seenPurple();
-     usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
-     bestReefPipe = tagAlign.getBestPipe();
-     isAligned = tagAlign.isAligned(bestReefPipe);
-     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
-     tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, false);
-     tagAlignSpeedsForwardForPurple =
-         tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, seenPurple);
+    seenPurple = purple.seenPurple();
+    usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
+    bestReefPipe = tagAlign.getBestPipe();
+    isAligned = tagAlign.isAligned(bestReefPipe);
+    isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
+    tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, false);
+    tagAlignSpeedsForwardForPurple =
+        tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, seenPurple);
   }
 
   public ChassisSpeeds getTagAlignSpeeds() {
