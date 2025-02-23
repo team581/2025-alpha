@@ -188,10 +188,10 @@ class CompConfig {
                           .withStatorCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(30.0)
                           .withStatorCurrentLimit(60.0)),
-              -58.7,
+              -56.4,
               156.5,
               18,
-              -58.7),
+              -56.4),
           new RollConfig(
               RIO_CAN_NAME,
               23,
@@ -219,7 +219,7 @@ class CompConfig {
               170.0,
               new TalonFXConfiguration()
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
-                  .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(125.0))
+                  .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(75.0))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
