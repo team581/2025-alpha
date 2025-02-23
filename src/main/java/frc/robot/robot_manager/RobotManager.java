@@ -968,8 +968,7 @@ public class RobotManager extends StateMachine<RobotState> {
           DISLODGE_ALGAE_L3_PUSHING,
           INTAKE_ALGAE_L2,
           INTAKE_ALGAE_L3 -> {
-        swerve.setSnapsEnabled(true);
-        swerve.setSnapToAngle(reefSnapAngle);
+        swerve.snapsDriveRequest(reefSnapAngle);
       }
       case CORAL_L1_1_APPROACH,
           CORAL_L2_1_APPROACH,
@@ -997,7 +996,7 @@ public class RobotManager extends StateMachine<RobotState> {
           CORAL_DISPLACED_L4_2_LINEUP,
           CORAL_DISPLACED_L4_3_PLACE,
           CORAL_DISPLACED_L4_4_RELEASE -> {
-        swerve.setSnapToAngle(reefSnapAngle);
+        swerve.snapsDriveRequest(reefSnapAngle);
       }
       case INTAKE_CORAL_STATION_BACK -> {
         swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()));
@@ -1053,7 +1052,7 @@ public class RobotManager extends StateMachine<RobotState> {
       switch (swerve.getState()) {
         case REEF_ALIGN_TELEOP -> {
           if (autoAlign.isTagAlignedDebounced()) {
-            swerve.setState(SwerveState.REEF_ALIGN_TELEOP_FINE_ADJUST);
+            swerve.reefAlignTeleopFineAdjustRequest();
           }
         }
         default -> {}
