@@ -51,9 +51,16 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   }
 
   public void setState(ElevatorState newState) {
-    if (getState() != ElevatorState.PRE_MATCH_HOMING
-        && getState() != ElevatorState.MID_MATCH_HOMING) {
-      setStateFromRequest(newState);
+    switch (getState()) {
+      case PRE_MATCH_HOMING -> {
+        if (newState == ElevatorState.MID_MATCH_HOMING) {
+          setStateFromRequest(newState);
+        }
+      }
+      case MID_MATCH_HOMING -> {}
+      default -> {
+        setStateFromRequest(newState);
+      }
     }
   }
 

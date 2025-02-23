@@ -12,6 +12,7 @@ import frc.robot.auto_align.purple_align.PurpleAlignState;
 import frc.robot.auto_align.tag_align.TagAlign;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.autos.constraints.AutoConstraintOptions;
+import frc.robot.fms.FmsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.swerve.SnapUtil;
 import frc.robot.swerve.SwerveSubsystem;
@@ -23,9 +24,7 @@ import frc.robot.vision.limelight.Limelight;
 public class AutoAlign extends StateMachine<AutoAlignState> {
   private static final double REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD = 1.5;
   private static final double LOWEST_TELEOP_SPEED_SCALAR = 0.5;
-  private static final double MIN_CONSTRAINT = 0.7;
   private static final double MAX_CONSTRAINT = 1.5;
-  private static final double BASE_TELEOP_SPEED = 2.0;
 
   public static boolean shouldNetScoreForwards(Pose2d robotPose) {
     double robotX = robotPose.getX();
@@ -50,6 +49,25 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     return !MathUtil.isNear(coralStationBackwardAngle, theta, 90, -180, 180);
   }
 
+  public static boolean isStationIntakeProcessorSide(Pose2d robotPose) {
+    if (robotPose.getY() > 4.025) {
+      if (FmsSubsystem.isRedAlliance()) {
+        // Coral station red, processor side
+        return true;
+      }
+
+      // Coral station blue, non processor side
+      return false;
+    } else {
+      if (FmsSubsystem.isRedAlliance()) {
+        // Coral station red, non processor side
+        return false;
+      }
+      // Coral station blue, processor side
+      return true;
+    }
+  }
+
   public static boolean isCloseToReefSide(
       Pose2d robotPose, Pose2d nearestReefSide, double thresholdMeters) {
     return robotPose.getTranslation().getDistance(nearestReefSide.getTranslation())
@@ -70,7 +88,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
             + LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KP * linearVelocity);
   }
 
-  private final Debouncer isAlignedDebouncer = new Debouncer(0.5, DebounceType.kRising);
+  private final Debouncer isAlignedDebouncer = new Debouncer(0.25, DebounceType.kRising);
   private final PurpleAlign purple;
   private final Limelight purpleLimelight;
   private final Limelight frontLimelight;

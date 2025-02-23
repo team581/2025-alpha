@@ -14,7 +14,7 @@ public class FeatureFlags {
       FeatureFlag.of("CollisionAvoidance/BoxShortcuts", true);
 
   public static final BooleanSupplier REEF_ALIGN_FINE_ADJUSTMENTS =
-      FeatureFlag.of("ReefAlignment/FineAdjustments", false);
+      FeatureFlag.of("ReefAlignment/FineAdjustments", true);
   public static final BooleanSupplier REEF_ALIGN_LOOKAHEAD_DISTANCE_COST_FN =
       FeatureFlag.of("ReefAlignment/LookaheadDistanceCostFn", false);
 
@@ -23,7 +23,10 @@ public class FeatureFlags {
   public static final BooleanSupplier CLIMBER_ENABLED = FeatureFlag.of("Climber/Enabled", true);
 
   public static final BooleanSupplier INTAKE_VELOCITY_CORAL_DETECTION =
-      FeatureFlag.of("Intake/CoralVelocityDetection", false);
+      FeatureFlag.of("Intake/CoralVelocityDetection", true);
+
+  public static final BooleanSupplier LIVE_WINDOW_TELEMETRY_ENABLED =
+      FeatureFlag.of("LiveWindow/TelemetryEnabled", true);
 
   private FeatureFlags() {}
 }
