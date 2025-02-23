@@ -1,12 +1,16 @@
 package frc.robot.climber;
 
+import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
@@ -23,6 +27,8 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   private boolean climberDirectionBad = false;
   private double currentAngle;
   private double motorAngle;
+  private final StaticBrake brakeNeutralRequest = new StaticBrake();
+  private final CoastOut coastNeutralRequest = new CoastOut();
 
   public ClimberSubsystem(TalonFX motor, CANcoder encoder) {
     super(SubsystemPriority.CLIMBER, ClimberState.STOWED);
@@ -39,6 +45,12 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
+
+    if (DriverStation.isDisabled() && getState() == ClimberState.STOWED) {
+      motor.setControl(coastNeutralRequest);
+    } else {
+      motor.setControl(brakeNeutralRequest);
+    }
 
     if (!climberDirectionBad) {
       climberDirectionBad =
