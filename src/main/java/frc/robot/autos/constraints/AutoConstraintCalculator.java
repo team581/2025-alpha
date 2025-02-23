@@ -119,7 +119,7 @@ public class AutoConstraintCalculator {
     DogLog.log("Debug/CurrentVelocity", distanceToEnd);
 
     var timeToTraverse = distanceToEnd / currentVelocity;
-    var acceleration = ( accelerationLimit - currentVelocity) / timeToTraverse;
+    var acceleration = (accelerationLimit - currentVelocity) / timeToTraverse;
     if (Math.abs(acceleration) < accelerationLimit) {
       return oldVelocityConstraint;
     }
