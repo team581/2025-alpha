@@ -44,8 +44,7 @@ public class Robot extends TimedRobot {
   private Command autonomousCommand;
   private final FmsSubsystem fms = new FmsSubsystem();
   private final Hardware hardware = new Hardware();
-  private final ElevatorSubsystem elevator =
-      new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor);
+
   private final SwerveSubsystem swerve = new SwerveSubsystem();
   private final ImuSubsystem imu = new ImuSubsystem(swerve.drivetrainPigeon);
   private final Limelight elevatorPurpleLimelight =
@@ -61,7 +60,8 @@ public class Robot extends TimedRobot {
       new VisionSubsystem(
           imu, elevatorPurpleLimelight, frontCoralLimelight, backTagLimelight, baseTagLimelight);
   private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
-
+  private final ElevatorSubsystem elevator =
+      new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor, localization);
   private final Trailblazer trailblazer = new Trailblazer(swerve, localization);
   private final RumbleControllerSubsystem rumbleController =
       new RumbleControllerSubsystem(hardware.driverController, true);

@@ -5,8 +5,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.config.RobotConfig;
+import frc.robot.fms.FmsSubsystem;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
@@ -18,6 +21,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
         height, RobotConfig.get().elevator().minHeight(), RobotConfig.get().elevator().maxHeight());
   }
 
+  private final LocalizationSubsystem localization;
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
 
@@ -41,10 +45,12 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   // Mid-match homing
   private double averageMotorCurrent;
 
-  public ElevatorSubsystem(TalonFX leftMotor, TalonFX rightMotor) {
+  public ElevatorSubsystem(
+      TalonFX leftMotor, TalonFX rightMotor, LocalizationSubsystem localization) {
     super(SubsystemPriority.ELEVATOR, ElevatorState.PRE_MATCH_HOMING);
     this.leftMotor = leftMotor;
     this.rightMotor = rightMotor;
+    this.localization = localization;
     // Motor Configs
     leftMotor.getConfigurator().apply(RobotConfig.get().elevator().leftMotorConfig());
     rightMotor.getConfigurator().apply(RobotConfig.get().elevator().rightMotorConfig());
@@ -95,10 +101,6 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   @Override
   protected void afterTransition(ElevatorState newState) {
     switch (newState) {
-      default -> {
-        leftMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
-        rightMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
-      }
       case MID_MATCH_HOMING -> {
         leftMotor.setVoltage(-0.5);
         rightMotor.setVoltage(-0.5);
@@ -106,6 +108,18 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       case COLLISION_AVOIDANCE -> {
         leftMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
         rightMotor.setControl(positionRequest.withPosition(clampHeight(collisionAvoidanceGoal)));
+      }
+      case INTAKING_CORAL_STATION_BACK, INTAKING_CORAL_STATION_FRONT -> {
+        leftMotor.setControl(
+            positionRequest.withPosition(
+                clampHeight(newState.height + getStationIntakeSide().offset)));
+        rightMotor.setControl(
+            positionRequest.withPosition(
+                clampHeight(newState.height + getStationIntakeSide().offset)));
+      }
+      default -> {
+        leftMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
+        rightMotor.setControl(positionRequest.withPosition(clampHeight(newState.height)));
       }
     }
   }
@@ -183,7 +197,30 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
           averageMeasuredHeight > ElevatorState.CORAL_CENTERED_L4_RAISE_WRIST.height - 8;
       case CORAL_DISPLACED_L4_RAISE_WRIST ->
           averageMeasuredHeight > ElevatorState.CORAL_DISPLACED_L4_RAISE_WRIST.height - 8;
+      case INTAKING_CORAL_STATION_BACK, INTAKING_CORAL_STATION_FRONT ->
+          MathUtil.isNear(
+              getState().height + getStationIntakeSide().offset, averageMeasuredHeight, TOLERANCE);
       default -> MathUtil.isNear(getState().height, averageMeasuredHeight, TOLERANCE);
     };
+  }
+
+  private CoralStation getStationIntakeSide() {
+    Pose2d robotPose = localization.getPose();
+    if (robotPose.getY() > 4.025) {
+      if (FmsSubsystem.isRedAlliance()) {
+        // Coral station red, processor side
+        return CoralStation.PROCESSOR_SIDE_RED;
+      }
+
+      // Coral station blue, non processor side
+      return CoralStation.NON_PROCESSOR_SIDE_BLUE;
+    } else {
+      if (FmsSubsystem.isRedAlliance()) {
+        // Coral station red, non processor side
+        return CoralStation.NON_PROCESSOR_SIDE_RED;
+      }
+      // Coral station blue, processor side
+      return CoralStation.PROCESSOR_SIDE_BLUE;
+    }
   }
 }
