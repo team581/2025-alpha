@@ -1,5 +1,6 @@
 package frc.robot.autos.constraints;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -81,7 +82,11 @@ public class AutoConstraintCalculator {
 
     double deltaVx = inputSpeeds.vxMetersPerSecond - previousSpeeds.vxMetersPerSecond;
     double deltaVy = inputSpeeds.vyMetersPerSecond - previousSpeeds.vyMetersPerSecond;
-
+    if (Math.abs(inputSpeeds.vxMetersPerSecond) - Math.abs(previousSpeeds.vxMetersPerSecond) < 0
+    && Math.abs(inputSpeeds.vyMetersPerSecond) - Math.abs(previousSpeeds.vyMetersPerSecond)
+        < 0.5) {
+  return inputSpeeds;
+}
     double unconstrainedLinearAcceleration =
         Math.sqrt(deltaVx * deltaVx + deltaVy * deltaVy) / timeBetweenPreviousAndInputSpeeds;
 
@@ -108,11 +113,14 @@ public class AutoConstraintCalculator {
       double oldVelocityConstraint,
       double accelerationLimit) {
     var distanceToEnd = currentPose.getTranslation().getDistance(endWaypoint.getTranslation());
+    DogLog.log("Debug/DistanceToEnd", distanceToEnd);
     var currentVelocity =
         Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+        DogLog.log("Debug/CurrentVelocity", distanceToEnd);
+
     var timeToTraverse = distanceToEnd / currentVelocity;
-    var acceleration = (0.0 - currentVelocity) / timeToTraverse;
-    if (acceleration < accelerationLimit) {
+    var acceleration = ((accelerationLimit)- currentVelocity) / timeToTraverse;
+    if (Math.abs(acceleration) < accelerationLimit) {
       return oldVelocityConstraint;
     }
     var velocityConstraint = acceleration * timeToTraverse;

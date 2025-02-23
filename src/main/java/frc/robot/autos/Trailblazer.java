@@ -125,6 +125,7 @@ public class Trailblazer {
             originalConstraints.maxLinearVelocity(),
             originalConstraints.maxLinearAcceleration());
     var usedConstraints = originalConstraints.withMaxLinearVelocity(newLinearVelocity);
+
     DogLog.log(
         "Trailblazer/Constraints/VelocityCalculation/CalculatedVelocity",
         usedConstraints.maxLinearVelocity());
