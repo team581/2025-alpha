@@ -987,7 +987,7 @@ public class RobotManager extends StateMachine<RobotState> {
           CORAL_DISPLACED_L4_2_LINEUP,
           CORAL_DISPLACED_L4_3_PLACE,
           CORAL_DISPLACED_L4_4_RELEASE -> {
-        swerve.snapsDriveRequest(reefSnapAngle);
+        swerve.scoringAlignmentRequest(reefSnapAngle);
       }
       case INTAKE_CORAL_STATION_BACK -> {
         swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()));
