@@ -1,8 +1,5 @@
 package frc.robot.autos.constraints;
 
-import com.fasterxml.jackson.databind.introspect.AccessorNamingStrategy;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -104,15 +101,20 @@ public class AutoConstraintCalculator {
     return inputSpeeds;
   }
 
-  public static double getDynamicVelocityConstraint(Pose2d currentPose, Pose2d endWaypoint, ChassisSpeeds currentSpeeds, double oldAccelerationConstraint) {
+  public static double getDynamicVelocityConstraint(
+      Pose2d currentPose,
+      Pose2d endWaypoint,
+      ChassisSpeeds currentSpeeds,
+      double oldAccelerationConstraint) {
     var distanceToEnd = currentPose.getTranslation().getDistance(endWaypoint.getTranslation());
-    var currentVelocity = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    var timeToTraverse = distanceToEnd/currentVelocity;
-    var acceleration = 0.0-currentVelocity/timeToTraverse;
-    if (acceleration<0.0) {
+    var currentVelocity =
+        Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    var timeToTraverse = distanceToEnd / currentVelocity;
+    var acceleration = 0.0 - currentVelocity / timeToTraverse;
+    if (acceleration < 0.0) {
       return oldAccelerationConstraint;
     }
-    var velocityConstraint = acceleration*timeToTraverse;
+    var velocityConstraint = acceleration * timeToTraverse;
     return Math.abs(velocityConstraint);
   }
 

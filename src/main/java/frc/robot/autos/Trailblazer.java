@@ -67,7 +67,10 @@ public class Trailblazer {
                       var currentAutoPoint = segment.points.get(currentAutoPointIndex);
 
                       var constrainedVelocityGoal =
-                          getSwerveSetpoint(currentAutoPoint, segment.defaultConstraints, segment.points.get(segment.points.size()-1).poseSupplier.get());
+                          getSwerveSetpoint(
+                              currentAutoPoint,
+                              segment.defaultConstraints,
+                              segment.points.get(segment.points.size() - 1).poseSupplier.get());
                       swerve.setFieldRelativeAutoSpeeds(constrainedVelocityGoal);
 
                       DogLog.log("Trailblazer/Tracker/CurrentPointIndex", currentAutoPointIndex);
@@ -114,7 +117,12 @@ public class Trailblazer {
     var originalTargetPose = pathTracker.getTargetPose();
     var originalVelocityGoal = pathFollower.calculateSpeeds(robotPose, originalTargetPose);
     var originalConstraints = resolveConstraints(point, segmentConstraints);
-    var newLinearVelocity = AutoConstraintCalculator.getDynamicVelocityConstraint(robotPose, endPose, swerve.getFieldRelativeSpeeds(), originalConstraints.maxLinearVelocity());
+    var newLinearVelocity =
+        AutoConstraintCalculator.getDynamicVelocityConstraint(
+            robotPose,
+            endPose,
+            swerve.getFieldRelativeSpeeds(),
+            originalConstraints.maxLinearVelocity());
     var usedConstraints = originalConstraints.withMaxLinearVelocity(newLinearVelocity);
     DogLog.log(
         "Trailblazer/Constraints/VelocityCalculation/CalculatedVelocity",
