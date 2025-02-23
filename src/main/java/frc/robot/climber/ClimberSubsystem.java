@@ -45,12 +45,6 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   public void robotPeriodic() {
     super.robotPeriodic();
 
-    if (DriverStation.isDisabled() && getState() == ClimberState.STOWED) {
-      motor.setControl(coastNeutralRequest);
-    } else {
-      motor.setControl(brakeNeutralRequest);
-    }
-
     if (!climberDirectionBad) {
       climberDirectionBad =
           motorDirectionDebouncer.calculate(
@@ -63,12 +57,19 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     }
 
     if (FeatureFlags.CLIMBER_ENABLED.getAsBoolean()) {
-      if (climberDirectionBad || atGoal() || !FeatureFlags.CLIMBER_ENABLED.getAsBoolean()) {
-        motor.disable();
-      } else if (currentAngle < clamp(getState().angle)) {
-        motor.setVoltage(getState().forwardsVoltage);
-      } else {
-        motor.setVoltage(getState().backwardsVoltage);
+      if (DriverStation.isDisabled()) {
+        if (getState() == ClimberState.STOWED) {
+          motor.setControl(coastNeutralRequest);
+        } else {
+          motor.setControl(brakeNeutralRequest);
+        }
+      } else if (climberDirectionBad || atGoal()) {
+          motor.disable();
+        } else if (currentAngle < clamp(getState().angle)) {
+          motor.setVoltage(getState().forwardsVoltage);
+        } else {
+          motor.setVoltage(getState().backwardsVoltage);
+        }
       }
     }
   }
