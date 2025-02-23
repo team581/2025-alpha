@@ -129,10 +129,8 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     // We don't necessarily set auto swerve speeds every loop, so this ensures we are always snapped
     // to the right angle during auto. Teleop doesn't need this since teleop speeds are constantly
     // fed into swerve.
-    switch (getState()) {
-      case AUTO_SNAPS -> {
+    if (DriverStation.isAutonomous()) {
         sendSwerveRequest();
-      }
     }
   }
 
@@ -411,17 +409,60 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     }
   }
 
+  @Deprecated
   public void setState(SwerveState newState) {
     setStateFromRequest(newState);
   }
 
-  public void enableScoringAlignment() {
+  public void normalDriveRequest() {
+    if (DriverStation.isAutonomous()) {
+      setStateFromRequest(SwerveState.AUTO);
+    } else {
+      setStateFromRequest(SwerveState.TELEOP);
+    }
+  }
+
+  public void snapsDriveRequest(double snapAngle) {
+    setSnapToAngle(snapAngle);
+
+    if (DriverStation.isAutonomous()) {
+      setStateFromRequest(SwerveState.AUTO_SNAPS);
+    } else {
+      setStateFromRequest(SwerveState.TELEOP_SNAPS);
+    }
+  }
+
+  public void scoringAlignmentRequest(double snapAngle) {
+    setSnapToAngle(snapAngle);
+
     if (DriverStation.isAutonomous()) {
       setStateFromRequest(SwerveState.REEF_ALIGN_AUTO);
-
     } else {
       setStateFromRequest(SwerveState.REEF_ALIGN_TELEOP);
     }
+  }
+
+  public void reefAlignTeleopFineAdjustRequest() {
+    if (DriverStation.isTeleop()) {
+      setStateFromRequest(SwerveState.REEF_ALIGN_TELEOP_FINE_ADJUST);
+    }
+  }
+
+  public void intakeAssistCoralTeleopRequest() {
+    if (DriverStation.isTeleop()) {
+      setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
+    }
+  }
+
+  public void intakeAssistAlgaeTeleopRequest() {
+    if (DriverStation.isTeleop()) {
+      setStateFromRequest(SwerveState.INTAKE_ASSIST_ALGAE_TELEOP);
+    }
+  }
+
+  public void climbRequest() {
+    setSnapToAngle(SnapUtil.getCageAngle());
+    setState(SwerveState.CLIMBING);
   }
 
   public Translation2d getPoseOffset() {
@@ -431,44 +472,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
     var mappedValues =
         ControllerHelpers.fromCircularDiscCoordinates(rawControllerXValue, rawControllerYValue);
-    var deadbandX = ControllerHelpers.deadbandJoystickValue(mappedValues.getX(), LEFT_X_DEADBAND);
-    var deadbandY = ControllerHelpers.deadbandJoystickValue(mappedValues.getY(), LEFT_Y_DEADBAND);
-    var scaledX = deadbandX * FINE_ADJUST_CONTROLLER_SCALAR;
-    var scaledY = deadbandY * FINE_ADJUST_CONTROLLER_SCALAR;
+        var deadbandX = ControllerHelpers.deadbandJoystickValue(mappedValues.getX(), LEFT_X_DEADBAND);
+        var deadbandY = ControllerHelpers.deadbandJoystickValue(mappedValues.getY(), LEFT_Y_DEADBAND);
+        var scaledX = deadbandX * FINE_ADJUST_CONTROLLER_SCALAR;
+        var scaledY = deadbandY * FINE_ADJUST_CONTROLLER_SCALAR;
 
     return new Translation2d(scaledY, scaledX);
-  }
-
-  public void enableCoralIntakeAssist() {
-    if (DriverStation.isTeleop()) {
-      if (FeatureFlags.CORAL_INTAKE_ASSIST.getAsBoolean()) {
-        setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
-      } else {
-        setStateFromRequest(SwerveState.TELEOP);
-      }
-    } else {
-      setStateFromRequest(SwerveState.AUTO);
-    }
-  }
-
-  public void setSnapsEnabled(boolean newValue) {
-    switch (getState()) {
-      case TELEOP,
-              TELEOP_SNAPS,
-              INTAKE_ASSIST_CORAL_TELEOP,
-              REEF_ALIGN_TELEOP,
-              REEF_ALIGN_TELEOP_FINE_ADJUST,
-              INTAKE_ASSIST_ALGAE_TELEOP,
-              CLIMBING ->
-          setStateFromRequest(newValue ? SwerveState.TELEOP_SNAPS : SwerveState.TELEOP);
-      case AUTO, AUTO_SNAPS, REEF_ALIGN_AUTO ->
-          setStateFromRequest(newValue ? SwerveState.AUTO_SNAPS : SwerveState.AUTO);
-    }
-  }
-
-  public void climbRequest() {
-    setSnapToAngle(SnapUtil.getCageAngle());
-    setState(SwerveState.CLIMBING);
   }
 
   @Override
