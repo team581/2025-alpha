@@ -64,12 +64,11 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
           motor.setControl(brakeNeutralRequest);
         }
       } else if (climberDirectionBad || atGoal()) {
-          motor.disable();
-        } else if (currentAngle < clamp(getState().angle)) {
-          motor.setVoltage(getState().forwardsVoltage);
-        } else {
-          motor.setVoltage(getState().backwardsVoltage);
-        }
+        motor.disable();
+      } else if (currentAngle < clamp(getState().angle)) {
+        motor.setVoltage(getState().forwardsVoltage);
+      } else {
+        motor.setVoltage(getState().backwardsVoltage);
       }
     }
   }
