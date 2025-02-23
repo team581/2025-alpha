@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
-import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.generated.CompBotTunerConstants;
@@ -130,7 +129,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
     // to the right angle during auto. Teleop doesn't need this since teleop speeds are constantly
     // fed into swerve.
     if (DriverStation.isAutonomous()) {
-        sendSwerveRequest();
+      sendSwerveRequest();
     }
   }
 
@@ -472,10 +471,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
     var mappedValues =
         ControllerHelpers.fromCircularDiscCoordinates(rawControllerXValue, rawControllerYValue);
-        var deadbandX = ControllerHelpers.deadbandJoystickValue(mappedValues.getX(), LEFT_X_DEADBAND);
-        var deadbandY = ControllerHelpers.deadbandJoystickValue(mappedValues.getY(), LEFT_Y_DEADBAND);
-        var scaledX = deadbandX * FINE_ADJUST_CONTROLLER_SCALAR;
-        var scaledY = deadbandY * FINE_ADJUST_CONTROLLER_SCALAR;
+    var deadbandX = ControllerHelpers.deadbandJoystickValue(mappedValues.getX(), LEFT_X_DEADBAND);
+    var deadbandY = ControllerHelpers.deadbandJoystickValue(mappedValues.getY(), LEFT_Y_DEADBAND);
+    var scaledX = deadbandX * FINE_ADJUST_CONTROLLER_SCALAR;
+    var scaledY = deadbandY * FINE_ADJUST_CONTROLLER_SCALAR;
 
     return new Translation2d(scaledY, scaledX);
   }

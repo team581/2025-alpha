@@ -27,7 +27,6 @@ import frc.robot.robot_manager.collision_avoidance.CollisionAvoidance;
 import frc.robot.roll.RollState;
 import frc.robot.roll.RollSubsystem;
 import frc.robot.swerve.SnapUtil;
-import frc.robot.swerve.SwerveState;
 import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
@@ -90,7 +89,8 @@ public class RobotManager extends StateMachine<RobotState> {
   private boolean isRollHomed = false;
   private boolean confirmScoreActive = false;
 
-  // TODO: Finished new swerve API interface change for state actions, rest of swerve lines still need to be changed
+  // TODO: Finished new swerve API interface change for state actions, rest of swerve lines still
+  // need to be changed
 
   @Override
   protected RobotState getNextState(RobotState currentState) {
