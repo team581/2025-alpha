@@ -441,7 +441,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case SMART_STOW_1 -> {
         intake.setState(IntakeState.INTAKING_CORAL);
-        moveSuperstructure(ElevatorState.STOWED, WristState.INTAKING_CORAL_STATION_BACK);
+        moveSuperstructure(ElevatorState.STOWED, WristState.SMART_STOW_1);
         swerve.normalDriveRequest();
         roll.setState(RollState.SMART_STOW);
         vision.setState(VisionState.TAGS);
@@ -806,6 +806,10 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getBackwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
         lights.setState(LightsState.IDLE_WITH_ALGAE);
         climber.setState(ClimberState.STOWED);
       }
@@ -815,6 +819,10 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getBackwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
         lights.setState(LightsState.IDLE_WITH_ALGAE);
         climber.setState(ClimberState.STOWED);
       }
@@ -824,6 +832,10 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getForwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
         lights.setState(LightsState.IDLE_WITH_ALGAE);
         climber.setState(ClimberState.STOWED);
       }
@@ -833,6 +845,10 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getForwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
         lights.setState(LightsState.IDLE_WITH_ALGAE);
         climber.setState(ClimberState.STOWED);
       }
