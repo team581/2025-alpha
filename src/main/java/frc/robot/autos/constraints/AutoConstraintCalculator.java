@@ -1,5 +1,9 @@
 package frc.robot.autos.constraints;
 
+import com.fasterxml.jackson.databind.introspect.AccessorNamingStrategy;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class AutoConstraintCalculator {
@@ -81,11 +85,6 @@ public class AutoConstraintCalculator {
     double deltaVx = inputSpeeds.vxMetersPerSecond - previousSpeeds.vxMetersPerSecond;
     double deltaVy = inputSpeeds.vyMetersPerSecond - previousSpeeds.vyMetersPerSecond;
 
-    if (Math.abs(inputSpeeds.vxMetersPerSecond) - Math.abs(previousSpeeds.vxMetersPerSecond) < 0
-        && Math.abs(inputSpeeds.vyMetersPerSecond) - Math.abs(previousSpeeds.vyMetersPerSecond)
-            < 0.5) {
-      return inputSpeeds;
-    }
     double unconstrainedLinearAcceleration =
         Math.sqrt(deltaVx * deltaVx + deltaVy * deltaVy) / timeBetweenPreviousAndInputSpeeds;
 
@@ -103,6 +102,18 @@ public class AutoConstraintCalculator {
       return new ChassisSpeeds(constrainedVx, constrainedVy, inputSpeeds.omegaRadiansPerSecond);
     }
     return inputSpeeds;
+  }
+
+  public static double getDynamicVelocityConstraint(Pose2d currentPose, Pose2d endWaypoint, ChassisSpeeds currentSpeeds, double oldAccelerationConstraint) {
+    var distanceToEnd = currentPose.getTranslation().getDistance(endWaypoint.getTranslation());
+    var currentVelocity = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    var timeToTraverse = distanceToEnd/currentVelocity;
+    var acceleration = 0.0-currentVelocity/timeToTraverse;
+    if (acceleration<0.0) {
+      return oldAccelerationConstraint;
+    }
+    var velocityConstraint = acceleration*timeToTraverse;
+    return Math.abs(velocityConstraint);
   }
 
   private static ChassisSpeeds constrainRotationalAcceleration(

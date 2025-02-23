@@ -12,7 +12,7 @@ import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
 
 public class TestAuto extends BaseAuto {
-  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(1, 50, 4, 30);
+  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(4.0, 50, 1.0, 30);
 
   public TestAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
@@ -67,10 +67,12 @@ public class TestAuto extends BaseAuto {
                 new AutoPoint(new Pose2d(16.292, 0.842, Rotation2d.fromDegrees(123.819))))),
         trailblazer.followSegment(
             new AutoSegment(
+              CONSTRAINTS,
                 new AutoPoint(new Pose2d(15.295, 2.435, Rotation2d.fromDegrees(115.844))),
                 new AutoPoint(new Pose2d(14.391, 3.81, Rotation2d.fromDegrees(176.077))))),
         trailblazer.followSegment(
             new AutoSegment(
+              CONSTRAINTS,
                 new AutoPoint(new Pose2d(14.391, 3.81, Rotation2d.fromDegrees(176.077))))));
   }
 }
