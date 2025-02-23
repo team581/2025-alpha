@@ -806,10 +806,6 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getBackwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         lights.setState(LightsState.IDLE_WITH_ALGAE);
         climber.setState(ClimberState.STOWED);
       }
@@ -819,10 +815,6 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getBackwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         lights.setState(LightsState.IDLE_WITH_ALGAE);
         climber.setState(ClimberState.STOWED);
       }
@@ -832,10 +824,6 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getForwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         lights.setState(LightsState.IDLE_WITH_ALGAE);
         climber.setState(ClimberState.STOWED);
       }
@@ -845,11 +833,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getForwardNetDirection());
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-<<<<<<< HEAD
-=======
-
->>>>>>> main
-        lights.setState(LightsState.IDLE_WITH_ALGAE);
+        lights.setState(LightsState.SCORING);
         climber.setState(ClimberState.STOWED);
       }
       case PROCESSOR_WAITING, PROCESSOR_PREPARE_TO_SCORE -> {
