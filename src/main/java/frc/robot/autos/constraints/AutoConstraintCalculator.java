@@ -83,10 +83,10 @@ public class AutoConstraintCalculator {
     double deltaVx = inputSpeeds.vxMetersPerSecond - previousSpeeds.vxMetersPerSecond;
     double deltaVy = inputSpeeds.vyMetersPerSecond - previousSpeeds.vyMetersPerSecond;
     if (Math.abs(inputSpeeds.vxMetersPerSecond) - Math.abs(previousSpeeds.vxMetersPerSecond) < 0
-    && Math.abs(inputSpeeds.vyMetersPerSecond) - Math.abs(previousSpeeds.vyMetersPerSecond)
-        < 0.5) {
-  return inputSpeeds;
-}
+        && Math.abs(inputSpeeds.vyMetersPerSecond) - Math.abs(previousSpeeds.vyMetersPerSecond)
+            < 0.5) {
+      return inputSpeeds;
+    }
     double unconstrainedLinearAcceleration =
         Math.sqrt(deltaVx * deltaVx + deltaVy * deltaVy) / timeBetweenPreviousAndInputSpeeds;
 
@@ -116,10 +116,10 @@ public class AutoConstraintCalculator {
     DogLog.log("Debug/DistanceToEnd", distanceToEnd);
     var currentVelocity =
         Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-        DogLog.log("Debug/CurrentVelocity", distanceToEnd);
+    DogLog.log("Debug/CurrentVelocity", distanceToEnd);
 
     var timeToTraverse = distanceToEnd / currentVelocity;
-    var acceleration = ((accelerationLimit)- currentVelocity) / timeToTraverse;
+    var acceleration = ( accelerationLimit - currentVelocity) / timeToTraverse;
     if (Math.abs(acceleration) < accelerationLimit) {
       return oldVelocityConstraint;
     }
