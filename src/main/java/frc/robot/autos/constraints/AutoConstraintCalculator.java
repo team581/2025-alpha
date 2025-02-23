@@ -105,14 +105,14 @@ public class AutoConstraintCalculator {
       Pose2d currentPose,
       Pose2d endWaypoint,
       ChassisSpeeds currentSpeeds,
-      double oldAccelerationConstraint) {
+      double oldVelocityConstraint, double accelerationLimit) {
     var distanceToEnd = currentPose.getTranslation().getDistance(endWaypoint.getTranslation());
     var currentVelocity =
         Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
     var timeToTraverse = distanceToEnd / currentVelocity;
-    var acceleration = 0.0 - currentVelocity / timeToTraverse;
-    if (acceleration < 0.0) {
-      return oldAccelerationConstraint;
+    var acceleration = (0.0 - currentVelocity) / timeToTraverse;
+    if (acceleration < accelerationLimit) {
+      return oldVelocityConstraint;
     }
     var velocityConstraint = acceleration * timeToTraverse;
     return Math.abs(velocityConstraint);

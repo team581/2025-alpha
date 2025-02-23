@@ -122,7 +122,7 @@ public class Trailblazer {
             robotPose,
             endPose,
             swerve.getFieldRelativeSpeeds(),
-            originalConstraints.maxLinearVelocity());
+            originalConstraints.maxLinearVelocity(), originalConstraints.maxLinearAcceleration());
     var usedConstraints = originalConstraints.withMaxLinearVelocity(newLinearVelocity);
     DogLog.log(
         "Trailblazer/Constraints/VelocityCalculation/CalculatedVelocity",
