@@ -211,8 +211,8 @@ class PracticeConfig {
               CANIVORE_NAME,
               24,
               25,
-              -20.0,
-              170.0,
+              -55.0,
+              215.0,
               new TalonFXConfiguration()
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
                   .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(75.0))
@@ -226,7 +226,8 @@ class PracticeConfig {
                   .withMagnetSensor(
                       new MagnetSensorConfigs()
                           .withMagnetOffset(-0.311279296875)
-                          .withSensorDirection(SensorDirectionValue.Clockwise_Positive))),
+                          .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                          .withAbsoluteSensorDiscontinuityPoint(0.75))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private PracticeConfig() {}
