@@ -12,7 +12,6 @@ import frc.robot.autos.Points;
 import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
-import frc.robot.robot_manager.RobotState;
 
 public class BlueThreePiece2IKLAuto extends BaseAuto {
   private static final AutoConstraintOptions INTAKING_CONSTRAINTS =
@@ -47,10 +46,7 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                         .pathflipped(),
                     new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                 false)
-            .until(
-                () ->
-                    robotManager.autoAlign.isTagAlignedDebounced()
-                        && robotManager.imu.isFlatDebounced()),
+            .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -71,10 +67,7 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(1, 57, 4, 30))),
                 false)
-            .until(
-                () ->
-                    robotManager.getState() == RobotState.SMART_STOW_1
-                        || robotManager.getState() == RobotState.SMART_STOW_2),
+            .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON K
         autoCommands
@@ -90,10 +83,7 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                             // REEF PIPE K
                             new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                         false)
-                    .until(
-                        () ->
-                            robotManager.autoAlign.isTagAlignedDebounced()
-                                && robotManager.imu.isFlatDebounced())),
+                    .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -111,10 +101,7 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                         Points.LEFT_CORAL_STATION.bluePose,
                         autoCommands.intakeStationWarmupCommand())),
                 false)
-            .until(
-                () ->
-                    robotManager.getState() == RobotState.SMART_STOW_1
-                        || robotManager.getState() == RobotState.SMART_STOW_2),
+            .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON L
         autoCommands
@@ -130,10 +117,7 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                             // REEF PIPE L
                             new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                         false)
-                    .until(
-                        () ->
-                            robotManager.autoAlign.isTagAlignedDebounced()
-                                && robotManager.imu.isFlatDebounced())),
+                    .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // DRIVE BACK & STOW
@@ -144,7 +128,7 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                     .pathflipped(),
                 new AutoPoint(
                         new Pose2d(14.284, 2.435, Rotation2d.fromDegrees(134.931)),
-                        Commands.runOnce(robotManager::stowRequest))
+                        autoCommands.stowRequest())
                     .pathflipped())));
   }
 }

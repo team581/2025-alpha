@@ -12,7 +12,6 @@ import frc.robot.autos.Points;
 import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
-import frc.robot.robot_manager.RobotState;
 
 public class RedFourPiece5FEDC extends BaseAuto {
   private static final AutoConstraintOptions INTAKING_CONSTRAINTS =
@@ -46,10 +45,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                             .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_F))),
                     new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                 false)
-            .until(
-                () ->
-                    robotManager.autoAlign.isTagAlignedDebounced()
-                        && robotManager.imu.isFlatDebounced()),
+            .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -64,14 +60,11 @@ public class RedFourPiece5FEDC extends BaseAuto {
                         new Pose2d(13.842, 6.393, Rotation2d.fromDegrees(-135.878)),
                         new AutoConstraintOptions(2, 57, 4, 30)),
                     new AutoPoint(
-                        Points.TOP_RIGHT_CORAL_STATION.redPose,
+                        Points.RIGHT_CORAL_STATION.redPose,
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(1, 57, 4, 30))),
                 false)
-            .until(
-                () ->
-                    robotManager.getState() == RobotState.SMART_STOW_1
-                        || robotManager.getState() == RobotState.SMART_STOW_2),
+            .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON J
         trailblazer
@@ -85,10 +78,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                     new AutoPoint(new Pose2d(12.246, 6.4974, Rotation2d.fromDegrees(-60.0))),
                     new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                 false)
-            .until(
-                () ->
-                    robotManager.autoAlign.isTagAlignedDebounced()
-                        && robotManager.imu.isFlatDebounced()),
+            .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -101,13 +91,10 @@ public class RedFourPiece5FEDC extends BaseAuto {
                         Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                     new AutoPoint(new Pose2d(13.998, 6.393, Rotation2d.fromDegrees(-135.88))),
                     new AutoPoint(
-                        Points.TOP_RIGHT_CORAL_STATION.redPose,
+                        Points.RIGHT_CORAL_STATION.redPose,
                         autoCommands.intakeStationWarmupCommand())),
                 false)
-            .until(
-                () ->
-                    robotManager.getState() == RobotState.SMART_STOW_1
-                        || robotManager.getState() == RobotState.SMART_STOW_2),
+            .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON K
         autoCommands
@@ -122,10 +109,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                             // REEF PIPE K
                             new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                         false)
-                    .until(
-                        () ->
-                            robotManager.autoAlign.isTagAlignedDebounced()
-                                && robotManager.imu.isFlatDebounced())),
+                    .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
@@ -138,13 +122,10 @@ public class RedFourPiece5FEDC extends BaseAuto {
                         Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                     new AutoPoint(new Pose2d(15.083, 6.611, Rotation2d.fromDegrees(-133.277))),
                     new AutoPoint(
-                        Points.TOP_RIGHT_CORAL_STATION.redPose,
+                        Points.RIGHT_CORAL_STATION.redPose,
                         autoCommands.intakeStationWarmupCommand())),
                 false)
-            .until(
-                () ->
-                    robotManager.getState() == RobotState.SMART_STOW_1
-                        || robotManager.getState() == RobotState.SMART_STOW_2),
+            .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON L
         autoCommands
@@ -159,10 +140,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                             // REEF PIPE L
                             new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                         false)
-                    .until(
-                        () ->
-                            robotManager.autoAlign.isTagAlignedDebounced()
-                                && robotManager.imu.isFlatDebounced())),
+                    .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // DRIVE BACK & STOW
@@ -172,6 +150,6 @@ public class RedFourPiece5FEDC extends BaseAuto {
                 new AutoPoint(new Pose2d(13.998, 5.328, Rotation2d.fromDegrees(-134.931))),
                 new AutoPoint(
                     new Pose2d(14.284, 5.615, Rotation2d.fromDegrees(-134.931)),
-                    Commands.runOnce(robotManager::stowRequest)))));
+                    autoCommands.stowRequest()))));
   }
 }
