@@ -177,7 +177,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-      autonomousCommand.cancel();
+    autonomousCommand.cancel();
 
     ElasticLayoutUtil.onEnable();
     if (RobotConfig.IS_DEVELOPMENT) {
