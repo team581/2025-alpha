@@ -1,4 +1,4 @@
-package frc.robot.autos.auto_path_commands;
+package frc.robot.autos.auto_path_commands.blue;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,23 +14,23 @@ import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.robot_manager.RobotState;
 
-public class ThreePiece2IKLAuto extends BaseAuto {
+public class BlueThreePiece2IKLAuto extends BaseAuto {
   private static final AutoConstraintOptions INTAKING_CONSTRAINTS =
       new AutoConstraintOptions(4.75, 57, 4, 30);
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
       new AutoConstraintOptions(2, 57, 4, 30);
 
-  public ThreePiece2IKLAuto(RobotManager robotManager, Trailblazer trailblazer) {
+  public BlueThreePiece2IKLAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
   }
 
   @Override
-  protected Pose2d getBlueStartingPose() {
+  protected Pose2d getStartingPose() {
     return Points.START_2_AND_5.bluePose;
   }
 
   @Override
-  protected Command getBlueAutoCommand() {
+  protected Command createAutoCommand() {
     return Commands.sequence(
         Commands.runOnce(robotManager::rehomeRollRequest),
         // SCORE L4 ON I
@@ -146,122 +146,5 @@ public class ThreePiece2IKLAuto extends BaseAuto {
                         new Pose2d(14.284, 2.435, Rotation2d.fromDegrees(134.931)),
                         Commands.runOnce(robotManager::stowRequest))
                     .pathflipped())));
-  }
-
-  @Override
-  protected Pose2d getRedStartingPose() {
-    return Points.START_2_AND_5.redPose;
-  }
-
-  @Override
-  protected Command getRedAutoCommand() {
-    return Commands.sequence(
-        Commands.runOnce(robotManager::rehomeRollRequest),
-        // SCORE L4 ON I
-        trailblazer
-            .followSegment(
-                new AutoSegment(
-                    SCORING_CONSTRAINTS,
-                    new AutoPoint(Points.START_2_AND_5.redPose, INTAKING_CONSTRAINTS),
-                    new AutoPoint(
-                        new Pose2d(11.785, 2.0, Rotation2d.fromDegrees(60)),
-                        autoCommands
-                            .preloadCoralAfterRollHomed()
-                            .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_I))),
-                    new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
-                false)
-            .until(
-                () ->
-                    robotManager.autoAlign.isTagAlignedDebounced()
-                        && robotManager.imu.isFlatDebounced()),
-        autoCommands.l4ScoreAndReleaseCommand(),
-
-        // INTAKE STATION
-        trailblazer
-            .followSegment(
-                new AutoSegment(
-                    new AutoPoint(
-                        new Pose2d(12.132, 2.243, Rotation2d.fromDegrees(135.88)),
-                        Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
-                    //        new AutoConstraintOptions(4, 57, 4, 30)),
-                    new AutoPoint(new Pose2d(13.636, 1.439, Rotation2d.fromDegrees(135.88))),
-                    new AutoPoint(
-                        new Pose2d(15.241, 1.107, Rotation2d.fromDegrees(135.88)),
-                        new AutoConstraintOptions(2.75, 57, 4, 30)),
-                    new AutoPoint(
-                        Points.LEFT_CORAL_STATION.redPose,
-                        autoCommands.intakeStationWarmupCommand())),
-                false)
-            .until(
-                () ->
-                    robotManager.getState() == RobotState.SMART_STOW_1
-                        || robotManager.getState() == RobotState.SMART_STOW_2),
-
-        // SCORE L4 ON K
-        autoCommands
-            .l4WarmupCommand(ReefPipe.PIPE_K)
-            .alongWith(
-                trailblazer
-                    .followSegment(
-                        new AutoSegment(
-                            SCORING_CONSTRAINTS,
-                            new AutoPoint(
-                                new Pose2d(14.506, 1.903, Rotation2d.fromDegrees(133.277))),
-                            // REEF PIPE K
-                            new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
-                        false)
-                    .until(
-                        () ->
-                            robotManager.autoAlign.isTagAlignedDebounced()
-                                && robotManager.imu.isFlatDebounced())),
-        autoCommands.l4ScoreAndReleaseCommand(),
-
-        // INTAKE STATION
-        trailblazer
-            .followSegment(
-                new AutoSegment(
-                    INTAKING_CONSTRAINTS,
-                    new AutoPoint(
-                        new Pose2d(14.284, 2.087, Rotation2d.fromDegrees(133.277)),
-                        Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
-                    new AutoPoint(
-                        new Pose2d(15.083, 1.439, Rotation2d.fromDegrees(133.277)),
-                        new AutoConstraintOptions(2.75, 57, 4, 30)),
-                    new AutoPoint(
-                        Points.LEFT_CORAL_STATION.redPose,
-                        autoCommands.intakeStationWarmupCommand())),
-                false)
-            .until(
-                () ->
-                    robotManager.getState() == RobotState.SMART_STOW_1
-                        || robotManager.getState() == RobotState.SMART_STOW_2),
-
-        // SCORE L4 ON L
-        autoCommands
-            .l4WarmupCommand(ReefPipe.PIPE_L)
-            .alongWith(
-                trailblazer
-                    .followSegment(
-                        new AutoSegment(
-                            SCORING_CONSTRAINTS,
-                            new AutoPoint(
-                                new Pose2d(14.954, 1.971, Rotation2d.fromDegrees(134.931))),
-                            // REEF PIPE L
-                            new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
-                        false)
-                    .until(
-                        () ->
-                            robotManager.autoAlign.isTagAlignedDebounced()
-                                && robotManager.imu.isFlatDebounced())),
-        autoCommands.l4ScoreAndReleaseCommand(),
-
-        // DRIVE BACK & STOW
-        trailblazer.followSegment(
-            new AutoSegment(
-                SCORING_CONSTRAINTS,
-                new AutoPoint(new Pose2d(13.998, 2.812, Rotation2d.fromDegrees(134.931))),
-                new AutoPoint(
-                    new Pose2d(14.284, 2.435, Rotation2d.fromDegrees(134.931)),
-                    Commands.runOnce(robotManager::stowRequest)))));
   }
 }
