@@ -45,7 +45,7 @@ public abstract class BaseAuto {
     // We continuously reset the pose anyway, but doing it here should be fine
     // It's basically free as long as we aren't updating the IMU
     return Commands.runOnce(() -> robotManager.localization.resetPose(getStartingPose()))
-        .andThen(getAutoCommand())
+        .andThen(createAutoCommand())
         .finallyDo(
             interrupted -> {
               // Check if we are enabled, since auto commands are cancelled during disable
