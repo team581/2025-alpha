@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.config.RobotConfig.ClimberConfig;
@@ -229,10 +228,11 @@ class CompConfig {
                           .withSupplyCurrentLimitEnable(true)
                           .withSupplyCurrentLimit(60)),
               new CANcoderConfiguration()
-                  .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(-0.368896484375)
-                 .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
-                 .withAbsoluteSensorDiscontinuityPoint(0.7)
-          )),
+                  .withMagnetSensor(
+                      new MagnetSensorConfigs()
+                          .withMagnetOffset(-0.368896484375)
+                          .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                          .withAbsoluteSensorDiscontinuityPoint(0.7))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private CompConfig() {}
