@@ -32,7 +32,7 @@ public class RedThreePiece5FDC extends BaseAuto {
   protected Command createAutoCommand() {
     return Commands.sequence(
         Commands.runOnce(robotManager::rehomeRollRequest),
-        // SCORE L4 ON I
+        // SCORE L4 ON F
         trailblazer
             .followSegment(
                 new AutoSegment(
@@ -69,7 +69,7 @@ public class RedThreePiece5FDC extends BaseAuto {
                 false)
             .until(autoCommands::isSmartStowing),
 
-        // SCORE L4 ON K
+        // SCORE L4 ON D
         autoCommands
             .l4WarmupCommand(ReefPipe.PIPE_D)
             .alongWith(
@@ -107,7 +107,7 @@ public class RedThreePiece5FDC extends BaseAuto {
                 false)
             .until(autoCommands::isSmartStowing),
 
-        // SCORE L4 ON L
+        // SCORE L4 ON C
         autoCommands
             .l4WarmupCommand(ReefPipe.PIPE_C)
             .alongWith(
