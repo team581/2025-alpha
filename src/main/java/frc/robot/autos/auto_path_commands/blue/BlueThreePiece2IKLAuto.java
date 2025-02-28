@@ -57,12 +57,12 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                 new AutoSegment(
                     INTAKING_CONSTRAINTS,
                     new AutoPoint(
-                        new Pose2d(5.418, 5.807, Rotation2d.fromDegrees(-45)),
+                        new Pose2d(5.418, 5.807, Rotation2d.fromDegrees(-44.12)),
                         Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                     //        new AutoConstraintOptions(4, 57, 4, 30)),
-                    new AutoPoint(new Pose2d(3.914, 6.611, Rotation2d.fromDegrees(-45))),
+                    new AutoPoint(new Pose2d(3.914, 6.611, Rotation2d.fromDegrees(-44.12))),
                     new AutoPoint(
-                        new Pose2d(2.309, 6.943, Rotation2d.fromDegrees(-45)),
+                        new Pose2d(2.309, 6.943, Rotation2d.fromDegrees(-44.12)),
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
                     new AutoPoint(Points.LEFT_CORAL_STATION.bluePose)),
@@ -78,10 +78,10 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                         new AutoSegment(
                             SCORING_CONSTRAINTS,
                             new AutoPoint(
-                                new Pose2d(2.636, 6.497, Rotation2d.fromDegrees(-47)),
+                                new Pose2d(2.636, 6.497, Rotation2d.fromDegrees(-46.723)),
                                 new AutoConstraintOptions(2.3, 57, 4, 30)),
                             new AutoPoint(
-                                new Pose2d(3.266, 5.963, Rotation2d.fromDegrees(-47)),
+                                new Pose2d(3.266, 5.963, Rotation2d.fromDegrees(-46.723)),
                                 new AutoConstraintOptions(1.5, 57, 4, 30)),
                             // REEF PIPE K
                             new AutoPoint(
@@ -97,10 +97,10 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                 new AutoSegment(
                     INTAKING_CONSTRAINTS,
                     new AutoPoint(
-                        new Pose2d(3.266, 5.963, Rotation2d.fromDegrees(-47)),
+                        new Pose2d(3.266, 5.963, Rotation2d.fromDegrees(-46.723)),
                         Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                     new AutoPoint(
-                        new Pose2d(2.467, 6.611, Rotation2d.fromDegrees(-47)),
+                        new Pose2d(2.467, 6.611, Rotation2d.fromDegrees(-46.723)),
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
                     new AutoPoint(Points.LEFT_CORAL_STATION.bluePose)),
@@ -116,10 +116,10 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                         new AutoSegment(
                             SCORING_CONSTRAINTS,
                             new AutoPoint(
-                                new Pose2d(2.636, 6.249, Rotation2d.fromDegrees(-47)),
+                                new Pose2d(2.636, 6.249, Rotation2d.fromDegrees(-46.723)),
                                 new AutoConstraintOptions(2.3, 57, 4, 30)),
                             new AutoPoint(
-                                new Pose2d(3.266, 5.615, Rotation2d.fromDegrees(-46)),
+                                new Pose2d(3.266, 5.615, Rotation2d.fromDegrees(-45.069)),
                                 new AutoConstraintOptions(1.5, 57, 4, 30)),
                             // REEF PIPE L
                             new AutoPoint(
@@ -133,9 +133,9 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
         trailblazer.followSegment(
             new AutoSegment(
                 INTAKING_CONSTRAINTS,
-                new AutoPoint(new Pose2d(3.552, 5.238, Rotation2d.fromDegrees(-46))),
+                new AutoPoint(new Pose2d(3.552, 5.238, Rotation2d.fromDegrees(-45.069))),
                 new AutoPoint(
-                    new Pose2d(3.266, 5.615, Rotation2d.fromDegrees(-46)),
+                    new Pose2d(3.266, 5.615, Rotation2d.fromDegrees(-45.069)),
                     autoCommands.stowRequest()))));
   }
 }
