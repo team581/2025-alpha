@@ -39,7 +39,7 @@ public class BlueThreePiece2IKLAuto extends BaseAuto {
                     SCORING_CONSTRAINTS,
                     new AutoPoint(Points.START_2_AND_5.bluePose, INTAKING_CONSTRAINTS),
                     new AutoPoint(
-                        new Pose2d(5.765, 2, Rotation2d.fromDegrees(-120)),
+                        new Pose2d(5.765, 6.05, Rotation2d.fromDegrees(-120)),
                         autoCommands
                             .preloadCoralAfterRollHomed()
                             .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_I)),
