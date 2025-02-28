@@ -27,7 +27,7 @@ const inputContents = await fs.readFile(inputPath, "utf8");
 
 const FIELD_LENGTH = 17.55;
 const FIELD_HEIGHT = 8.05;
-const POSE_2D_REGEXP = /new\s+Pose2d\((\d*\.\d+),\s*(\d*\.\d+)/g;
+const POSE_2D_REGEXP = /new\s+Pose2d\(([\d\.]*),\s*([\d\.]*)/g;
 const ROTATION_2D_REGEXP = /Rotation2d\.fromDegrees\((-?[.\d]+)\)/g;
 
 function stupidRound(value, precision) {
