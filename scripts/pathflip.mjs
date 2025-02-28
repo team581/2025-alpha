@@ -1,24 +1,32 @@
 // pathflip if it sucked in every way but worked with trailblazer
-// run with bun or run npm install and run with node
+// node scripts/pathflip.mjs -t vertical -i src/main/java/frc/robot/autos/auto_path_commands/red/RedFourPiece2IJKLAuto.java
+// node scripts/pathflip.mjs -t color -i src/main/java/frc/robot/autos/auto_path_commands/red/RedFourPiece2IJKLAuto.java
 
 import { parseArgs } from "node:util";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import { multiReplace } from "@jonahsnider/util";
 
 const args = parseArgs({
   options: {
     input: { type: "string", short: "i" },
+    transform: { type: "string", short: "t", default: "color" },
   },
 });
 
-const { input: inputPath } = args.values;
+const ALLOWED_TRANSFORMS = ["color", "vertical"];
 
+const { input: inputPath, transform: wantedTransform } = args.values;
+
+assert(
+  ALLOWED_TRANSFORMS.includes(wantedTransform),
+  "transform should be one of " + ALLOWED_TRANSFORMS.join(", ")
+);
 assert(inputPath, "input is required");
 
 const inputContents = await fs.readFile(inputPath, "utf8");
 
 const FIELD_LENGTH = 17.55;
+const FIELD_HEIGHT = 8.05;
 const POSE_2D_REGEXP = /new\s+Pose2d\((\d*\.\d+),\s*(\d*\.\d+)/g;
 const ROTATION_2D_REGEXP = /Rotation2d\.fromDegrees\((\d+)(\.\d+)?\)/g;
 
@@ -31,6 +39,14 @@ function colorFlip(x, y) {
   return {
     x: yAxis - (x - yAxis),
     y,
+  };
+}
+
+function verticalFlip(x, y) {
+  const xAxis = FIELD_HEIGHT / 2;
+  return {
+    x,
+    y: xAxis - (y - xAxis),
   };
 }
 
@@ -51,8 +67,12 @@ function angleModulusDegrees(angle) {
   return angleModulusRadians((angle / 180) * Math.PI) * (180 / Math.PI);
 }
 
-function transformRotation(rotationDeg) {
+function transformRotationColor(rotationDeg) {
   return angleModulusDegrees(-rotationDeg + 180);
+}
+
+function transformRotationVertical(rotationDeg) {
+  return angleModulusDegrees(-rotationDeg);
 }
 
 function transformColors(value) {
@@ -70,17 +90,65 @@ function transformColors(value) {
 function transform(text) {
   const firstPass = text
     .replaceAll(POSE_2D_REGEXP, (_, xString, yString) => {
-      const { x, y } = colorFlip(Number(xString), Number(yString));
-      return `new Pose2d(${stupidRound(x, 3)}, ${stupidRound(y, 3)}`;
+      switch (wantedTransform) {
+        case "color": {
+          const { x, y } = colorFlip(Number(xString), Number(yString));
+          return `new Pose2d(${stupidRound(x, 3)}, ${stupidRound(y, 3)}`;
+        }
+        case "vertical": {
+          const { x, y } = verticalFlip(Number(xString), Number(yString));
+          return `new Pose2d(${stupidRound(x, 3)}, ${stupidRound(y, 3)}`;
+        }
+      }
     })
     .replaceAll(ROTATION_2D_REGEXP, (_, degreesString) => {
-      return `Rotation2d.fromDegrees(${stupidRound(
-        transformRotation(Number(degreesString)),
-        3
-      )})`;
+      switch (wantedTransform) {
+        case "color": {
+          return `Rotation2d.fromDegrees(${stupidRound(
+            transformRotationColor(Number(degreesString)),
+            3
+          )})`;
+        }
+        case "vertical": {
+          return `Rotation2d.fromDegrees(${stupidRound(
+            transformRotationVertical(Number(degreesString)),
+            3
+          )})`;
+        }
+      }
     });
 
-  return transformColors(firstPass);
+  if (wantedTransform === "color") {
+    return transformColors(firstPass);
+  }
+
+  return firstPass;
 }
 
-await fs.writeFile(transformColors(inputPath), transform(inputContents));
+if (wantedTransform === "color") {
+  await fs.writeFile(transformColors(inputPath), transform(inputContents));
+} else {
+  await fs.writeFile(inputPath + "_flipped_vertical", transform(inputContents));
+}
+
+function multiReplace(string, replacements) {
+  const replacementsIterable = Object.entries(replacements);
+  let result = "";
+  let index = 0;
+
+  while (index < string.length) {
+    foundReplace: {
+      for (const [searchValue, replaceValue] of replacementsIterable) {
+        if (string.slice(index).startsWith(searchValue)) {
+          result += replaceValue;
+          index += searchValue.length;
+          break foundReplace;
+        }
+      }
+
+      result += string[index++];
+    }
+  }
+
+  return result;
+}
