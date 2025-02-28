@@ -65,7 +65,7 @@ public class BlueThreePiece5FDC extends BaseAuto {
                         new Pose2d(2.309, 6.943, Rotation2d.fromDegrees(-135)),
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
-                    new AutoPoint(Points.LEFT_CORAL_STATION.bluePose)),
+                    new AutoPoint(Points.RIGHT_CORAL_STATION.bluePose)),
                 false)
             .until(autoCommands::isSmartStowing),
 
@@ -103,7 +103,7 @@ public class BlueThreePiece5FDC extends BaseAuto {
                         new Pose2d(2.467, 6.611, Rotation2d.fromDegrees(-133)),
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
-                    new AutoPoint(Points.LEFT_CORAL_STATION.bluePose)),
+                    new AutoPoint(Points.RIGHT_CORAL_STATION.bluePose)),
                 false)
             .until(autoCommands::isSmartStowing),
 
