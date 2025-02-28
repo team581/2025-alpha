@@ -25,7 +25,7 @@ public class BlueThreePiece5FDC extends BaseAuto {
 
   @Override
   protected Pose2d getStartingPose() {
-    return Points.START_2_AND_5.bluePose;
+    return Points.START_5_AND_2.bluePose;
   }
 
   @Override
@@ -37,7 +37,7 @@ public class BlueThreePiece5FDC extends BaseAuto {
             .followSegment(
                 new AutoSegment(
                     SCORING_CONSTRAINTS,
-                    new AutoPoint(Points.START_2_AND_5.bluePose, INTAKING_CONSTRAINTS),
+                    new AutoPoint(Points.START_5_AND_2.bluePose, INTAKING_CONSTRAINTS),
                     new AutoPoint(
                         new Pose2d(5.765, 6.05, Rotation2d.fromDegrees(-60)),
                         autoCommands
