@@ -24,15 +24,6 @@ public class GamePieceDetectionUtil {
     return robotRelativeToFieldRelativeGamePiecePose(robotPoseAtCapture, robotRelative);
   }
 
-  public static double getFieldRelativeAngleToGamePiece(
-      Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
-    var gamePiecePose =
-        calculateFieldRelativeTranslationFromCamera(robotPoseAtCapture, visionResult);
-    return LocalizationSubsystem.distanceAngleToTarget(
-            new Pose2d(gamePiecePose, Rotation2d.kZero), robotPoseAtCapture)
-        .targetAngle();
-  }
-
   private static Translation2d calculateRobotRelativeTranslationFromCamera(
       GamePieceResult visionResult, Pose3d limelightToRobotOffset) {
 
