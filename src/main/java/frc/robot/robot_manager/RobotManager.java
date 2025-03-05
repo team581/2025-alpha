@@ -1,6 +1,9 @@
 package frc.robot.robot_manager;
 
+import java.util.Optional;
+
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -88,6 +91,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private double reefSnapAngle = 0.0;
   private double coralIntakeAssistAngle = 0.0;
+  private Optional<Translation2d> maybeBestCoralMapTranslation = Optional.empty();
   private ReefSide nearestReefSide = ReefSide.SIDE_GH;
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
   private boolean isRollHomed = false;
@@ -479,7 +483,8 @@ public class RobotManager extends StateMachine<RobotState> {
       case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
         intake.setState(IntakeState.INTAKING_CORAL);
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
-        swerve.snapsDriveRequest(coralIntakeAssistAngle);
+        // Enable assist in periodic if there's coral in map
+        swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_HORIZONTAL);
         vision.setState(VisionState.CORAL_DETECTION);
         lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
@@ -1014,7 +1019,11 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0);
       }
       case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
-        swerve.snapsDriveRequest(coralIntakeAssistAngle);
+        if (maybeBestCoralMapTranslation.isPresent()) {
+          swerve.snapsDriveRequest(coralIntakeAssistAngle);
+        } else {
+          swerve.normalDriveRequest();
+        }
       }
       default -> {}
     }
@@ -1078,7 +1087,10 @@ public class RobotManager extends StateMachine<RobotState> {
   protected void collectInputs() {
     super.collectInputs();
     nearestReefSide = autoAlign.getClosestReefSide();
-    coralIntakeAssistAngle = IntakeAssistUtil.getIntakeAssistAngle(coralMap.getBestCoral(), localization.getPose());
+    maybeBestCoralMapTranslation = coralMap.getBestCoral();
+    if (maybeBestCoralMapTranslation.isPresent()) {
+      coralIntakeAssistAngle = IntakeAssistUtil.getIntakeAssistAngle(maybeBestCoralMapTranslation.get(), localization.getPose());
+    }
     reefSnapAngle = nearestReefSide.getPose().getRotation().getDegrees();
     scoringLevel =
         switch (getState()) {

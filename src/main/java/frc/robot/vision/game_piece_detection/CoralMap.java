@@ -36,7 +36,8 @@ public class CoralMap extends StateMachine<CoralMapState> {
   private static final double HORIZONTAL_LEFT_VIEW = 82.0 / 2.0;
   private static final double VERTICAL_TOP_VIEW = 56.2 / 2.0;
 
-  private static final String LIMELIGHT_NAME = "limelight-coral";
+  // TODO: UPDATE NAME
+  private static final String LIMELIGHT_NAME = "limelight-front";
   private static final NetworkTableEntry LL_TCORNXY =
       NetworkTableInstance.getDefault().getTable(LIMELIGHT_NAME).getEntry("tcornxy");
 
@@ -96,18 +97,23 @@ public class CoralMap extends StateMachine<CoralMapState> {
     return coralTranslations;
   }
 
-  public Translation2d getBestCoral() {
+  public Optional<Translation2d> getBestCoral() {
     Comparator<Pose2d> comparator =
         Comparator.comparingDouble(
             target ->
                 AlignmentCostUtil.getAlignCost(
                     target, localization.getPose(), swerve.getFieldRelativeSpeeds()));
+    if (coralMap.isEmpty()){
+      return Optional.empty();
+    }
 
-    return coralMap.stream()
+    var bestCoral = coralMap.stream()
         .map(coral -> new Pose2d(coral.coralTranslation(), Rotation2d.kZero))
         .min(comparator)
-        .orElseThrow()
-        .getTranslation();
+        .orElseThrow();
+    DogLog.log("CoralMap/BestCoral", bestCoral);
+    return Optional.of(bestCoral.getTranslation());
+
   }
 
   private List<Translation2d> getFilteredCoralPoses() {
@@ -116,7 +122,6 @@ public class CoralMap extends StateMachine<CoralMapState> {
   }
 
   private boolean safeToTrack() {
-
     return swerveSpeeds.vxMetersPerSecond < SWERVE_MAX_LINEAR_SPEED_TRACKING
         && swerveSpeeds.vyMetersPerSecond < SWERVE_MAX_LINEAR_SPEED_TRACKING
         && swerveSpeeds.omegaRadiansPerSecond
