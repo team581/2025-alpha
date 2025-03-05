@@ -1,7 +1,5 @@
 package frc.robot.robot_manager;
 
-import java.util.Optional;
-
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -37,6 +35,7 @@ import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.game_piece_detection.CoralMap;
 import frc.robot.wrist.WristState;
 import frc.robot.wrist.WristSubsystem;
+import java.util.Optional;
 
 public class RobotManager extends StateMachine<RobotState> {
   public final LocalizationSubsystem localization;
@@ -82,7 +81,7 @@ public class RobotManager extends StateMachine<RobotState> {
     this.imu = imu;
     this.swerve = swerve;
     this.localization = localization;
-    this.coralMap =coralMap;
+    this.coralMap = coralMap;
     this.lights = lights;
     this.climber = climber;
     this.autoAlign = autoAlign;
@@ -1089,7 +1088,9 @@ public class RobotManager extends StateMachine<RobotState> {
     nearestReefSide = autoAlign.getClosestReefSide();
     maybeBestCoralMapTranslation = coralMap.getBestCoral();
     if (maybeBestCoralMapTranslation.isPresent()) {
-      coralIntakeAssistAngle = IntakeAssistUtil.getIntakeAssistAngle(maybeBestCoralMapTranslation.get(), localization.getPose());
+      coralIntakeAssistAngle =
+          IntakeAssistUtil.getIntakeAssistAngle(
+              maybeBestCoralMapTranslation.get(), localization.getPose());
     }
     reefSnapAngle = nearestReefSide.getPose().getRotation().getDegrees();
     scoringLevel =
@@ -1125,8 +1126,6 @@ public class RobotManager extends StateMachine<RobotState> {
               ReefPipeLevel.L4;
           default -> ReefPipeLevel.BASE;
         };
-
-
 
     DogLog.log("PurpleAlignment/UsedPose", autoAlign.getUsedScoringPose());
 

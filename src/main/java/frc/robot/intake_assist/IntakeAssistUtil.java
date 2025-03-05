@@ -69,8 +69,7 @@ public class IntakeAssistUtil {
   }
 
   public static double getIntakeAssistAngle(Translation2d target, Pose2d robotPose) {
-    return
-        Units.radiansToDegrees(
-            Math.atan2(target.getY() - robotPose.getY(), target.getX() - robotPose.getX()));
+    return Units.radiansToDegrees(
+        Math.atan2(target.getY() - robotPose.getY(), target.getX() - robotPose.getX()));
   }
 }

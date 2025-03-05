@@ -103,17 +103,17 @@ public class CoralMap extends StateMachine<CoralMapState> {
             target ->
                 AlignmentCostUtil.getAlignCost(
                     target, localization.getPose(), swerve.getFieldRelativeSpeeds()));
-    if (coralMap.isEmpty()){
+    if (coralMap.isEmpty()) {
       return Optional.empty();
     }
 
-    var bestCoral = coralMap.stream()
-        .map(coral -> new Pose2d(coral.coralTranslation(), Rotation2d.kZero))
-        .min(comparator)
-        .orElseThrow();
+    var bestCoral =
+        coralMap.stream()
+            .map(coral -> new Pose2d(coral.coralTranslation(), Rotation2d.kZero))
+            .min(comparator)
+            .orElseThrow();
     DogLog.log("CoralMap/BestCoral", bestCoral);
     return Optional.of(bestCoral.getTranslation());
-
   }
 
   private List<Translation2d> getFilteredCoralPoses() {
