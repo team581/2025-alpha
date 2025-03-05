@@ -7,7 +7,6 @@ import com.ctre.phoenix6.signals.S1StateValue;
 import com.ctre.phoenix6.signals.S2StateValue;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.util.VelocityDetector;
@@ -54,20 +53,13 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     this.candi = candi;
   }
 
-  private final Debouncer topAlgaeVelocityDebouncer = new Debouncer(0.0, DebounceType.kRising);
-  private final Debouncer bottomAlgaeVelocityDebouncer = new Debouncer(0.0, DebounceType.kRising);
-
   @Override
   protected void collectInputs() {
     topMotorVelocity = topMotor.getVelocity().getValueAsDouble();
     bottomMotorVelocity = bottomMotor.getVelocity().getValueAsDouble();
 
-    topMotorAlgaeVelocityGp =
-        topAlgaeVelocityDebouncer.calculate(
-            topMotorAlgaeDetection.hasGamePiece(topMotorVelocity, 20));
-    bottomMotorAlgaeVelocityGp =
-        bottomAlgaeVelocityDebouncer.calculate(
-            bottomMotorAlgaeDetection.hasGamePiece(bottomMotorVelocity, 20));
+    topMotorAlgaeVelocityGp = topMotorAlgaeDetection.hasGamePiece(topMotorVelocity, 20);
+    bottomMotorAlgaeVelocityGp = bottomMotorAlgaeDetection.hasGamePiece(bottomMotorVelocity, 20);
 
     topMotorCoralVelocityGp = topMotorCoralDetection.hasGamePiece(topMotorVelocity, 65);
     bottomMotorCoralVelocityGp = bottomMotorCoralDetection.hasGamePiece(bottomMotorVelocity, 65);
