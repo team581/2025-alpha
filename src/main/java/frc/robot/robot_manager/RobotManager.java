@@ -1,6 +1,7 @@
 package frc.robot.robot_manager;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -90,7 +91,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private double reefSnapAngle = 0.0;
   private double coralIntakeAssistAngle = 0.0;
-  private Optional<Translation2d> maybeBestCoralMapTranslation = Optional.empty();
+  private Optional<Pose2d> maybeBestCoralMapTranslation = Optional.empty();
   private ReefSide nearestReefSide = ReefSide.SIDE_GH;
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
   private boolean isRollHomed = false;
@@ -1088,9 +1089,7 @@ public class RobotManager extends StateMachine<RobotState> {
     nearestReefSide = autoAlign.getClosestReefSide();
     maybeBestCoralMapTranslation = coralMap.getBestCoral();
     if (maybeBestCoralMapTranslation.isPresent()) {
-      coralIntakeAssistAngle =
-          IntakeAssistUtil.getIntakeAssistAngle(
-              maybeBestCoralMapTranslation.get(), localization.getPose());
+      coralIntakeAssistAngle = IntakeAssistUtil.getIntakeAssistAngle(maybeBestCoralMapTranslation.get().getTranslation(), localization.getPose());
     }
     reefSnapAngle = nearestReefSide.getPose().getRotation().getDegrees();
     scoringLevel =

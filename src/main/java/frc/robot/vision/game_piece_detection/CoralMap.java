@@ -47,6 +47,9 @@ public class CoralMap extends StateMachine<CoralMapState> {
   private ChassisSpeeds swerveSpeeds = new ChassisSpeeds();
   private LocalizationSubsystem localization;
   private SwerveSubsystem swerve;
+  private Comparator<Pose2d> bestCoralComparator = Comparator.comparingDouble(
+    target -> AlignmentCostUtil.getAlignCost(target, localization.getPose(), swerve.getFieldRelativeSpeeds())
+  );
 
   public CoralMap(LocalizationSubsystem localization, SwerveSubsystem swerve) {
     super(SubsystemPriority.VISION, CoralMapState.DEFAULT_STATE);
@@ -97,23 +100,20 @@ public class CoralMap extends StateMachine<CoralMapState> {
     return coralTranslations;
   }
 
-  public Optional<Translation2d> getBestCoral() {
-    Comparator<Pose2d> comparator =
-        Comparator.comparingDouble(
-            target ->
-                AlignmentCostUtil.getAlignCost(
-                    target, localization.getPose(), swerve.getFieldRelativeSpeeds()));
-    if (coralMap.isEmpty()) {
+  public Optional<Pose2d> getBestCoral() {
+    if (coralMap.isEmpty()){
       return Optional.empty();
     }
 
-    var bestCoral =
-        coralMap.stream()
-            .map(coral -> new Pose2d(coral.coralTranslation(), Rotation2d.kZero))
-            .min(comparator)
-            .orElseThrow();
-    DogLog.log("CoralMap/BestCoral", bestCoral);
-    return Optional.of(bestCoral.getTranslation());
+    var bestCoral = coralMap.stream()
+        .map(coral -> new Pose2d(coral.coralTranslation(), Rotation2d.kZero))
+        .min(bestCoralComparator);
+
+    if (bestCoral.isPresent()) {
+      DogLog.log("CoralMap/BestCoral", bestCoral.get());
+    }
+
+    return bestCoral;
   }
 
   private List<Translation2d> getFilteredCoralPoses() {
@@ -178,7 +178,7 @@ public class CoralMap extends StateMachine<CoralMapState> {
       DogLog.log(
           "CoralMap/Map",
           coralMap.stream()
-              .map(element -> new Pose2d(element.coralTranslation(), new Rotation2d()))
+              .map(element -> new Pose2d(element.coralTranslation(), Rotation2d.kZero))
               .toArray(Pose2d[]::new));
     } catch (Exception error) {
       DogLog.logFault("CoralMapLoggingError");
