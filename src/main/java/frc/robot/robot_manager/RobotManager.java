@@ -32,6 +32,7 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionState;
 import frc.robot.vision.VisionSubsystem;
+import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.vision.game_piece_detection.CoralMap;
 import frc.robot.wrist.WristState;
 import frc.robot.wrist.WristSubsystem;
@@ -950,6 +951,12 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
+    if (vision.getAlgaeResult().isPresent()) {
+      DogLog.log(
+          "AlgaePose",
+          GamePieceDetectionUtil.calculateFieldRelativeAlgaeTranslationFromCamera(
+              localization.getPose(), vision.getAlgaeResult().get()));
+    }
 
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(
