@@ -62,7 +62,7 @@ public class RedLollipopAuto extends BaseAuto {
                     new Pose2d(13.644, 2.243, Rotation2d.fromDegrees(0)),
                     autoCommands.floorIntakeUprightCoral(),
                     new AutoConstraintOptions(3, 57, 4, 30)),
-                new AutoPoint(Points.LOLLIPOP_1.redPose))),
+                new AutoPoint(Points.LOLLIPOP_LEFT.redPose))),
 
         // SCORE L4 ON K
         autoCommands
@@ -91,7 +91,7 @@ public class RedLollipopAuto extends BaseAuto {
                         new AutoPoint(
                             new Pose2d(14.614, 4.028, Rotation2d.fromDegrees(0)),
                             autoCommands.floorIntakeUprightCoral()),
-                        new AutoPoint(Points.LOLLIPOP_2.redPose))),
+                        new AutoPoint(Points.LOLLIPOP_LEFT.redPose))),
 
                 // SCORE L4 ON L
                 autoCommands
