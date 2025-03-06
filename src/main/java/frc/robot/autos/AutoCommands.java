@@ -87,7 +87,7 @@ public class AutoCommands {
     return robotManager.autoAlign.isTagAlignedDebounced() && robotManager.imu.isFlatDebounced();
   }
 
-  public Command floorIntakeUprightCoral(){
+  public Command floorIntakeUprightCoral() {
     return Commands.runOnce(robotManager::intakeFloorCoralUprightRequest);
   }
 }
