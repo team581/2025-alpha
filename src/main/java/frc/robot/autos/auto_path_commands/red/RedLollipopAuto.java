@@ -92,7 +92,7 @@ public class RedLollipopAuto extends BaseAuto {
                     autoCommands.floorIntakeUprightCoral()),
                 new AutoPoint(Points.LOLLIPOP_LEFT.redPose))),
 
-        // SCORE L4 ON L
+        // SCORE L4 ON A
         autoCommands
             .l4WarmupCommand(ReefPipe.PIPE_A)
             .alongWith(
