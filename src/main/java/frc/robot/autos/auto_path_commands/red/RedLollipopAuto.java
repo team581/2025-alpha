@@ -77,7 +77,7 @@ public class RedLollipopAuto extends BaseAuto {
                             new AutoPoint(
                                 robotManager.autoAlign::getUsedScoringPose,
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
-                                false)
+                        false)
                     .until(autoCommands::alignedForScore),
                 autoCommands.l4ScoreAndReleaseCommand(),
 
@@ -107,7 +107,7 @@ public class RedLollipopAuto extends BaseAuto {
                                 new AutoPoint(
                                     robotManager.autoAlign::getUsedScoringPose,
                                     new AutoConstraintOptions())),
-                                    false))
+                            false))
                     .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand());
   }
