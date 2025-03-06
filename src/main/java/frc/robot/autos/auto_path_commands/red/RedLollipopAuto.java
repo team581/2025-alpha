@@ -42,7 +42,7 @@ public class RedLollipopAuto extends BaseAuto {
                         new Pose2d(11.291, 2.952, Rotation2d.fromDegrees(60)),
                         autoCommands
                             .preloadCoralAfterRollHomed()
-                            .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_I)),
+                            .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_J)),
                         new AutoConstraintOptions(1.5, 57, 4, 30)),
                     new AutoPoint(
                         robotManager.autoAlign::getUsedScoringPose,
@@ -56,7 +56,7 @@ public class RedLollipopAuto extends BaseAuto {
             new AutoSegment(
                 INTAKING_CONSTRAINTS,
                 new AutoPoint(
-                    new Pose2d(12.132, 2.243, Rotation2d.fromDegrees(135.88)),
+                    new Pose2d(12.265, 2.368, Rotation2d.fromDegrees(60)),
                     Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                 new AutoPoint(
                     new Pose2d(13.644, 2.243, Rotation2d.fromDegrees(0)),
