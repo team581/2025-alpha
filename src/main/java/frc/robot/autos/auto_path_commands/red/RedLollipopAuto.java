@@ -25,7 +25,7 @@ public class RedLollipopAuto extends BaseAuto {
 
   @Override
   protected Pose2d getStartingPose() {
-    return Points.START_2_AND_5.redPose;
+    return Points.START_3_AND_4.redPose;
   }
 
   @Override
@@ -37,9 +37,9 @@ public class RedLollipopAuto extends BaseAuto {
             .followSegment(
                 new AutoSegment(
                     SCORING_CONSTRAINTS,
-                    new AutoPoint(Points.START_2_AND_5.redPose, INTAKING_CONSTRAINTS),
+                    new AutoPoint(Points.START_3_AND_4.redPose, INTAKING_CONSTRAINTS),
                     new AutoPoint(
-                        new Pose2d(11.785, 2.0, Rotation2d.fromDegrees(60)),
+                        new Pose2d(11.291, 2.952, Rotation2d.fromDegrees(60)),
                         autoCommands
                             .preloadCoralAfterRollHomed()
                             .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_I)),
