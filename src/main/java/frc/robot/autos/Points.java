@@ -13,7 +13,11 @@ public enum Points {
   START_6_AND_1(new Pose2d(10.289, 7.292, Rotation2d.kZero)),
 
   LEFT_CORAL_STATION(new Pose2d(16.194, 0.861, Rotation2d.fromDegrees(125.309))),
-  RIGHT_CORAL_STATION(new Pose2d(16.1, 7.35, Rotation2d.fromDegrees(-131.807)));
+  RIGHT_CORAL_STATION(new Pose2d(16.1, 7.35, Rotation2d.fromDegrees(-131.807))),
+
+  LOLLIPOP_1(new Pose2d(15.458, 2.243, Rotation2d.kZero)),
+  LOLLIPOP_2(new Pose2d()),
+  LOLLIPOP_3(new Pose2d());
 
   public Pose2d redPose;
   public Pose2d bluePose;
