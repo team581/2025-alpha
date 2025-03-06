@@ -113,7 +113,8 @@ public class RedLollipopAuto extends BaseAuto {
             new AutoSegment(
                 INTAKING_CONSTRAINTS,
                 new AutoPoint(new Pose2d(14.804, 3.809, Rotation2d.fromDegrees(180))),
-                new AutoPoint(new Pose2d(15.085, 3.809, Rotation2d.fromDegrees(180.0)),
+                new AutoPoint(
+                    new Pose2d(15.085, 3.809, Rotation2d.fromDegrees(180.0)),
                     autoCommands.stowRequest()))));
   }
 }
