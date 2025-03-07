@@ -16,6 +16,8 @@ import frc.robot.robot_manager.RobotManager;
 public class RedLollipopAuto extends BaseAuto {
   private static final AutoConstraintOptions INTAKING_CONSTRAINTS =
       new AutoConstraintOptions(4.75, 57, 4, 30);
+  private static final AutoConstraintOptions BEFORE_INTAKING_CONSTRAINTS =
+      new AutoConstraintOptions(1, 57, 4, 30);
   private static final AutoConstraintOptions BEFORE_SCORING_CONSTRAINTS =
       new AutoConstraintOptions(2, 57, 4, 30);
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
@@ -60,8 +62,10 @@ public class RedLollipopAuto extends BaseAuto {
                     Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                 new AutoPoint(
                     new Pose2d(13.644, 2.243, Rotation2d.fromDegrees(0)),
-                    autoCommands.floorIntakeUprightCoral()),
-                new AutoPoint(Points.LOLLIPOP_LEFT.redPose))),
+                    autoCommands.floorIntakeUprightCoral(),
+                    BEFORE_INTAKING_CONSTRAINTS),
+                new AutoPoint(Points.LOLLIPOP_LEFT.redPose,
+                BEFORE_INTAKING_CONSTRAINTS))),
 
         // SCORE L4 ON K
         autoCommands
@@ -88,8 +92,10 @@ public class RedLollipopAuto extends BaseAuto {
                     new AutoConstraintOptions()),
                 new AutoPoint(
                     new Pose2d(14.614, 4.028, Rotation2d.fromDegrees(0)),
-                    autoCommands.floorIntakeUprightCoral()),
-                new AutoPoint(Points.LOLLIPOP_LEFT.redPose))),
+                    autoCommands.floorIntakeUprightCoral(),
+                    BEFORE_INTAKING_CONSTRAINTS),
+                new AutoPoint(Points.LOLLIPOP_LEFT.redPose,
+                BEFORE_INTAKING_CONSTRAINTS))),
 
         // SCORE L4 ON A
         autoCommands
