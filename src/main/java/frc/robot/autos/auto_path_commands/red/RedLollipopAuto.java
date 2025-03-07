@@ -60,8 +60,7 @@ public class RedLollipopAuto extends BaseAuto {
                     Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                 new AutoPoint(
                     new Pose2d(13.644, 2.243, Rotation2d.fromDegrees(0)),
-                    autoCommands.floorIntakeUprightCoral(),
-                    new AutoConstraintOptions(3, 57, 4, 30)),
+                    autoCommands.floorIntakeUprightCoral()),
                 new AutoPoint(Points.LOLLIPOP_LEFT.redPose))),
 
         // SCORE L4 ON K
