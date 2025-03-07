@@ -49,7 +49,8 @@ public class RollSubsystem extends StateMachine<RollState> {
       }
       case SMART_STOW -> {
         smartStowAngle = getSmartStowDirection();
-        motor.setControl(motionMagicRequest.withPosition(Units.degreesToRotations(clamp(smartStowAngle))));
+        motor.setControl(
+            motionMagicRequest.withPosition(Units.degreesToRotations(clamp(smartStowAngle))));
       }
       case UNHOMED -> motor.disable();
       default -> {
@@ -142,6 +143,7 @@ public class RollSubsystem extends StateMachine<RollState> {
       DogLog.clearFault("Roll Unhomed");
     }
   }
+
   private static double clamp(double rollAngle) {
     return MathUtil.clamp(
         rollAngle, RobotConfig.get().roll().minAngle(), RobotConfig.get().roll().maxAngle());
