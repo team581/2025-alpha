@@ -34,6 +34,7 @@ import frc.robot.vision.VisionState;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.vision.game_piece_detection.CoralMap;
+import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.wrist.WristState;
 import frc.robot.wrist.WristSubsystem;
 import java.util.Optional;
