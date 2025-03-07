@@ -8,19 +8,19 @@ public class NetAlign {
     var robotX = robotPose.getX();
     if(isRedAlliance){
       if(robotX > 17.2) {
-        LightsState.NET_SCORE_TOO_CLOSE;
+         return NetAlignState.TOO_FORWARD;
      } else if(robotX < 16.9) {
-        LightsState.NET_SCORE_TOO_FAR;
+        return NetAlignState.TOO_BACKWARD;
      } else {
-        LightsState.NET_SCORE_GOOD;
+        return NetAlignState.GOOD;
      }
     } else {
-       if(robotPose > 17.2) {
-      LightsState.NET_SCORE_TOO_CLOSE;
-   } else if(robotPose < 16.9) {
-      LightsState.NET_SCORE_TOO_FAR;
+       if(robotX > 17.2) {
+        return NetAlignState.TOO_FORWARD;
+   } else if(robotX < 16.9) {
+    return NetAlignState.TOO_BACKWARD;
    } else {
-      LightsState.NET_SCORE_GOOD;
+    return NetAlignState.GOOD;
    }
     }
   }
