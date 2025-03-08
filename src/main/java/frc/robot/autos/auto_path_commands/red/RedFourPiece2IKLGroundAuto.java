@@ -49,7 +49,7 @@ public class RedFourPiece2IKLGroundAuto extends BaseAuto {
                         new AutoConstraintOptions(1.5, 57, 4, 30))),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE GROUND WITH CORAL MAP
         trailblazer
@@ -91,7 +91,7 @@ public class RedFourPiece2IKLGroundAuto extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE GROUND CORAL MAP
         trailblazer
@@ -133,7 +133,7 @@ public class RedFourPiece2IKLGroundAuto extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE GROUND CORAL MAP
         trailblazer
@@ -175,7 +175,7 @@ public class RedFourPiece2IKLGroundAuto extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // DRIVE BACK & STOW
         trailblazer.followSegment(

@@ -49,7 +49,7 @@ public class RedThreePiece5FDC extends BaseAuto {
                         new AutoConstraintOptions(1.5, 57, 4, 30))),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -89,7 +89,7 @@ public class RedThreePiece5FDC extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -127,7 +127,7 @@ public class RedThreePiece5FDC extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // DRIVE BACK & STOW
         trailblazer.followSegment(

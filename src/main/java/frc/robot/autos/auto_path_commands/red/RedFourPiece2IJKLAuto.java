@@ -46,7 +46,7 @@ public class RedFourPiece2IJKLAuto extends BaseAuto {
                     new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -77,7 +77,7 @@ public class RedFourPiece2IJKLAuto extends BaseAuto {
                     new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -108,7 +108,7 @@ public class RedFourPiece2IJKLAuto extends BaseAuto {
                             new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -139,7 +139,7 @@ public class RedFourPiece2IJKLAuto extends BaseAuto {
                             new AutoPoint(robotManager.autoAlign::getUsedScoringPose)),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ScoreAndReleaseCommand(),
+        autoCommands.l4ReleaseCommand(),
 
         // DRIVE BACK & STOW
         trailblazer.followSegment(

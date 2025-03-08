@@ -22,14 +22,15 @@ public class AutoCommands {
     requirements = requirementsList.toArray(Subsystem[]::new);
   }
 
-  public Command l4ScoreAndReleaseCommand() {
-    return Commands.runOnce(robotManager::l4coralPlaceAndReleaseRequest, requirements)
+  //TODO: very dangerous fix ts later
+  public Command l4ReleaseCommand() {
+    return Commands.runOnce(robotManager::l4CoralReleaseRequest, requirements)
         .andThen(
             robotManager
                 .waitForStates(
                     RobotState.CORAL_DISPLACED_L4_4_RELEASE, RobotState.CORAL_CENTERED_L4_4_RELEASE)
                 .withTimeout(1))
-        .withName("L4ScoreAndReleaseCommand");
+        .withName("L4ReleaseCommand");
   }
 
   public Command waitThenStow() {
