@@ -32,8 +32,6 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionState;
 import frc.robot.vision.VisionSubsystem;
-import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
-import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.vision.game_piece_detection.CoralMap;
 import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.wrist.WristState;
@@ -254,7 +252,7 @@ public class RobotManager extends StateMachine<RobotState> {
         yield currentState;
       }
       case CORAL_L1_4_RELEASE,
-         CORAL_CENTERED_L2_4_RELEASE,
+          CORAL_CENTERED_L2_4_RELEASE,
           CORAL_CENTERED_L3_4_RELEASE,
           CORAL_CENTERED_L4_4_RELEASE,
           CORAL_DISPLACED_L2_4_RELEASE,
@@ -953,11 +951,12 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-    if (vision.getAlgaeResult().isPresent()) {
+    var maybeAlgaeResult = vision.getAlgaeResult();
+    if (maybeAlgaeResult.isPresent()) {
       DogLog.log(
           "AlgaePose",
           GamePieceDetectionUtil.calculateFieldRelativeAlgaeTranslationFromCamera(
-              localization.getPose(), vision.getAlgaeResult().get()));
+              localization.getPose(), maybeAlgaeResult.get()));
     }
 
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
@@ -1013,7 +1012,9 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
         if (maybeBestCoralMapTranslation.isPresent()) {
-          swerve.setFieldRelativeCoralAssistSpeedsOffset(IntakeAssistUtil.getAssistSpeedsFromPose(maybeBestCoralMapTranslation.get(), localization.getPose()));
+          swerve.setFieldRelativeCoralAssistSpeedsOffset(
+              IntakeAssistUtil.getAssistSpeedsFromPose(
+                  maybeBestCoralMapTranslation.get(), localization.getPose()));
           swerve.coralAlignmentDriveRequest(coralIntakeAssistAngle);
         } else {
           swerve.normalDriveRequest();

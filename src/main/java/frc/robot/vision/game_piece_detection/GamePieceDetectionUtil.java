@@ -19,8 +19,9 @@ public class GamePieceDetectionUtil {
 
           // Positive-Up
           Units.inchesToMeters(36.09),
-
           new Rotation3d(0, Units.degreesToRadians(32.5), Units.degreesToRadians(-15)));
+  private static final double CORAL_LENGTH = 11.875;
+  private static final double ALGAE_DIAMETER = 16.25;
 
   public static Translation2d calculateFieldRelativeTranslationFromCamera(
       Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
@@ -47,7 +48,8 @@ public class GamePieceDetectionUtil {
 
   public static Translation2d calculateRobotRelativeAlgaeTranslationFromCamera(
       GamePieceResult visionResult, Pose3d limelightToRobotOffset) {
-    double algaeToGroundOffset = 9.0 + (16.25 / 2);
+    double algaeToGroundOffset =
+        (CORAL_LENGTH) + (ALGAE_DIAMETER / 2.0); // length of coral + half of diameter of algae
 
     double thetaX = -1 * Units.degreesToRadians(visionResult.tx());
     double thetaY = Units.degreesToRadians(visionResult.ty());
