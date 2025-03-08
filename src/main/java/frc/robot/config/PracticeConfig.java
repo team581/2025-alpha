@@ -1,6 +1,7 @@
 package frc.robot.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -213,6 +214,8 @@ class PracticeConfig {
               CANIVORE_NAME,
               24,
               25,
+              27,
+              28,
               -55.0,
               215.0,
               new TalonFXConfiguration()
@@ -229,7 +232,9 @@ class PracticeConfig {
                       new MagnetSensorConfigs()
                           .withMagnetOffset(-0.311279296875)
                           .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
-                          .withAbsoluteSensorDiscontinuityPoint(0.75))),
+                          .withAbsoluteSensorDiscontinuityPoint(0.75)),
+              new TalonFXConfiguration(),
+              new CANrangeConfiguration()),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private PracticeConfig() {}
