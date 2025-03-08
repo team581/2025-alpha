@@ -76,9 +76,7 @@ public class AutoCommands {
   }
 
   /**
-   *
    * @deprecated Use {@link #hasCoral()} instead
-
    * @deprecated Use {@link #hasCoral()} instead
    */
   @Deprecated
