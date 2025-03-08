@@ -1272,7 +1272,7 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void intakeFloorCoralUprightRequest() {
-    gamePieceMode = GamePieceMode.CORAL;
+    algaeMode = false;
     switch (getState()) {
       case CLIMBING_1_LINEUP,
           CLIMBING_2_HANGING,
