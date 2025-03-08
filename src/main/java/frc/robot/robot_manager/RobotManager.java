@@ -1005,6 +1005,7 @@ public class RobotManager extends StateMachine<RobotState> {
           swerve.setFieldRelativeCoralAssistSpeedsOffset(
               IntakeAssistUtil.getAssistSpeedsFromPose(
                   maybeBestCoralMapTranslation.get(), localization.getLookaheadPose(0.4)));
+
           swerve.coralAlignmentDriveRequest(coralIntakeAssistAngle);
         } else {
           swerve.normalDriveRequest();
