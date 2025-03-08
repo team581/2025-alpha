@@ -27,12 +27,6 @@ public class IntakeAssistUtil {
     return getRobotRelativeAssistSpeeds(algae, robotHeading, ALGAE_ASSIST_KP, greedyIntake);
   }
 
-  public static ChassisSpeeds getCoralFromAlgaeAssistSpeeds(
-      Optional<GamePieceResult> coralFromAlgae, double robotHeading, boolean greedyIntake) {
-    return getRobotRelativeAssistSpeeds(
-        coralFromAlgae, robotHeading, CORAL_FROM_ALGAE_ASSIST_KP, greedyIntake);
-  }
-
   private static ChassisSpeeds getRobotRelativeAssistSpeeds(
       Optional<GamePieceResult> visionResult,
       double robotHeading,
