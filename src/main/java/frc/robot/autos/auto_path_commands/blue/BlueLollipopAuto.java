@@ -64,8 +64,7 @@ public class BlueLollipopAuto extends BaseAuto {
                     new Pose2d(3.906, 2.243, Rotation2d.fromDegrees(180)),
                     autoCommands.floorIntakeUprightCoral(),
                     BEFORE_INTAKING_CONSTRAINTS),
-                new AutoPoint(Points.LOLLIPOP_LEFT.bluePose,
-                BEFORE_INTAKING_CONSTRAINTS))),
+                new AutoPoint(Points.LOLLIPOP_LEFT.bluePose, BEFORE_INTAKING_CONSTRAINTS))),
 
         // SCORE L4 ON K
         autoCommands
@@ -75,8 +74,7 @@ public class BlueLollipopAuto extends BaseAuto {
                     .followSegment(
                         new AutoSegment(
                             BEFORE_SCORING_CONSTRAINTS,
-                            new AutoPoint(
-                                new Pose2d(3.095, 2.498, Rotation2d.fromDegrees(46.723))),
+                            new AutoPoint(new Pose2d(3.095, 2.498, Rotation2d.fromDegrees(46.723))),
                             new AutoPoint(
                                 robotManager.autoAlign::getUsedScoringPose, SCORING_CONSTRAINTS)),
                         false)
@@ -94,8 +92,7 @@ public class BlueLollipopAuto extends BaseAuto {
                     new Pose2d(2.936, 4.028, Rotation2d.fromDegrees(180)),
                     autoCommands.floorIntakeUprightCoral(),
                     BEFORE_INTAKING_CONSTRAINTS),
-                new AutoPoint(Points.LOLLIPOP_LEFT.bluePose,
-                BEFORE_INTAKING_CONSTRAINTS))),
+                new AutoPoint(Points.LOLLIPOP_LEFT.bluePose, BEFORE_INTAKING_CONSTRAINTS))),
 
         // SCORE L4 ON A
         autoCommands
