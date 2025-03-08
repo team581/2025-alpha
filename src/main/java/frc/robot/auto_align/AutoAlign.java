@@ -131,7 +131,6 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ChassisSpeeds constrainLinearVelocity(ChassisSpeeds speeds, double maxSpeed) {
     var options =
         new AutoConstraintOptions()
-            .withCollisionAvoidance(false)
             .withMaxAngularAcceleration(0)
             .withMaxAngularVelocity(0)
             .withMaxLinearAcceleration(0)
@@ -213,6 +212,15 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
 
   public Pose2d getUsedScoringPose() {
     return usedScoringPose;
+  }
+
+  public Pose2d getUsedScoringPose(ReefPipe pipe) {
+    return tagAlign.getUsedScoringPose(pipe);
+  }
+
+  public Pose2d getUsedScoringPose(ReefPipe pipe, ReefPipeLevel level) {
+    setScoringLevel(level);
+    return getUsedScoringPose(pipe);
   }
 
   public void setDriverPoseOffset(Translation2d offset) {
