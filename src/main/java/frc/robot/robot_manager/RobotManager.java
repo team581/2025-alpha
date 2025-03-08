@@ -91,6 +91,8 @@ public class RobotManager extends StateMachine<RobotState> {
   private double reefSnapAngle = 0.0;
   private double coralIntakeAssistAngle = 0.0;
   private Optional<Pose2d> maybeBestCoralMapTranslation = Optional.empty();
+  private double algaeIntakeAssistAngle = 0.0;
+  private Optional<Pose2d> maybeBestAlgaeMapTranslation = Optional.empty();
   private ReefSide nearestReefSide = ReefSide.SIDE_GH;
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
   private boolean isRollHomed = false;
@@ -294,7 +296,8 @@ public class RobotManager extends StateMachine<RobotState> {
 
       case INTAKE_CORAL_FLOOR_HORIZONTAL,
           INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL,
-          INTAKE_CORAL_FLOOR_UPRIGHT -> {
+          INTAKE_CORAL_FLOOR_UPRIGHT,
+          INTAKE_ASSIST_ALGAE_TELEOP -> {
         if (intake.getHasGP()) {
           rumbleController.rumbleRequest();
           yield RobotState.IDLE_CORAL;
@@ -470,6 +473,16 @@ public class RobotManager extends StateMachine<RobotState> {
         roll.setState(RollState.CORAL_HORIZONTAL);
         vision.setState(VisionState.CORAL_DETECTION);
         lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
+        climber.setState(ClimberState.STOWED);
+      }
+      case INTAKE_ASSIST_ALGAE_TELEOP -> {
+        intake.setState(IntakeState.INTAKING_ALGAE);
+        moveSuperstructure(ElevatorState.GROUND_ALGAE_INTAKE, WristState.GROUND_ALGAE_INTAKE);
+        // Enable assist in periodic if there's coral in map
+        swerve.normalDriveRequest();
+        roll.setState(RollState.ALGAE);
+        vision.setState(VisionState.ALGAE_DETECTION);
+        lights.setState(LightsState.IDLE_NO_GP_ALGAE_MODE);
         climber.setState(ClimberState.STOWED);
       }
       case DISLODGE_ALGAE_L2_WAIT -> {
@@ -1002,6 +1015,16 @@ public class RobotManager extends StateMachine<RobotState> {
           swerve.normalDriveRequest();
         }
       }
+      case INTAKE_ASSIST_ALGAE_TELEOP -> {
+        if (maybeBestAlgaeMapTranslation.isPresent()) {
+          swerve.setFieldRelativeAlgaeAssistSpeedsOffset(
+              IntakeAssistUtil.getAssistSpeedsFromPose(
+                  maybeBestAlgaeMapTranslation.get(), localization.getLookaheadPose(0.4)));
+          swerve.algaeAlignmentDriveRequest(reefSnapAngle);
+        } else {
+          swerve.normalDriveRequest();
+        }
+      }
       default -> {}
     }
 
@@ -1158,7 +1181,8 @@ public class RobotManager extends StateMachine<RobotState> {
       case INTAKE_CORAL_FLOOR_HORIZONTAL,
           INTAKE_CORAL_FLOOR_UPRIGHT,
           INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL,
-          INTAKE_ALGAE_FLOOR -> {
+          INTAKE_ALGAE_FLOOR,
+          INTAKE_ASSIST_ALGAE_TELEOP -> {
         algaeMode = newAlgaeActive;
         if (newAlgaeActive) {
           setStateFromRequest(RobotState.INTAKE_ALGAE_FLOOR);
@@ -1279,6 +1303,20 @@ public class RobotManager extends StateMachine<RobotState> {
           REHOME_ROLL,
           REHOME_WRIST -> {}
       default -> setStateFromRequest(RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL);
+    }
+  }
+
+  public void intakeAssistFloorAlgaeRequest() {
+    algaeMode = true;
+    switch (getState()) {
+      case CLIMBING_1_LINEUP,
+          CLIMBING_2_HANGING,
+          CLIMBING_3_HANGING_2,
+          CLIMBING_4_HANGING_3,
+          REHOME_ELEVATOR,
+          REHOME_ROLL,
+          REHOME_WRIST -> {}
+      default -> setStateFromRequest(RobotState.INTAKE_ASSIST_ALGAE_TELEOP);
     }
   }
 
@@ -1549,6 +1587,7 @@ public class RobotManager extends StateMachine<RobotState> {
           DISLODGE_ALGAE_L3_PUSHING,
           INTAKE_CORAL_FLOOR_HORIZONTAL,
           INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL,
+          INTAKE_ASSIST_ALGAE_TELEOP,
           INTAKE_CORAL_FLOOR_UPRIGHT,
           INTAKE_CORAL_STATION_BACK,
           INTAKE_CORAL_STATION_FRONT,

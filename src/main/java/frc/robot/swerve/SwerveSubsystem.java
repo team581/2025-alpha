@@ -100,6 +100,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
 
   private ChassisSpeeds coralAssistSpeedsOffset = new ChassisSpeeds();
+  private ChassisSpeeds algaeAssistSpeedsOffset = new ChassisSpeeds();
 
   private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoAlignAutoSpeeds = new ChassisSpeeds();
@@ -156,6 +157,10 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setFieldRelativeCoralAssistSpeedsOffset(ChassisSpeeds speeds) {
     coralAssistSpeedsOffset = speeds;
+  }
+
+  public void setFieldRelativeAlgaeAssistSpeedsOffset(ChassisSpeeds speeds) {
+    algaeAssistSpeedsOffset = speeds;
   }
 
   public void setAutoAlignAutoSpeeds(ChassisSpeeds speeds) {
@@ -453,6 +458,16 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       setStateFromRequest(SwerveState.AUTO_SNAPS);
     } else {
       setStateFromRequest(SwerveState.INTAKE_ASSIST_CORAL_TELEOP);
+    }
+  }
+
+  public void algaeAlignmentDriveRequest(double snapAngle) {
+    setSnapToAngle(snapAngle);
+
+    if (DriverStation.isAutonomous()) {
+      setStateFromRequest(SwerveState.AUTO_SNAPS);
+    } else {
+      setStateFromRequest(SwerveState.INTAKE_ASSIST_ALGAE_TELEOP);
     }
   }
 
