@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto_align.AutoAlign;
+import frc.robot.auto_align.NetAlign;
 import frc.robot.auto_align.ReefAlignState;
 import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.ReefSide;
@@ -16,6 +17,7 @@ import frc.robot.climber.ClimberSubsystem;
 import frc.robot.controller.RumbleControllerSubsystem;
 import frc.robot.elevator.ElevatorState;
 import frc.robot.elevator.ElevatorSubsystem;
+import frc.robot.fms.FmsSubsystem;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeState;
 import frc.robot.intake.IntakeSubsystem;
@@ -811,7 +813,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getBackwardNetDirection(localization.getPose()));
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-        lights.setState(LightsState.IDLE_WITH_ALGAE);
+        lights.setState(getNetLightsState());
         climber.setState(ClimberState.STOWED);
       }
       case NET_BACK_SCORING -> {
@@ -820,7 +822,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getBackwardNetDirection(localization.getPose()));
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-        lights.setState(LightsState.IDLE_WITH_ALGAE);
+        lights.setState(getNetLightsState());
         climber.setState(ClimberState.STOWED);
       }
       case NET_FORWARD_WAITING, NET_FORWARD_PREPARE_TO_SCORE -> {
@@ -829,7 +831,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getForwardNetDirection(localization.getPose()));
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-        lights.setState(LightsState.IDLE_WITH_ALGAE);
+        lights.setState(getNetLightsState());
         climber.setState(ClimberState.STOWED);
       }
       case NET_FORWARD_SCORING -> {
@@ -838,7 +840,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getForwardNetDirection(localization.getPose()));
         roll.setState(RollState.ALGAE);
         vision.setState(VisionState.TAGS);
-        lights.setState(LightsState.SCORING);
+        lights.setState(getNetLightsState());
         climber.setState(ClimberState.STOWED);
       }
       case PROCESSOR_WAITING, PROCESSOR_PREPARE_TO_SCORE -> {
@@ -1810,6 +1812,15 @@ public class RobotManager extends StateMachine<RobotState> {
       // TODO: Once purple is implemented, only say we're ready once purple is aligned
       case HAS_TAGS_IN_POSITION, HAS_PURPLE_ALIGNED -> LightsState.SCORE_ALIGN_READY;
       default -> LightsState.SCORE_ALIGN_NOT_READY;
+    };
+  }
+
+  private LightsState getNetLightsState() {
+    var state = NetAlign.getAlignState(localization.getPose(), FmsSubsystem.isRedAlliance());
+    return switch (state) {
+      case GOOD -> LightsState.NET_SCORE_GOOD;
+      case TOO_FORWARD -> LightsState.NET_SCORE_TOO_FORWARD;
+      case TOO_BACKWARD -> LightsState.NET_SCORE_TOO_BACKWARD;
     };
   }
 

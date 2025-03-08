@@ -19,9 +19,8 @@ public enum LightsState {
   SCORE_ALIGN_READY(Color.kGreen, BlinkPattern.SOLID),
 
   NET_SCORE_GOOD(Color.kGreen, BlinkPattern.SOLID),
-  NET_SCORE_TOO_CLOSE(Color.kOrange, BlinkPattern.SOLID),
-  NET_SCORE_TOO_FAR(Color.kBlue, BlinkPattern.SOLID),
-
+  NET_SCORE_TOO_FORWARD(Color.kOrange, BlinkPattern.SOLID),
+  NET_SCORE_TOO_BACKWARD(Color.kBlue, BlinkPattern.SOLID),
 
   SCORING(Color.kGreen, BlinkPattern.BLINK_FAST),
 
