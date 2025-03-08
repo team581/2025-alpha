@@ -48,7 +48,6 @@ public class AlignmentCostUtil {
 
   public static double getCoralAlignCost(
       Pose2d target, Pose2d robotPose, ChassisSpeeds robotVelocity) {
-
     var distanceCost = target.getTranslation().getDistance(robotPose.getTranslation());
     if (target.getTranslation().equals(Translation2d.kZero)
         || robotPose.getTranslation().equals(Translation2d.kZero)) {
