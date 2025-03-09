@@ -13,6 +13,7 @@ import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.ReefSide;
 import frc.robot.climber.ClimberState;
 import frc.robot.climber.ClimberSubsystem;
+import frc.robot.config.FeatureFlags;
 import frc.robot.controller.RumbleControllerSubsystem;
 import frc.robot.elevator.ElevatorState;
 import frc.robot.elevator.ElevatorSubsystem;
@@ -1001,12 +1002,18 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0);
       }
       case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
-        if (maybeBestCoralMapTranslation.isPresent()) {
+        if (DriverStation.isTeleop() && maybeBestCoralMapTranslation.isPresent()) {
+          Pose2d lookaheadPose = localization.getLookaheadPose(0.5);
+          DogLog.log("IntakeAssist/LookaheadPose", lookaheadPose);
           swerve.setFieldRelativeCoralAssistSpeedsOffset(
               IntakeAssistUtil.getAssistSpeedsFromPose(
-                  maybeBestCoralMapTranslation.get(), localization.getLookaheadPose(0.4)));
-
-          swerve.coralAlignmentDriveRequest(coralIntakeAssistAngle);
+                  maybeBestCoralMapTranslation.get(), lookaheadPose));
+          swerve.coralAlignmentDriveRequest();
+        } else if (DriverStation.isAutonomous()) {
+          var coralSnapAngle =
+              IntakeAssistUtil.getIntakeAssistAngle(
+                  maybeBestCoralMapTranslation.get().getTranslation(), localization.getPose());
+          swerve.snapsDriveRequest(coralSnapAngle);
         } else {
           swerve.normalDriveRequest();
         }
@@ -1047,15 +1054,15 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     // Prevent this from interfering with the lights for field calibration
-    // if (!FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
-    if (vision.isAnyCameraOffline()) {
-      lights.setDisabledState(LightsState.ERROR);
-    } else if (wrist.getState() == WristState.PRE_MATCH_HOMING && !wrist.rangeOfMotionGood()) {
-      lights.setDisabledState(LightsState.UNHOMED);
-    } else {
-      lights.setDisabledState(LightsState.HEALTHY);
+    if (!FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
+      if (vision.isAnyCameraOffline()) {
+        lights.setDisabledState(LightsState.ERROR);
+      } else if (wrist.getState() == WristState.PRE_MATCH_HOMING && !wrist.rangeOfMotionGood()) {
+        lights.setDisabledState(LightsState.UNHOMED);
+      } else {
+        lights.setDisabledState(LightsState.HEALTHY);
+      }
     }
-    // }
 
     autoAlign.setDriverPoseOffset(swerve.getPoseOffset());
     switch (swerve.getState()) {
@@ -1073,12 +1080,7 @@ public class RobotManager extends StateMachine<RobotState> {
     super.collectInputs();
     nearestReefSide = autoAlign.getClosestReefSide();
     maybeBestCoralMapTranslation = coralMap.getBestCoral();
-    if (maybeBestCoralMapTranslation.isPresent()) {
-      coralIntakeAssistAngle =
-          IntakeAssistUtil.getIntakeAssistAngle(
-              maybeBestCoralMapTranslation.get().getTranslation(),
-              localization.getLookaheadPose(0.2));
-    }
+
     reefSnapAngle = nearestReefSide.getPose().getRotation().getDegrees();
     scoringLevel =
         switch (getState()) {
@@ -1120,7 +1122,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
     autoAlign.setScoringLevel(scoringLevel);
     autoAlign.setTeleopSpeeds(swerve.getTeleopSpeeds());
-    if (vision.isAnyScoringTagLimelightOnline()) {
+    if (vision.isAnyScoringTagLimelightOnline() || DriverStation.isAutonomous()) {
       var idealAlignSpeeds =
           switch (getState()) {
             case INTAKE_ALGAE_L2, INTAKE_ALGAE_L3 -> autoAlign.getAlgaeAlignSpeeds();
