@@ -89,6 +89,7 @@ public class Trailblazer {
                       }
                     },
                     swerve))
+            .finallyDo(swerve::finishTrailblazerRequest)
             .withName("FollowSegmentIndefinitely");
 
     if (shouldEnd) {
