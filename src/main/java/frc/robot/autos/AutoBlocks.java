@@ -63,15 +63,28 @@ public class AutoBlocks {
                     () -> pipe.getPose(ReefPipeLevel.L4).transformBy(PIPE_APPROACH_OFFSET)))));
   }
 
-  public Command intakeStation(CoralStation station) {
+  public Command intakeStationFront(CoralStation station) {
     return trailblazer
         .followSegment(
             new AutoSegment(
                 BASE_CONSTRAINTS,
                 new AutoPoint(
-                    station.pose.transformBy(STATION_APPROACH_OFFSET),
-                    Commands.runOnce(robotManager::intakeStationRequest)),
-                new AutoPoint(station.pose, Commands.runOnce(robotManager::intakeStationRequest))),
+                    station.frontLoadPose.transformBy(STATION_APPROACH_OFFSET),
+                    Commands.runOnce(robotManager::intakeStationFrontRequest)),
+                new AutoPoint(station.frontLoadPose)),
+            false)
+        .until(autoCommands::hasCoral);
+  }
+
+  public Command intakeStationBack(CoralStation station) {
+    return trailblazer
+        .followSegment(
+            new AutoSegment(
+                BASE_CONSTRAINTS,
+                new AutoPoint(
+                    station.backLoadPose.transformBy(STATION_APPROACH_OFFSET),
+                    Commands.runOnce(robotManager::intakeStationBackRequest)),
+                new AutoPoint(station.backLoadPose)),
             false)
         .until(autoCommands::isSmartStowing);
   }

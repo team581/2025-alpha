@@ -56,13 +56,13 @@ public class RedThreePiece2IKLAuto extends BaseAuto {
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
-        blocks.intakeStation(CoralStation.NON_PROCESSOR_SIDE_RED),
+        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_RED),
 
         // SCORE L4 ON K
         blocks.scoreL4(ReefPipe.PIPE_K),
 
         // INTAKE STATION
-        blocks.intakeStation(CoralStation.NON_PROCESSOR_SIDE_RED),
+        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_RED),
 
         // SCORE L4 ON L
         blocks.scoreL4(ReefPipe.PIPE_L));
