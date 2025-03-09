@@ -62,6 +62,7 @@ public class Trailblazer {
             .alongWith(
                 Commands.run(
                     () -> {
+                      swerve.startTrailblazerRequest();
                       pathTracker.updateRobotState(
                           localization.getPose(), swerve.getFieldRelativeSpeeds());
                       var currentAutoPointIndex = pathTracker.getCurrentPointIndex();

@@ -475,4 +475,12 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       setStateFromRequest(SwerveState.TELEOP);
     }
   }
+
+  public void startTrailblazerRequest() {
+    if (DriverStation.isAutonomous()) {
+      setStateFromRequest(SwerveState.AUTO);
+    } else {
+      setStateFromRequest(SwerveState.TELEOP_TRAILBLAZER);
+    }
+  }
 }
