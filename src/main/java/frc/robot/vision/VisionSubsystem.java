@@ -1,11 +1,14 @@
 package frc.robot.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.imu.ImuSubsystem;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
+import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.vision.limelight.Limelight;
 import frc.robot.vision.limelight.LimelightState;
-import frc.robot.vision.results.GamePieceResult;
 import frc.robot.vision.results.TagResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,19 +59,19 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     var maybeFrontLeftResult = frontLeftLimelight.getTagResult();
 
     if (maybeBottomResult.isPresent()) {
-      tagResult.add(maybeBottomResult.get());
+      tagResult.add(maybeBottomResult.orElseThrow());
     }
 
     if (maybeBackResult.isPresent()) {
-      tagResult.add(maybeBackResult.get());
+      tagResult.add(maybeBackResult.orElseThrow());
     }
 
     if (maybeFrontRightResult.isPresent()) {
-      tagResult.add(maybeFrontRightResult.get());
+      tagResult.add(maybeFrontRightResult.orElseThrow());
     }
 
     if (maybeFrontLeftResult.isPresent()) {
-      tagResult.add(maybeFrontLeftResult.get());
+      tagResult.add(maybeFrontLeftResult.orElseThrow());
     }
   }
 
@@ -135,10 +138,6 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     backTagLimelight.setClosestScoringReefTag(tagID);
   }
 
-  public Optional<GamePieceResult> getCoralResult() {
-    return frontCoralLimelight.getCoralResult();
-  }
-
   public boolean isAnyCameraOffline() {
     return frontCoralLimelight.getCameraHealth() == CameraHealth.OFFLINE
         || backTagLimelight.getCameraHealth() == CameraHealth.OFFLINE
@@ -184,5 +183,24 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     }
 
     return false;
+  }
+
+  public Optional<Pose2d> getLollipopPose(LocalizationSubsystem localization) {
+    var maybeAlgaeResult = frontCoralLimelight.getAlgaeResult();
+
+    if (maybeAlgaeResult.isEmpty()) {
+      return Optional.empty();
+    }
+
+    var algaeResult = maybeAlgaeResult.orElseThrow();
+    var angleToCoral =
+        GamePieceDetectionUtil.getFieldRelativeAngleToGamePiece(
+            localization.getPose(algaeResult.timestamp()), algaeResult);
+
+    return Optional.of(
+        new Pose2d(
+            GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
+                localization.getPose(algaeResult.timestamp()), algaeResult),
+            Rotation2d.fromDegrees(angleToCoral)));
   }
 }

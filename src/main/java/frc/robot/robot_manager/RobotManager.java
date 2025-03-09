@@ -13,6 +13,7 @@ import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.auto_align.ReefSide;
 import frc.robot.climber.ClimberState;
 import frc.robot.climber.ClimberSubsystem;
+import frc.robot.config.FeatureFlags;
 import frc.robot.controller.RumbleControllerSubsystem;
 import frc.robot.elevator.ElevatorState;
 import frc.robot.elevator.ElevatorSubsystem;
@@ -40,7 +41,7 @@ import java.util.Optional;
 public class RobotManager extends StateMachine<RobotState> {
   public final LocalizationSubsystem localization;
 
-  private final VisionSubsystem vision;
+  public final VisionSubsystem vision;
   public final ImuSubsystem imu;
 
   public final CoralMap coralMap;
@@ -854,7 +855,6 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(
         "RobotManager/ShouldIntakeForward",
@@ -902,10 +902,20 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
         if (maybeBestCoralMapTranslation.isPresent()) {
-          swerve.setFieldRelativeCoralAssistSpeedsOffset(
-              IntakeAssistUtil.getAssistSpeedsFromPose(
-                  maybeBestCoralMapTranslation.get(), localization.getLookaheadPose(0.4)));
-          swerve.coralAlignmentDriveRequest(coralIntakeAssistAngle);
+          var bestCoralMapTranslation = maybeBestCoralMapTranslation.orElseThrow();
+
+          if (DriverStation.isTeleop()) {
+            Pose2d lookaheadPose = localization.getLookaheadPose(0.5);
+            DogLog.log("IntakeAssist/LookaheadPose", lookaheadPose);
+            swerve.setFieldRelativeCoralAssistSpeedsOffset(
+                IntakeAssistUtil.getAssistSpeedsFromPose(bestCoralMapTranslation, lookaheadPose));
+            swerve.coralAlignmentDriveRequest();
+          } else {
+            var coralSnapAngle =
+                IntakeAssistUtil.getIntakeAssistAngle(
+                    bestCoralMapTranslation.getTranslation(), localization.getPose());
+            swerve.snapsDriveRequest(coralSnapAngle);
+          }
         } else {
           swerve.normalDriveRequest();
         }
@@ -940,15 +950,15 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     // Prevent this from interfering with the lights for field calibration
-    // if (!FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
-    if (vision.isAnyCameraOffline()) {
-      lights.setDisabledState(LightsState.ERROR);
-    } else if (wrist.getState() == WristState.PRE_MATCH_HOMING && !wrist.rangeOfMotionGood()) {
-      lights.setDisabledState(LightsState.UNHOMED);
-    } else {
-      lights.setDisabledState(LightsState.HEALTHY);
+    if (!FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
+      if (vision.isAnyCameraOffline()) {
+        lights.setDisabledState(LightsState.ERROR);
+      } else if (wrist.getState() == WristState.PRE_MATCH_HOMING && !wrist.rangeOfMotionGood()) {
+        lights.setDisabledState(LightsState.UNHOMED);
+      } else {
+        lights.setDisabledState(LightsState.HEALTHY);
+      }
     }
-    // }
 
     autoAlign.setDriverPoseOffset(swerve.getPoseOffset());
     switch (swerve.getState()) {
@@ -966,12 +976,7 @@ public class RobotManager extends StateMachine<RobotState> {
     super.collectInputs();
     nearestReefSide = autoAlign.getClosestReefSide();
     maybeBestCoralMapTranslation = coralMap.getBestCoral();
-    if (maybeBestCoralMapTranslation.isPresent()) {
-      coralIntakeAssistAngle =
-          IntakeAssistUtil.getIntakeAssistAngle(
-              maybeBestCoralMapTranslation.get().getTranslation(),
-              localization.getLookaheadPose(0.2));
-    }
+
     reefSnapAngle = nearestReefSide.getPose().getRotation().getDegrees();
     scoringLevel =
         switch (getState()) {
@@ -999,13 +1004,13 @@ public class RobotManager extends StateMachine<RobotState> {
           default -> ReefPipeLevel.BASE;
         };
 
-    DogLog.log("PurpleAlignment/UsedPose", autoAlign.getUsedScoringPose());
+    DogLog.log("AutoAlign/UsedPose", autoAlign.getUsedScoringPose());
 
     vision.setClosestScoringReefTag(nearestReefSide.getTagID());
 
     autoAlign.setScoringLevel(scoringLevel);
     autoAlign.setTeleopSpeeds(swerve.getTeleopSpeeds());
-    if (vision.isAnyScoringTagLimelightOnline()) {
+    if (vision.isAnyScoringTagLimelightOnline() || DriverStation.isAutonomous()) {
       var idealAlignSpeeds =
           switch (getState()) {
             case INTAKE_ALGAE_L2, INTAKE_ALGAE_L3 -> autoAlign.getAlgaeAlignSpeeds();
@@ -1578,7 +1583,7 @@ public class RobotManager extends StateMachine<RobotState> {
       elevator.setState(elevatorGoal);
       wrist.setState(wristGoal);
     } else {
-      var intermediaryPosition = maybeIntermediaryPosition.get();
+      var intermediaryPosition = maybeIntermediaryPosition.orElseThrow();
 
       // A collision was detected, so we need to go to an intermediary point
       elevator.setCollisionAvoidanceGoal(intermediaryPosition.elevatorHeight());
@@ -1591,9 +1596,8 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private LightsState getLightStateForScoring() {
     return switch (autoAlign.getReefAlignState()) {
-      case TAG_CAMERAS_DEAD, PURPLE_CAMERA_DEAD -> LightsState.ERROR;
-      // TODO: Once purple is implemented, only say we're ready once purple is aligned
-      case HAS_TAGS_IN_POSITION, HAS_PURPLE_ALIGNED -> LightsState.SCORE_ALIGN_READY;
+      case ALL_CAMERAS_DEAD -> LightsState.ERROR;
+      case HAS_TAGS_IN_POSITION -> LightsState.SCORE_ALIGN_READY;
       default -> LightsState.SCORE_ALIGN_NOT_READY;
     };
   }

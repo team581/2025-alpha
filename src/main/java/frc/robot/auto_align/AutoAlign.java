@@ -131,7 +131,6 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ChassisSpeeds constrainLinearVelocity(ChassisSpeeds speeds, double maxSpeed) {
     var options =
         new AutoConstraintOptions()
-            .withCollisionAvoidance(false)
             .withMaxAngularAcceleration(0)
             .withMaxAngularVelocity(0)
             .withMaxLinearAcceleration(0)
@@ -215,6 +214,15 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     return usedScoringPose;
   }
 
+  public Pose2d getUsedScoringPose(ReefPipe pipe) {
+    return tagAlign.getUsedScoringPose(pipe);
+  }
+
+  public Pose2d getUsedScoringPose(ReefPipe pipe, ReefPipeLevel level) {
+    setScoringLevel(level);
+    return getUsedScoringPose(pipe);
+  }
+
   public void setDriverPoseOffset(Translation2d offset) {
     tagAlign.setDriverPoseOffset(offset);
   }
@@ -228,8 +236,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
             frontLeftLimelight.getCameraHealth(), frontRightLimelight.getCameraHealth());
 
     if (combinedTagHealth == CameraHealth.OFFLINE) {
-
-      return ReefAlignState.TAG_CAMERAS_DEAD;
+      return ReefAlignState.ALL_CAMERAS_DEAD;
     }
 
     if (tagResult.isEmpty()) {
