@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.intake_assist.IntakeAssistUtil;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.vision.results.GamePieceResult;
 
@@ -62,9 +63,7 @@ public class GamePieceDetectionUtil {
       Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
     var gamePiecePose =
         calculateFieldRelativeTranslationFromCamera(robotPoseAtCapture, visionResult);
-    return LocalizationSubsystem.distanceAngleToTarget(
-            new Pose2d(gamePiecePose, Rotation2d.kZero), robotPoseAtCapture)
-        .targetAngle();
+    return IntakeAssistUtil.getIntakeAssistAngle(gamePiecePose, robotPoseAtCapture);
   }
 
   public static Translation2d calculateRobotRelativeLollipopTranslationFromCamera(
@@ -180,7 +179,8 @@ public class GamePieceDetectionUtil {
 
   public static Translation2d calculateRobotRelativeLollipopPoseToIntake(
       GamePieceResult visionResult, double offset) {
-    var robotRelativeGamePiecePose = calculateRobotRelativeLollipopTranslationFromCamera(visionResult);
+    var robotRelativeGamePiecePose =
+        calculateRobotRelativeLollipopTranslationFromCamera(visionResult);
     return new Translation2d(
         robotRelativeGamePiecePose.getX() - offset, robotRelativeGamePiecePose.getY());
   }
