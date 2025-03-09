@@ -157,19 +157,68 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case PREPARE_UNJAM_CORAL_STATION ->
           elevator.atGoal() && wrist.atGoal() ? RobotState.UNJAM_CORAL_STATION : currentState;
-      case CORAL_CENTERED_L2_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L2_3_PLACE : currentState;
-      case CORAL_CENTERED_L3_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L3_3_PLACE : currentState;
-      case CORAL_CENTERED_L4_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L4_3_PLACE : currentState;
 
-      case CORAL_DISPLACED_L2_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L2_3_PLACE : currentState;
-      case CORAL_DISPLACED_L3_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L3_3_PLACE : currentState;
-      case CORAL_DISPLACED_L4_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L4_3_PLACE : currentState;
+      case CORAL_CENTERED_L2_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_CENTERED_L2_3_PLACE;
+      }
+      // case CORAL_CENTERED_L2_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L2_3_PLACE : currentState;
+      case CORAL_CENTERED_L3_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_CENTERED_L3_3_PLACE;
+      }
+      // case CORAL_CENTERED_L3_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L3_3_PLACE : currentState;
+      case CORAL_CENTERED_L4_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_CENTERED_L4_3_PLACE;
+      }
+      // case CORAL_CENTERED_L4_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L4_3_PLACE : currentState;
+
+      case CORAL_DISPLACED_L2_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_DISPLACED_L2_3_PLACE;
+      }
+      // case CORAL_DISPLACED_L2_2_LINEUP ->
+          // shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L2_3_PLACE : currentState;
+      case CORAL_DISPLACED_L3_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_DISPLACED_L3_3_PLACE;
+      }
+      // case CORAL_DISPLACED_L3_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L3_3_PLACE : currentState;
+      case CORAL_DISPLACED_L4_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_DISPLACED_L4_3_PLACE;
+      }
+      // case CORAL_DISPLACED_L4_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L4_3_PLACE : currentState;
 
       case CORAL_L3_1_APPROACH -> {
         var isClose =
@@ -1141,7 +1190,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     var isFarEnoughFromReefSide =
-        !AutoAlign.isCloseToReefSide(localization.getPose(), nearestReefSide.getPose(), 0.75);
+        !AutoAlign.isCloseToPose(localization.getPose(), nearestReefSide.getPose(), 0.75);
 
     return isFarEnoughFromReefSide;
   }
