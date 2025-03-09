@@ -51,6 +51,13 @@ public class GamePieceDetectionUtil {
     double algaeToGroundOffset =
         (CORAL_LENGTH) + (ALGAE_DIAMETER / 2.0); // length of coral + half of diameter of algae
 
+    // Pose3d limelightToRobotOffset =
+    //     new Pose3d(
+    //         limelightToRobotOffset1.getX(),
+    //         limelightToRobotOffset1.getY(),
+    //         limelightToRobotOffset1.getZ() - (CORAL_LENGTH) + (ALGAE_DIAMETER / 2.0),
+    //         limelightToRobotOffset1.getRotation());
+
     double thetaX = -1 * Units.degreesToRadians(visionResult.tx());
     double thetaY = Units.degreesToRadians(visionResult.ty());
     double adjustedThetaY = limelightToRobotOffset.getRotation().getY() - thetaY;
@@ -61,7 +68,7 @@ public class GamePieceDetectionUtil {
     } else {
       yOffset =
           // .getZ() represents height from floor
-          (limelightToRobotOffset.getZ() - algaeToGroundOffset / Math.tan(adjustedThetaY))
+          ((limelightToRobotOffset.getZ()-algaeToGroundOffset) / Math.tan(adjustedThetaY))
               // .getX() is supposed to represent forward and backward distance from center of robot
               + Math.abs(limelightToRobotOffset.getX());
     }
@@ -71,8 +78,7 @@ public class GamePieceDetectionUtil {
     var cameraRelativeTranslation = new Translation2d(yOffset, xOffset);
     var robotRelativeTranslation =
         cameraRelativeTranslation
-            .rotateBy(
-                new Rotation2d(limelightToRobotOffset.getRotation().getZ() - algaeToGroundOffset))
+            .rotateBy(new Rotation2d(limelightToRobotOffset.getRotation().getZ()))
             .plus(limelightToRobotOffset.getTranslation().toTranslation2d());
     return robotRelativeTranslation;
   }
