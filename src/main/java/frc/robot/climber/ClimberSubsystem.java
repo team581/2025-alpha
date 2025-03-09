@@ -21,7 +21,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   private final TalonFX climbMotor;
   private final CANcoder encoder;
   private final TalonFX grabMotor;
-  private final CANrange canrange;
+  private final CANrange canRange;
   private final Debouncer climbMotorDirectionDebouncer = new Debouncer(1.0, DebounceType.kBoth);
   private double climbMotorDirection = 0;
   private double cancoderDirection = 0;
@@ -39,7 +39,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     this.climbMotor = climbMotor;
     this.encoder = encoder;
     this.grabMotor = grabMotor;
-    this.canrange = canrange;
+    this.canRange = canrange;
 
     climbMotor.getConfigurator().apply(RobotConfig.get().climber().climbMotorConfig());
     encoder.getConfigurator().apply(RobotConfig.get().climber().cancoderConfig());
@@ -86,7 +86,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     }
 
     if (getState() == ClimberState.LINEUP && !holdingCage) {
-      grabMotor.setVoltage(3);
+      grabMotor.setVoltage(6);
     } else {
       grabMotor.disable();
     }
@@ -118,7 +118,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     cancoderDirection = Math.signum(climbMotor.getVelocity().getValueAsDouble());
     climbMotorDirection = Math.signum(encoder.getVelocity().getValueAsDouble());
 
-    holdingCage = canrange.getIsDetected().getValue();
+    holdingCage = canRange.getIsDetected().getValue();
 
     DogLog.log("Climber/Cancoder/Direction", cancoderDirection);
     DogLog.log("Climber/Cancoder/Angle", currentAngle);
@@ -126,7 +126,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     DogLog.log("Climber/ClimbMotor/Direction", climbMotorDirection);
     DogLog.log("Climber/ClimbMotor/Angle", cilmberMotorAngle);
 
-    DogLog.log("Climber/GrabbingCage", canrange.getIsDetected().getValue());
+    DogLog.log("Climber/GrabbingCage", holdingCage);
 
     DogLog.log("Climber/AppliedVoltage", climbMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Climber/StatorCurrent", climbMotor.getStatorCurrent().getValueAsDouble());
