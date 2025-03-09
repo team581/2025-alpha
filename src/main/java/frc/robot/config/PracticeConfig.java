@@ -230,7 +230,7 @@ class PracticeConfig {
               new CANcoderConfiguration()
                   .withMagnetSensor(
                       new MagnetSensorConfigs()
-                          .withMagnetOffset(-0.311279296875)
+                          .withMagnetOffset(-0.242431640625)
                           .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
                           .withAbsoluteSensorDiscontinuityPoint(0.75)),
               new TalonFXConfiguration()
