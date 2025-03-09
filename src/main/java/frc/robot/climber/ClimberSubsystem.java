@@ -53,13 +53,13 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   public void robotPeriodic() {
     super.robotPeriodic();
 
-    if (!climberDirectionBad) {
-      climberDirectionBad =
-          climbMotorDirectionDebouncer.calculate(
-              cancoderDirection != 0
-                  && climbMotorDirection != 0
-                  && cancoderDirection != climbMotorDirection);
-    }
+    // if (!climberDirectionBad) {
+    //   climberDirectionBad =
+    //       climbMotorDirectionDebouncer.calculate(
+    //           cancoderDirection != 0
+    //               && climbMotorDirection != 0
+    //               && cancoderDirection != climbMotorDirection);
+    // }
 
     if (climberDirectionBad) {
       DogLog.logFault("Climber Direction Bad", AlertType.kError);
