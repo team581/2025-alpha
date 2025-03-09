@@ -17,7 +17,7 @@ public class RedLollipopAuto extends BaseAuto {
   private static final AutoConstraintOptions INTAKING_CONSTRAINTS =
       new AutoConstraintOptions(4.75, 57, 4, 30);
   private static final AutoConstraintOptions BEFORE_INTAKING_CONSTRAINTS =
-      new AutoConstraintOptions(1, 57, 4, 30);
+      new AutoConstraintOptions(0.75, 57, 4, 30);
   private static final AutoConstraintOptions BEFORE_SCORING_CONSTRAINTS =
       new AutoConstraintOptions(2, 57, 4, 30);
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
@@ -56,10 +56,11 @@ public class RedLollipopAuto extends BaseAuto {
         // INTAKE LOLLIPOP 1
         trailblazer.followSegment(
             new AutoSegment(
-                INTAKING_CONSTRAINTS,
+                BEFORE_INTAKING_CONSTRAINTS,
                 new AutoPoint(
                     new Pose2d(12.265, 2.368, Rotation2d.fromDegrees(60)),
-                    Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
+                    Commands.waitSeconds(0.25).andThen(robotManager::stowRequest),
+                    BEFORE_INTAKING_CONSTRAINTS),
                 new AutoPoint(
                     new Pose2d(13.644, 2.243, Rotation2d.fromDegrees(0)),
                     autoCommands.floorIntakeUprightCoral(),
@@ -67,48 +68,45 @@ public class RedLollipopAuto extends BaseAuto {
                 new AutoPoint(Points.LOLLIPOP_LEFT.redPose, BEFORE_INTAKING_CONSTRAINTS))),
 
         // SCORE L4 ON K
-        autoCommands
-            .l4WarmupCommand(ReefPipe.PIPE_K)
-            .alongWith(
-                trailblazer
-                    .followSegment(
-                        new AutoSegment(
-                            BEFORE_SCORING_CONSTRAINTS,
-                            new AutoPoint(
-                                new Pose2d(14.455, 2.498, Rotation2d.fromDegrees(133.277))),
-                            new AutoPoint(
-                                robotManager.autoAlign::getUsedScoringPose, SCORING_CONSTRAINTS)),
-                        false)
-                    .until(autoCommands::alignedForScore)),
+        trailblazer
+            .followSegment(
+                new AutoSegment(
+                    BEFORE_SCORING_CONSTRAINTS,
+                    new AutoPoint(new Pose2d(15.260, 2.368, Rotation2d.fromDegrees(133.277))),
+                    new AutoPoint(
+                        new Pose2d(14.455, 2.498, Rotation2d.fromDegrees(133.277)),
+                        autoCommands.l4WarmupCommand(ReefPipe.PIPE_K)),
+                    new AutoPoint(robotManager.autoAlign::getUsedScoringPose, SCORING_CONSTRAINTS)),
+                false)
+            .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE LOLLIPOP 2
         trailblazer.followSegment(
             new AutoSegment(
-                INTAKING_CONSTRAINTS,
+                BEFORE_INTAKING_CONSTRAINTS,
                 new AutoPoint(
                     new Pose2d(14.455, 2.498, Rotation2d.fromDegrees(84.276)),
-                    new AutoConstraintOptions()),
+                    BEFORE_INTAKING_CONSTRAINTS),
                 new AutoPoint(
                     new Pose2d(14.614, 4.028, Rotation2d.fromDegrees(0)),
                     autoCommands.floorIntakeUprightCoral(),
                     BEFORE_INTAKING_CONSTRAINTS),
-                new AutoPoint(Points.LOLLIPOP_LEFT.redPose, BEFORE_INTAKING_CONSTRAINTS))),
+                new AutoPoint(Points.LOLLIPOP_MIDDLE.redPose, BEFORE_INTAKING_CONSTRAINTS))),
 
         // SCORE L4 ON A
-        autoCommands
-            .l4WarmupCommand(ReefPipe.PIPE_A)
-            .alongWith(
-                trailblazer
-                    .followSegment(
-                        new AutoSegment(
-                            BEFORE_SCORING_CONSTRAINTS,
-                            new AutoPoint(new Pose2d(15.085, 3.809, Rotation2d.fromDegrees(180.0))),
-                            new AutoPoint(new Pose2d(14.804, 3.809, Rotation2d.fromDegrees(180))),
-                            new AutoPoint(
-                                robotManager.autoAlign::getUsedScoringPose, SCORING_CONSTRAINTS)),
-                        false)
-                    .until(autoCommands::alignedForScore)),
+        trailblazer
+            .followSegment(
+                new AutoSegment(
+                    BEFORE_SCORING_CONSTRAINTS,
+                    new AutoPoint(new Pose2d(15.588, 3.809, Rotation2d.fromDegrees(180.0))),
+                    new AutoPoint(
+                        new Pose2d(15.085, 3.809, Rotation2d.fromDegrees(180.0)),
+                        autoCommands.l4WarmupCommand(ReefPipe.PIPE_A)),
+                    new AutoPoint(new Pose2d(14.804, 3.809, Rotation2d.fromDegrees(180))),
+                    new AutoPoint(robotManager.autoAlign::getUsedScoringPose, SCORING_CONSTRAINTS)),
+                false)
+            .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // DRIVE BACK & STOW
