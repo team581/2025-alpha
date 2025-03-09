@@ -17,7 +17,7 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 
 public class ClimberSubsystem extends StateMachine<ClimberState> {
-  private static final double TOLERANCE = 3;
+  private static final double TOLERANCE = 1.5;
   private final TalonFX climbMotor;
   private final CANcoder encoder;
   private final TalonFX grabMotor;
