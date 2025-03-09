@@ -6,6 +6,8 @@ import frc.robot.autos.auto_path_commands.blue.BlueFrontThreePiece2IKLAuto;
 import frc.robot.autos.auto_path_commands.blue.BluePushPartnerAuto;
 import frc.robot.autos.auto_path_commands.blue.BlueThreePiece2IKLAuto;
 import frc.robot.autos.auto_path_commands.blue.BlueThreePiece5FDC;
+import frc.robot.autos.auto_path_commands.red.ConstraintTestAuto;
+import frc.robot.autos.auto_path_commands.red.ConstraintTestAutoTwo;
 import frc.robot.autos.auto_path_commands.red.RedDoNothingAuto;
 import frc.robot.autos.auto_path_commands.red.RedFourPiece2IKLGroundAuto;
 import frc.robot.autos.auto_path_commands.red.RedFrontThreePiece2IKLAuto;
@@ -23,6 +25,9 @@ public enum AutoSelection {
   FOUR_PIECE_2IJKA_GROUND(RedFourPiece2IKLGroundAuto::new, BlueThreePiece2IKLAuto::new),
   THREE_PIECE_5FDC_GROUND(RedThreePiece5FDC::new, BlueFourPiece5FDCGround::new),
   // FOUR_PIECE_5FEDC(RedFourPiece5FEDC::new, BlueFourPiece5FEDC::new),
+
+  CONSTRAINT_TEST_1(ConstraintTestAuto::new, BlueDoNothingAuto::new),
+  CONSTRAINT_TEST_2(ConstraintTestAutoTwo::new, BlueDoNothingAuto::new),
   THREE_PIECE_2IKL(RedThreePiece2IKLAuto::new, BlueThreePiece2IKLAuto::new),
   FRONT_THREE_PIECE_2IKL(RedFrontThreePiece2IKLAuto::new, BlueFrontThreePiece2IKLAuto::new),
   THREE_PIECE_5FDC(RedThreePiece5FDC::new, BlueThreePiece5FDC::new);

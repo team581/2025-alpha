@@ -67,8 +67,12 @@ public class Trailblazer {
                       var currentAutoPointIndex = pathTracker.getCurrentPointIndex();
                       var currentAutoPoint = segment.points.get(currentAutoPointIndex);
 
+
                       var constrainedVelocityGoal =
-                          getSwerveSetpoint(currentAutoPoint, segment.defaultConstraints);
+                          getSwerveSetpoint(
+                              currentAutoPoint,
+                              segment.defaultConstraints,
+                             segment.getLastPoint().orElse(localization.getPose()));
                       swerve.setFieldRelativeAutoSpeeds(constrainedVelocityGoal);
 
                       DogLog.log("Trailblazer/Tracker/CurrentPointIndex", currentAutoPointIndex);
@@ -106,7 +110,7 @@ public class Trailblazer {
   }
 
   private ChassisSpeeds getSwerveSetpoint(
-      AutoPoint point, AutoConstraintOptions segmentConstraints) {
+      AutoPoint point, AutoConstraintOptions segmentConstraints, Pose2d endPose) {
     double currentTimestamp = Timer.getFPGATimestamp();
     if (previousTimestamp == 0.0) {
       previousTimestamp = currentTimestamp - 0.02;
@@ -114,10 +118,16 @@ public class Trailblazer {
     var robotPose = localization.getPose();
     var originalTargetPose = pathTracker.getTargetPose();
     var originalVelocityGoal = pathFollower.calculateSpeeds(robotPose, originalTargetPose);
-    var currentVelocity =
-        Math.hypot(originalVelocityGoal.vxMetersPerSecond, originalVelocityGoal.vyMetersPerSecond);
+    var originalConstraints = resolveConstraints(point, segmentConstraints);
+    var newLinearVelocity =
+        AutoConstraintCalculator.getDynamicVelocityConstraint(
+            robotPose,
+            endPose,
+            swerve.getFieldRelativeSpeeds(),
+            originalConstraints.maxLinearVelocity(),
+            originalConstraints.maxLinearAcceleration());
+    var usedConstraints = originalConstraints.withMaxLinearVelocity(newLinearVelocity);
 
-    var usedConstraints = resolveConstraints(point, segmentConstraints);
     DogLog.log(
         "Trailblazer/Constraints/VelocityCalculation/CalculatedVelocity",
         usedConstraints.maxLinearVelocity());

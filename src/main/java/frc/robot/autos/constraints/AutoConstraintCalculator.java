@@ -1,5 +1,8 @@
 package frc.robot.autos.constraints;
 
+import dev.doglog.DogLog;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class AutoConstraintCalculator {
@@ -125,6 +128,28 @@ public class AutoConstraintCalculator {
           constrainedAngularAcceleration);
     }
     return inputSpeeds;
+  }
+
+    public static double getDynamicVelocityConstraint(
+      Pose2d currentPose,
+      Pose2d endWaypoint,
+      ChassisSpeeds currentSpeeds,
+      double oldVelocityConstraint,
+      double accelerationLimit) {
+    var distanceToEnd = currentPose.getTranslation().getDistance(endWaypoint.getTranslation());
+    DogLog.log("Debug/DistanceToEnd", distanceToEnd);
+    var currentVelocity =
+        Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    DogLog.log("Debug/CurrentVelocity", distanceToEnd);
+
+    var timeToTraverse = distanceToEnd / currentVelocity;
+    var acceleration = (accelerationLimit - currentVelocity) / timeToTraverse;
+    if (Math.abs(acceleration) < accelerationLimit) {
+      return oldVelocityConstraint;
+    }
+    var velocityConstraint = acceleration * timeToTraverse;
+    var clampedConstraint = MathUtil.clamp(Math.abs(velocityConstraint), 0.5, 5.0);
+    return clampedConstraint;
   }
 
   private AutoConstraintCalculator() {}

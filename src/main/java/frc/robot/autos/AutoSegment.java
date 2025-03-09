@@ -2,6 +2,10 @@ package frc.robot.autos;
 
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.geometry.Pose2d;
 
 /**
  * A segment is a path (a continuous set of {@link AutoPoint points}) that the roobt will follow.
@@ -31,5 +35,12 @@ public class AutoSegment {
   public AutoSegment pathflipped() {
     return new AutoSegment(
         defaultConstraints, points.stream().map(AutoPoint::pathflipped).toList());
+  }
+
+  public Optional<Pose2d> getLastPoint() {
+    if (points.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(points.get(points.size() - 1).poseSupplier.get());
   }
 }

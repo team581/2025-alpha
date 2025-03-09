@@ -3,6 +3,9 @@ package frc.robot;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -11,8 +14,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto_align.AutoAlign;
 import frc.robot.auto_align.field_calibration.FieldCalibrationUtil;
+import frc.robot.autos.AutoPoint;
+import frc.robot.autos.AutoSegment;
 import frc.robot.autos.Autos;
 import frc.robot.autos.Trailblazer;
+import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.climber.ClimberSubsystem;
 import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
@@ -250,7 +256,15 @@ public class Robot extends TimedRobot {
         .onFalse(robotCommands.setAlgaeModeCommand(false));
     hardware.driverController.start().onTrue(robotCommands.unjamCommand());
     hardware.driverController.back().onTrue(localization.getZeroCommand());
-
+   hardware.operatorController.rightTrigger().whileTrue(
+    trailblazer.followSegment(
+      new AutoSegment(
+        new AutoPoint(
+          new Pose2d(localization.getPose().getTranslation().minus(new Translation2d(0,2)), Rotation2d.kZero),
+          new AutoConstraintOptions(4, 57, 1, 30))
+        )
+      )
+   );
     hardware.operatorController.a().onTrue(robotCommands.rehomeElevatorCommand());
     hardware.operatorController.b().onTrue(robotCommands.rehomeWristCommand());
     hardware.operatorController.y().onTrue(robotCommands.rehomeRollCommand());
