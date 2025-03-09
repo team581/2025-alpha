@@ -50,7 +50,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                                 ReefPipe.PIPE_I, ReefPipeLevel.L4))),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -86,7 +86,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                                 ReefPipe.PIPE_J, ReefPipeLevel.L4))),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -120,7 +120,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                                         ReefPipe.PIPE_K, ReefPipeLevel.L4))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -154,7 +154,7 @@ public class RedFourPiece5FEDC extends BaseAuto {
                                         ReefPipe.PIPE_L, ReefPipeLevel.L4))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // DRIVE BACK & STOW
         trailblazer.followSegment(

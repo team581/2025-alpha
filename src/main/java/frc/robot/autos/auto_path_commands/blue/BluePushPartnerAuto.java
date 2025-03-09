@@ -59,7 +59,7 @@ public class BluePushPartnerAuto extends BaseAuto {
                         new AutoConstraintOptions(1.5, 57, 4, 30))),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -101,7 +101,7 @@ public class BluePushPartnerAuto extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
         trailblazer
@@ -141,7 +141,7 @@ public class BluePushPartnerAuto extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // DRIVE BACK & STOW
         trailblazer.followSegment(

@@ -52,7 +52,7 @@ public class RedFrontThreePiece2IKLAuto extends BaseAuto {
                         new AutoConstraintOptions(1.5, 57, 4, 30))),
                 false)
             .until(autoCommands::alignedForScore),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
         autoCommands
             .waitThenStow()
             .alongWith(
@@ -97,7 +97,7 @@ public class RedFrontThreePiece2IKLAuto extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
         autoCommands
             .waitThenStow()
             .alongWith(
@@ -139,7 +139,7 @@ public class RedFrontThreePiece2IKLAuto extends BaseAuto {
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
-        autoCommands.l4ReleaseCommand(),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // DRIVE BACK & STOW
         trailblazer.followSegment(
