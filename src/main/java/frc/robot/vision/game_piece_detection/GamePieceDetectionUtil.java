@@ -50,10 +50,10 @@ public class GamePieceDetectionUtil {
     return robotRelativeToFieldRelativeGamePiecePose(robotPoseAtCapture, robotRelative);
   }
 
-  public static Translation2d calculateFieldRelativeAlgaeTranslationFromCamera(
+  public static Translation2d calculateFieldRelativeLollipopTranslationFromCamera(
       Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
     var robotRelative =
-        calculateRobotRelativeAlgaeTranslationFromCamera(
+        calculateRobotRelativeLollipopTranslationFromCamera(
             visionResult, LIMELIGHT_POSE_TO_ROBOT_WITH_ALGAE_OFFSET);
     return robotRelativeToFieldRelativeGamePiecePose(robotPoseAtCapture, robotRelative);
   }
@@ -67,7 +67,7 @@ public class GamePieceDetectionUtil {
         .targetAngle();
   }
 
-  public static Translation2d calculateRobotRelativeAlgaeTranslationFromCamera(
+  public static Translation2d calculateRobotRelativeLollipopTranslationFromCamera(
       GamePieceResult visionResult, Pose3d limelightToRobotOffset) {
 
     double thetaX = Units.degreesToRadians(visionResult.tx());
@@ -102,9 +102,9 @@ public class GamePieceDetectionUtil {
     return robotRelativeTranslation;
   }
 
-  public static Translation2d calculateRobotRelativeAlgaeTranslationFromCamera(
+  public static Translation2d calculateRobotRelativeLollipopTranslationFromCamera(
       GamePieceResult visionResult) {
-    return calculateRobotRelativeAlgaeTranslationFromCamera(
+    return calculateRobotRelativeLollipopTranslationFromCamera(
         visionResult, LIMELIGHT_POSE_TO_ROBOT_WITH_ALGAE_OFFSET);
   }
 
@@ -178,9 +178,9 @@ public class GamePieceDetectionUtil {
         robotRelativeGamePiecePose.getX() - offset, robotRelativeGamePiecePose.getY());
   }
 
-  public static Translation2d calculateRobotRelativeAlgaePoseToIntake(
+  public static Translation2d calculateRobotRelativeLollipopPoseToIntake(
       GamePieceResult visionResult, double offset) {
-    var robotRelativeGamePiecePose = calculateRobotRelativeAlgaeTranslationFromCamera(visionResult);
+    var robotRelativeGamePiecePose = calculateRobotRelativeLollipopTranslationFromCamera(visionResult);
     return new Translation2d(
         robotRelativeGamePiecePose.getX() - offset, robotRelativeGamePiecePose.getY());
   }

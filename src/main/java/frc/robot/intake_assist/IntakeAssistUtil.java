@@ -15,7 +15,6 @@ public class IntakeAssistUtil {
   private static final double FINAL_SHOVE_DISTANCE_FROM_CORAL = 0.5;
   private static final double CORAL_ASSIST_KP = 3.0;
   private static final double ALGAE_ASSIST_KP = 2.0;
-  private static final double CORAL_FROM_ALGAE_ASSIST_KP = 2.0;
 
   public static ChassisSpeeds getCoralAssistSpeeds(
       Optional<GamePieceResult> coral, double robotHeading, boolean greedyIntake) {

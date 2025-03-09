@@ -945,8 +945,8 @@ public class RobotManager extends StateMachine<RobotState> {
     var maybeAlgaeResult = vision.getAlgaeResult();
     if (maybeAlgaeResult.isPresent()) {
       DogLog.log(
-          "AlgaePose",
-          GamePieceDetectionUtil.calculateFieldRelativeAlgaeTranslationFromCamera(
+          "AlgaePose/Pose",
+          GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
               localization.getPose(), maybeAlgaeResult.get()));
     }
 
