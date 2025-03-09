@@ -23,6 +23,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   private final TalonFX grabMotor;
   private final CANrange canRange;
   private final Debouncer climbMotorDirectionDebouncer = new Debouncer(1.0, DebounceType.kBoth);
+  private final Debouncer canRangeDebouncer = new Debouncer(0.25, DebounceType.kBoth);
   private double climbMotorDirection = 0;
   private double cancoderDirection = 0;
   private boolean climberDirectionBad = false;
@@ -86,7 +87,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     }
 
     if (getState() == ClimberState.LINEUP && !holdingCage) {
-      grabMotor.setVoltage(12);
+      grabMotor.setVoltage(-12);
     } else {
       grabMotor.disable();
     }
@@ -118,7 +119,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     cancoderDirection = Math.signum(climbMotor.getVelocity().getValueAsDouble());
     climbMotorDirection = Math.signum(encoder.getVelocity().getValueAsDouble());
 
-    holdingCage = canRange.getIsDetected().getValue();
+    holdingCage = canRangeDebouncer.calculate(canRange.getIsDetected().getValue());
 
     DogLog.log("Climber/Cancoder/Direction", cancoderDirection);
     DogLog.log("Climber/Cancoder/Angle", currentAngle);
@@ -126,7 +127,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     DogLog.log("Climber/ClimbMotor/Direction", climbMotorDirection);
     DogLog.log("Climber/ClimbMotor/Angle", cilmberMotorAngle);
 
-    DogLog.log("Climber/GrabbingCage", holdingCage);
+    DogLog.log("Climber/HoldingCage", holdingCage);
 
     DogLog.log("Climber/AppliedVoltage", climbMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log("Climber/StatorCurrent", climbMotor.getStatorCurrent().getValueAsDouble());
