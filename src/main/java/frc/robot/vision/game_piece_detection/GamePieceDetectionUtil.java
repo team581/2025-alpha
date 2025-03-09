@@ -147,13 +147,6 @@ public class GamePieceDetectionUtil {
     return calculateRobotRelativeTranslationFromCamera(visionResult, LIMELIGHT_POSE_TO_ROBOT);
   }
 
-  public static double getRobotRelativeAngleToGamePiece(GamePieceResult visionResult) {
-    var gamePiecePose = calculateRobotRelativeTranslationFromCamera(visionResult);
-    return LocalizationSubsystem.distanceAngleToTarget(
-            new Pose2d(gamePiecePose, Rotation2d.kZero), Pose2d.kZero)
-        .targetAngle();
-  }
-
   private static Translation2d robotRelativeToFieldRelativeGamePiecePose(
       Pose2d robotPose, Translation2d robotRelativeGamePiecePose) {
     return robotRelativeGamePiecePose
