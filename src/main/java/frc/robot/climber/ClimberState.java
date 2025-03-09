@@ -5,7 +5,7 @@ public enum ClimberState {
   LINEUP(0.0, 12, -12),
   HANGING(40.0, 12, -12),
   HANGING_2(60.0, 12, -12),
-  HANGING_3(80.0, 12, -12);
+  HANGING_3(83.0, 12, -12);
 
   public final double angle;
   public final double forwardsVoltage;
