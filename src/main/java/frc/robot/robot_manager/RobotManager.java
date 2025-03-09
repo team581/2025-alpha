@@ -447,7 +447,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_CORAL_FLOOR_UPRIGHT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
-        moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
+        moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.UPRIGHT_CORAL_INTAKE);
         swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_UPRIGHT);
         vision.setState(VisionState.CORAL_DETECTION);
