@@ -237,9 +237,9 @@ class PracticeConfig {
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
-                          .withStatorCurrentLimit(15)
+                          .withStatorCurrentLimit(25)
                           .withSupplyCurrentLimitEnable(true)
-                          .withSupplyCurrentLimit(15)),
+                          .withSupplyCurrentLimit(25)),
               new CANrangeConfiguration()),
           new LightsConfig(RIO_CAN_NAME, 18));
 
