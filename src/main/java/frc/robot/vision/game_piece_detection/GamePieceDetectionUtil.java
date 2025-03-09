@@ -24,8 +24,26 @@ public class GamePieceDetectionUtil {
               Units.degreesToRadians(32.5),
               Units.degreesToRadians(-15)));
 
+
   private static final double CORAL_LENGTH = 11.875;
   private static final double ALGAE_DIAMETER = 16.25;
+  private static final double algaeToGroundOffset =
+        (CORAL_LENGTH) + (ALGAE_DIAMETER / 2.0); // length of coral + half of diameter of algae
+
+        public static final Pose3d LIMELIGHT_POSE_TO_ROBOT_WITH_ALGAE_OFFSET =
+              new Pose3d(
+                  // Positive-Forward
+                  Units.inchesToMeters(11.41),
+                  // Positive-Left
+                  Units.inchesToMeters(10.22),
+
+                  // Positive-Up
+                  Units.inchesToMeters(36.09-algaeToGroundOffset),
+                  new Rotation3d(
+                      Units.degreesToRadians(-5),
+                      Units.degreesToRadians(32.5),
+                      Units.degreesToRadians(-15)));
+
 
   public static Translation2d calculateFieldRelativeTranslationFromCamera(
       Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
@@ -37,7 +55,7 @@ public class GamePieceDetectionUtil {
   public static Translation2d calculateFieldRelativeAlgaeTranslationFromCamera(
       Pose2d robotPoseAtCapture, GamePieceResult visionResult) {
     var robotRelative =
-        calculateRobotRelativeAlgaeTranslationFromCamera(visionResult, LIMELIGHT_POSE_TO_ROBOT);
+        calculateRobotRelativeAlgaeTranslationFromCamera(visionResult, LIMELIGHT_POSE_TO_ROBOT_WITH_ALGAE_OFFSET);
     return robotRelativeToFieldRelativeGamePiecePose(robotPoseAtCapture, robotRelative);
   }
 
@@ -52,44 +70,43 @@ public class GamePieceDetectionUtil {
 
   public static Translation2d calculateRobotRelativeAlgaeTranslationFromCamera(
       GamePieceResult visionResult, Pose3d limelightToRobotOffset) {
-    double algaeToGroundOffset =
-        (CORAL_LENGTH) + (ALGAE_DIAMETER / 2.0); // length of coral + half of diameter of algae
 
-    // Pose3d limelightToRobotOffset =
-    //     new Pose3d(
-    //         limelightToRobotOffset1.getX(),
-    //         limelightToRobotOffset1.getY(),
-    //         limelightToRobotOffset1.getZ() - (CORAL_LENGTH) + (ALGAE_DIAMETER / 2.0),
-    //         limelightToRobotOffset1.getRotation());
 
-    double thetaX = -1 * Units.degreesToRadians(visionResult.tx());
-    double thetaY = Units.degreesToRadians(visionResult.ty());
-    double adjustedThetaY = limelightToRobotOffset.getRotation().getY() - thetaY;
+        double thetaX = Units.degreesToRadians(visionResult.tx());
+        double thetaY = Units.degreesToRadians(visionResult.ty());
+        double hypot = Math.copySign(Math.hypot(thetaX, thetaY), thetaX);
+        double thetaRelativeToCenter = Math.atan(thetaY / thetaX);
+        double adjustedRelativeToCenter =
+            thetaRelativeToCenter + LIMELIGHT_POSE_TO_ROBOT_WITH_ALGAE_OFFSET.getRotation().getX();
+        double newThetaX = -1 * (hypot * Math.cos(adjustedRelativeToCenter));
+        double newThetaY = hypot * Math.sin(adjustedRelativeToCenter);
 
-    double yOffset = 0;
-    if (adjustedThetaY == 0) {
-      yOffset = Math.abs(limelightToRobotOffset.getY());
-    } else {
-      yOffset =
-          // .getZ() represents height from floor
-          ((limelightToRobotOffset.getZ()-algaeToGroundOffset) / Math.tan(adjustedThetaY))
-              // .getX() is supposed to represent forward and backward distance from center of robot
-              + Math.abs(limelightToRobotOffset.getX());
-    }
+        double adjustedThetaY = limelightToRobotOffset.getRotation().getY() - newThetaY;
 
-    double xOffset = yOffset * Math.tan(thetaX);
+        double yOffset = 0;
+        if (adjustedThetaY == 0) {
+          yOffset = Math.abs(limelightToRobotOffset.getY());
+        } else {
+          yOffset =
+              // .getZ() represents height from floor
+              (limelightToRobotOffset.getZ() / Math.tan(adjustedThetaY))
+                  // .getX() is supposed to represent forward and backward distance from center of robot
+                  + Math.abs(limelightToRobotOffset.getX());
+        }
 
-    var cameraRelativeTranslation = new Translation2d(yOffset, xOffset);
-    var robotRelativeTranslation =
-        cameraRelativeTranslation
-            .rotateBy(new Rotation2d(limelightToRobotOffset.getRotation().getZ()))
-            .plus(limelightToRobotOffset.getTranslation().toTranslation2d());
-    return robotRelativeTranslation;
+        double xOffset = yOffset * Math.tan(newThetaX);
+
+        var cameraRelativeTranslation = new Translation2d(yOffset, xOffset);
+        var robotRelativeTranslation =
+            cameraRelativeTranslation
+                .rotateBy(new Rotation2d(limelightToRobotOffset.getRotation().getZ()))
+                .plus(limelightToRobotOffset.getTranslation().toTranslation2d());
+        return robotRelativeTranslation;
   }
 
   public static Translation2d calculateRobotRelativeAlgaeTranslationFromCamera(
       GamePieceResult visionResult) {
-    return calculateRobotRelativeAlgaeTranslationFromCamera(visionResult, LIMELIGHT_POSE_TO_ROBOT);
+    return calculateRobotRelativeAlgaeTranslationFromCamera(visionResult, LIMELIGHT_POSE_TO_ROBOT_WITH_ALGAE_OFFSET);
   }
 
   private static Translation2d calculateRobotRelativeTranslationFromCamera(

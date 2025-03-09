@@ -10,11 +10,22 @@ import org.junit.jupiter.api.Test;
 
 public class GamePieceDetectionUtilTest {
   @Test
-  public void TruffalaPoseTest() {
+  public void TruffalaStraightOnPoseTest() {
     var result =
         GamePieceDetectionUtil.calculateFieldRelativeAlgaeTranslationFromCamera(
-            new Pose2d(15.41, 4.24, Rotation2d.fromDegrees(32.4)), new GamePieceResult(2.3, 11.8));
-    var expected = new Translation2d();
+            new Pose2d(15.06, 3.81, Rotation2d.fromDegrees(-3.0)), new GamePieceResult(-13.28, 10.37));//: -13.28° ty: +10.37°
+    var expected = new Translation2d(16.33, 4.02);
     assertEquals(expected, result);
   }
+  @Test
+public void TruffalaFromSidePoseTest() {
+  var result =
+      GamePieceDetectionUtil.calculateFieldRelativeAlgaeTranslationFromCamera(
+          new Pose2d(15.18, 2.85, Rotation2d.fromDegrees(35.58)), new GamePieceResult(-13.28, 10.37));//:tx: -14.57 ty: +14.25°
+
+  var expected = new Translation2d(16.33, 4.02);
+  assertEquals(expected, result);
 }
+
+}
+
