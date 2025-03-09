@@ -942,14 +942,6 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-    var maybeAlgaeResult = vision.getAlgaeResult();
-    if (maybeAlgaeResult.isPresent()) {
-      DogLog.log(
-          "AlgaePose/Pose",
-          GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
-              localization.getPose(), maybeAlgaeResult.get()));
-    }
-
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(
         "RobotManager/ShouldIntakeForward",
