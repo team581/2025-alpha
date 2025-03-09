@@ -233,7 +233,13 @@ class PracticeConfig {
                           .withMagnetOffset(-0.311279296875)
                           .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
                           .withAbsoluteSensorDiscontinuityPoint(0.75)),
-              new TalonFXConfiguration(),
+              new TalonFXConfiguration()
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimitEnable(true)
+                          .withStatorCurrentLimit(15)
+                          .withSupplyCurrentLimitEnable(true)
+                          .withSupplyCurrentLimit(15)),
               new CANrangeConfiguration()),
           new LightsConfig(RIO_CAN_NAME, 18));
 
