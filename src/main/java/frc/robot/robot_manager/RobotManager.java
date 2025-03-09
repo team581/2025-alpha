@@ -994,18 +994,21 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0);
       }
       case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
-        if (DriverStation.isTeleop() && maybeBestCoralMapTranslation.isPresent()) {
-          Pose2d lookaheadPose = localization.getLookaheadPose(0.5);
-          DogLog.log("IntakeAssist/LookaheadPose", lookaheadPose);
-          swerve.setFieldRelativeCoralAssistSpeedsOffset(
-              IntakeAssistUtil.getAssistSpeedsFromPose(
-                  maybeBestCoralMapTranslation.get(), lookaheadPose));
-          swerve.coralAlignmentDriveRequest();
-        } else if (DriverStation.isAutonomous()) {
-          var coralSnapAngle =
-              IntakeAssistUtil.getIntakeAssistAngle(
-                  maybeBestCoralMapTranslation.get().getTranslation(), localization.getPose());
-          swerve.snapsDriveRequest(coralSnapAngle);
+        if (maybeBestCoralMapTranslation.isPresent()) {
+          var bestCoralMapTranslation = maybeBestCoralMapTranslation.orElseThrow();
+
+          if (DriverStation.isTeleop()) {
+            Pose2d lookaheadPose = localization.getLookaheadPose(0.5);
+            DogLog.log("IntakeAssist/LookaheadPose", lookaheadPose);
+            swerve.setFieldRelativeCoralAssistSpeedsOffset(
+                IntakeAssistUtil.getAssistSpeedsFromPose(bestCoralMapTranslation, lookaheadPose));
+            swerve.coralAlignmentDriveRequest();
+          } else {
+            var coralSnapAngle =
+                IntakeAssistUtil.getIntakeAssistAngle(
+                    bestCoralMapTranslation.getTranslation(), localization.getPose());
+            swerve.snapsDriveRequest(coralSnapAngle);
+          }
         } else {
           swerve.normalDriveRequest();
         }
@@ -1734,7 +1737,7 @@ public class RobotManager extends StateMachine<RobotState> {
       elevator.setState(elevatorGoal);
       wrist.setState(wristGoal);
     } else {
-      var intermediaryPosition = maybeIntermediaryPosition.get();
+      var intermediaryPosition = maybeIntermediaryPosition.orElseThrow();
 
       // A collision was detected, so we need to go to an intermediary point
       elevator.setCollisionAvoidanceGoal(intermediaryPosition.elevatorHeight());
