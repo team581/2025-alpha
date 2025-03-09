@@ -86,7 +86,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     }
 
     if (getState() == ClimberState.LINEUP && !holdingCage) {
-      grabMotor.setVoltage(6);
+      grabMotor.setVoltage(12);
     } else {
       grabMotor.disable();
     }
