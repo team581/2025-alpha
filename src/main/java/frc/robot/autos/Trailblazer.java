@@ -46,18 +46,6 @@ public class Trailblazer {
     return followSegment(segment, true);
   }
 
-  public double getDistanceToSegmentEnd(Pose2d robotPose, AutoSegment segment, int segmentIndex) {
-    double distance = 0;
-    Pose2d lastPose = robotPose;
-    Pose2d nextPose = robotPose;
-    for (int i = segmentIndex; i < segment.points.size(); i++){
-      nextPose = segment.points.get(i).poseSupplier.get();
-      distance += lastPose.getTranslation().getDistance(nextPose.getTranslation());
-      lastPose = nextPose;
-    }
-    return distance;
-  }
-
   public Command followSegment(AutoSegment segment, boolean shouldEnd) {
     TrailblazerPathLogger.logSegment(segment);
     var command =
@@ -79,8 +67,8 @@ public class Trailblazer {
                       var currentAutoPointIndex = pathTracker.getCurrentPointIndex();
                       var currentAutoPoint = segment.points.get(currentAutoPointIndex);
                       double distanceToSegmentEnd =
-                          getDistanceToSegmentEnd(
-                              localization.getPose(), segment, currentAutoPointIndex);
+                          segment.getRemainingDistance(
+                              localization.getPose(), currentAutoPointIndex);
 
                       var constrainedVelocityGoal =
                           getSwerveSetpoint(
@@ -141,7 +129,8 @@ public class Trailblazer {
             originalConstraints.maxLinearVelocity(),
             originalConstraints.maxLinearAcceleration());
     */
-    var usedConstraints = originalConstraints.withMaxLinearVelocity(originalConstraints.maxLinearVelocity());
+    var usedConstraints =
+        originalConstraints.withMaxLinearVelocity(originalConstraints.maxLinearVelocity());
 
     DogLog.log(
         "Trailblazer/Constraints/VelocityCalculation/CalculatedVelocity",
