@@ -12,7 +12,7 @@ import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
 
 public class StraightLineAuto extends BaseAuto {
-  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(1, 50, 4, 30);
+  private static final AutoConstraintOptions CONSTRAINTS = new AutoConstraintOptions(10, 50, 1, 30);
 
   public StraightLineAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
@@ -40,11 +40,12 @@ public class StraightLineAuto extends BaseAuto {
             new AutoSegment(
                 CONSTRAINTS,
                 new AutoPoint(getRedStartingPose()),
-                new AutoPoint(new Pose2d(11.924, 0.748, Rotation2d.kZero)))),
-        trailblazer.followSegment(
-            new AutoSegment(
-                CONSTRAINTS,
-                new AutoPoint(new Pose2d(13.313, 0.748, Rotation2d.kZero)),
-                new AutoPoint(new Pose2d(14.928, 0.748, Rotation2d.kZero)))));
+                new AutoPoint(new Pose2d(11.924, 0.748, Rotation2d.kZero)),
+                new AutoPoint(new Pose2d(12.0, 0.748, Rotation2d.kZero)),
+                new AutoPoint(new Pose2d(13.0, 0.748, Rotation2d.kZero)),
+                new AutoPoint(new Pose2d(15.0, 0.748, Rotation2d.kZero))
+            )
+        )
+    );
   }
 }

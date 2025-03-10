@@ -107,6 +107,21 @@ public class AutoConstraintCalculator {
     return inputSpeeds;
   }
 
+  public static double getAccelerationBasedVelocityConstraint(
+    ChassisSpeeds currentSpeeds, double distanceToSegmentEnd, double accelerationLimit, double velocityConstraint){
+      double currentVelocity = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+      double deccelerationDistance = (-1.0 * (currentVelocity * currentVelocity)) / (2.0 * accelerationLimit);
+      double perfectVelocity = Math.sqrt(0.0 - (-1.0 * 2.0 * (accelerationLimit * distanceToSegmentEnd)));
+      DogLog.log("Debug/DistanceToSegmentEnd", distanceToSegmentEnd);
+      DogLog.log("Debug/currentVelocity", currentVelocity);
+      DogLog.log("Debug/perfectDecelerationVelocity", perfectVelocity);
+      DogLog.log("Debug/decelerationDistance", deccelerationDistance);
+      if (deccelerationDistance < distanceToSegmentEnd){
+        return velocityConstraint;
+      }
+      return perfectVelocity;
+  }
+
   public static double getDynamicVelocityConstraint(
       Pose2d currentPose,
       Pose2d endWaypoint,
