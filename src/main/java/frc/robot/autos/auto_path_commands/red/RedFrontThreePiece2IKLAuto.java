@@ -55,10 +55,11 @@ public class RedFrontThreePiece2IKLAuto extends BaseAuto {
             .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
         autoCommands
-            .waitThenStow().alongWith(
+            .waitThenStow()
+            .alongWith(
 
-        // INTAKE STATION
-        blocks.intakeStationFront(CoralStation.NON_PROCESSOR_SIDE_RED)),
+                // INTAKE STATION
+                blocks.intakeStationFront(CoralStation.NON_PROCESSOR_SIDE_RED)),
 
         // SCORE L4 ON K
         blocks.scoreL4(ReefPipe.PIPE_K),

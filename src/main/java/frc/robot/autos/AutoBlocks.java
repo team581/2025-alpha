@@ -66,8 +66,7 @@ public class AutoBlocks {
 
   public Command waitForFrontIntakeDone() {
     return robotManager
-        .waitForState(
-            RobotState.INTAKE_CORAL_STATION_FRONT)
+        .waitForState(RobotState.INTAKE_CORAL_STATION_FRONT)
         .andThen(robotManager.waitForState(RobotState.IDLE_CORAL));
   }
 
