@@ -9,6 +9,25 @@ public class AutoConstraintCalculator {
   private static AutoConstraintOptions lastUsedConstraints = new AutoConstraintOptions();
 
   public static ChassisSpeeds constrainVelocityGoal(
+    ChassisSpeeds inputSpeeds,
+    ChassisSpeeds previousSpeeds,
+    double timeBetweenPreviousAndInputSpeeds,
+    AutoConstraintOptions options,
+    double distanceToSegmentEnd) {
+      ChassisSpeeds constrainedSpeeds = constrainVelocityGoal(inputSpeeds, previousSpeeds, timeBetweenPreviousAndInputSpeeds, options);
+
+      double newLinearVelocity = getAccelerationBasedVelocityConstraint(
+        constrainedSpeeds,
+        distanceToSegmentEnd,
+        options.maxLinearAcceleration(),
+        options.maxLinearVelocity()
+      );
+      constrainedSpeeds = constrainLinearVelocity(constrainedSpeeds, options.withMaxLinearVelocity(newLinearVelocity));
+      DogLog.log("Debug/finalConstrainedSpeeds", Math.hypot(constrainedSpeeds.vxMetersPerSecond, constrainedSpeeds.vyMetersPerSecond));
+      return constrainedSpeeds;
+  }
+
+  public static ChassisSpeeds constrainVelocityGoal(
       ChassisSpeeds inputSpeeds,
       ChassisSpeeds previousSpeeds,
       double timeBetweenPreviousAndInputSpeeds,
@@ -107,25 +126,20 @@ public class AutoConstraintCalculator {
   }
 
   public static double getAccelerationBasedVelocityConstraint(
-      ChassisSpeeds currentSpeeds,
-      double distanceToSegmentEnd,
-      double accelerationLimit,
-      double velocityConstraint) {
-    double currentVelocity =
-        Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    double deccelerationDistance =
-        (-1.0 * (currentVelocity * currentVelocity)) / (2.0 * accelerationLimit);
-    double perfectVelocity =
-        Math.sqrt(0.0 - (-1.0 * 2.0 * (accelerationLimit * distanceToSegmentEnd)));
-    DogLog.log("Debug/DistanceToSegmentEnd", distanceToSegmentEnd);
-    DogLog.log("Debug/currentVelocity", currentVelocity);
-    DogLog.log("Debug/perfectDecelerationVelocity", perfectVelocity);
-    DogLog.log("Debug/decelerationDistance", deccelerationDistance);
-    if (deccelerationDistance < distanceToSegmentEnd) {
-      return velocityConstraint;
-    }
-    return perfectVelocity;
+    ChassisSpeeds currentSpeeds, double distanceToSegmentEnd, double accelerationLimit, double velocityConstraint){
+      double currentVelocity = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+      double deccelerationDistance = (1.0 * (currentVelocity * currentVelocity)) / (2.0 * accelerationLimit);
+      double perfectVelocity = Math.sqrt(0.0 - (-1.0 * 2.0 * (accelerationLimit * distanceToSegmentEnd)));
+      DogLog.log("Debug/DistanceToSegmentEnd", distanceToSegmentEnd);
+      DogLog.log("Debug/currentVelocity", currentVelocity);
+      DogLog.log("Debug/perfectDecelerationVelocity", perfectVelocity);
+      DogLog.log("Debug/decelerationDistance", deccelerationDistance);
+      if (distanceToSegmentEnd > deccelerationDistance){
+        return currentVelocity;
+      }
+      return Math.max(perfectVelocity, 0.05);  // Allow you to go 2 inches per second
   }
+
 
   public static double getDynamicVelocityConstraint(
       Pose2d currentPose,
