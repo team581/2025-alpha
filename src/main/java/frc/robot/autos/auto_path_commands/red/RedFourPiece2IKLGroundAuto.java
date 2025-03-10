@@ -63,7 +63,6 @@ public class RedFourPiece2IKLGroundAuto extends BaseAuto {
                         new Pose2d(12.132, 2.243, Rotation2d.fromDegrees(60)),
                         Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
                     new AutoPoint(new Pose2d(12.888, 1.871, Rotation2d.fromDegrees(-31.0))),
-                    new AutoPoint(new Pose2d(12.888, 1.871, Rotation2d.fromDegrees(-31.0))),
                     new AutoPoint(
                         () ->
                             robotManager
