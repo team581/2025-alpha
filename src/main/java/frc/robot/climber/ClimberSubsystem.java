@@ -83,16 +83,6 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
         DogLog.log("Climber/Status", "Too high");
       }
     }
-
-    if (RobotConfig.IS_DEVELOPMENT) {
-      if (atGoal()) {
-        DogLog.log("Climber/Status", "At goal");
-      } else if (currentAngle < clamp(getState().angle)) {
-        DogLog.log("Climber/Status", "Too low");
-      } else {
-        DogLog.log("Climber/Status", "Too high");
-      }
-    }
   }
 
   public void setState(ClimberState newState) {
