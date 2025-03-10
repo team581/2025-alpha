@@ -46,11 +46,11 @@ public class Trailblazer {
     return followSegment(segment, true);
   }
 
-  public double getDistanceToSegmentEnd(Pose2d robotPose, AutoSegment segment, int segmentIndex){
+  public double getDistanceToSegmentEnd(Pose2d robotPose, AutoSegment segment, int segmentIndex) {
     double distance = 0;
     Pose2d lastPose = robotPose;
     Pose2d nextPose = segment.points.get(segmentIndex).poseSupplier.get();
-    for (int i = segmentIndex; i < segment.points.size(); i++){
+    for (int i = segmentIndex; i < segment.points.size(); i++) {
       distance += lastPose.getTranslation().getDistance(nextPose.getTranslation());
       lastPose = nextPose;
       nextPose = segment.points.get(i).poseSupplier.get();
@@ -77,13 +77,13 @@ public class Trailblazer {
                           localization.getPose(), swerve.getFieldRelativeSpeeds());
                       var currentAutoPointIndex = pathTracker.getCurrentPointIndex();
                       var currentAutoPoint = segment.points.get(currentAutoPointIndex);
-                      double distanceToSegmentEnd = getDistanceToSegmentEnd(localization.getPose(), segment, currentAutoPointIndex);
+                      double distanceToSegmentEnd =
+                          getDistanceToSegmentEnd(
+                              localization.getPose(), segment, currentAutoPointIndex);
 
                       var constrainedVelocityGoal =
                           getSwerveSetpoint(
-                              currentAutoPoint,
-                              segment.defaultConstraints,
-                              distanceToSegmentEnd);
+                              currentAutoPoint, segment.defaultConstraints, distanceToSegmentEnd);
                       swerve.setFieldRelativeAutoSpeeds(constrainedVelocityGoal);
 
                       DogLog.log("Trailblazer/Tracker/CurrentPointIndex", currentAutoPointIndex);
@@ -131,12 +131,11 @@ public class Trailblazer {
     var originalVelocityGoal = pathFollower.calculateSpeeds(robotPose, originalTargetPose);
     var originalConstraints = resolveConstraints(point, segmentConstraints);
     var newLinearVelocity =
-      AutoConstraintCalculator.getAccelerationBasedVelocityConstraint(
-        swerve.getFieldRelativeSpeeds(),
-        distanceToSegmentEnd,
-        originalConstraints.maxLinearAcceleration(),
-        originalConstraints.maxLinearVelocity()
-      );
+        AutoConstraintCalculator.getAccelerationBasedVelocityConstraint(
+            swerve.getFieldRelativeSpeeds(),
+            distanceToSegmentEnd,
+            originalConstraints.maxLinearAcceleration(),
+            originalConstraints.maxLinearVelocity());
     /*
     var newLinearVelocity =
         AutoConstraintCalculator.getDynamicVelocityConstraint(

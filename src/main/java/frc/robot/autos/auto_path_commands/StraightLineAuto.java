@@ -43,9 +43,6 @@ public class StraightLineAuto extends BaseAuto {
                 new AutoPoint(new Pose2d(11.924, 0.748, Rotation2d.kZero)),
                 new AutoPoint(new Pose2d(12.0, 0.748, Rotation2d.kZero)),
                 new AutoPoint(new Pose2d(13.0, 0.748, Rotation2d.kZero)),
-                new AutoPoint(new Pose2d(15.0, 0.748, Rotation2d.kZero))
-            )
-        )
-    );
+                new AutoPoint(new Pose2d(15.0, 0.748, Rotation2d.kZero)))));
   }
 }
