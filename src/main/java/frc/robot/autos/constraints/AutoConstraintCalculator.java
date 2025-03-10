@@ -143,15 +143,16 @@ public class AutoConstraintCalculator {
       double velocityConstraint) {
     double currentVelocity =
         Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    double deccelerationDistance =
+    double decelerationDistance =
         (1.0 * (currentVelocity * currentVelocity)) / (2.0 * accelerationLimit);
     double perfectVelocity =
         Math.sqrt(0.0 - (-1.0 * 2.0 * (accelerationLimit * distanceToSegmentEnd)));
+    // TODO: Clean these logs up
     DogLog.log("Debug/DistanceToSegmentEnd", distanceToSegmentEnd);
     DogLog.log("Debug/currentVelocity", currentVelocity);
     DogLog.log("Debug/perfectDecelerationVelocity", perfectVelocity);
-    DogLog.log("Debug/decelerationDistance", deccelerationDistance);
-    if (distanceToSegmentEnd > deccelerationDistance) {
+    DogLog.log("Debug/decelerationDistance", decelerationDistance);
+    if (distanceToSegmentEnd > decelerationDistance) {
       return currentVelocity;
     }
     return Math.max(perfectVelocity, 0.05); // Allow you to go 2 inches per second
