@@ -39,12 +39,12 @@ public enum RobotState {
   NET_BACK_SCORING,
 
   // Aproaching coral states
-  CORAL_L1_1_APPROACH,
   CORAL_L2_1_APPROACH,
   CORAL_L3_1_APPROACH,
   CORAL_L4_1_APPROACH,
 
-  // L1 scoring has no LINEUP state or CENTERED/DISPLACED versions since it's so simple to score
+  // L1 scoring has no LINEUP, APPROACH state, or CENTERED/DISPLACED versions since it's so simple
+  // to score
   CORAL_L1_3_PLACE,
   CORAL_L1_4_RELEASE,
 
@@ -84,6 +84,8 @@ public enum RobotState {
   CLIMBING_4_HANGING_3,
 
   UNJAM,
+  PREPARE_UNJAM_CORAL_STATION,
+  UNJAM_CORAL_STATION,
 
   REHOME_ELEVATOR,
   REHOME_WRIST,

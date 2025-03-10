@@ -1,11 +1,13 @@
 package frc.robot.elevator;
 
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
@@ -27,6 +29,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private double leftMotorCurrent;
   private double rightMotorCurrent;
 
+  private final double RAISE_WRIST_EARLY_THRESHOLD = 25.0;
+
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
 
   private final MotionMagicVoltage positionRequest =
@@ -43,6 +47,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
 
   // Mid-match homing
   private double averageMotorCurrent;
+  private final CoastOut coastRequest = new CoastOut();
 
   public ElevatorSubsystem(
       TalonFX leftMotor, TalonFX rightMotor, LocalizationSubsystem localization) {
@@ -158,6 +163,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       default -> {}
     }
 
+    if (DriverStation.isDisabled() && FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
+      leftMotor.setControl(coastRequest);
+      rightMotor.setControl(coastRequest);
+    }
+
     var usedHeight =
         getState() == ElevatorState.COLLISION_AVOIDANCE
             ? collisionAvoidanceGoal
@@ -192,7 +202,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
       // This state is only used when it's safe to cancel the move partway
       // Since the next state is same setpoint, different wrist angle
       case CORAL_CENTERED_L4_RAISE_WRIST, CORAL_DISPLACED_L4_RAISE_WRIST ->
-          averageMeasuredHeight > getState().height - 8;
+          averageMeasuredHeight > getState().height - RAISE_WRIST_EARLY_THRESHOLD;
       case INTAKING_CORAL_STATION_BACK, INTAKING_CORAL_STATION_FRONT ->
           MathUtil.isNear(
               getState().height + getStationIntakeSide().offset, averageMeasuredHeight, TOLERANCE);

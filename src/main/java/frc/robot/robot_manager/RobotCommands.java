@@ -68,12 +68,12 @@ public class RobotCommands {
         .withName("HighLineupCommand");
   }
 
-  public Command setGamepieceModeCommand(GamePieceMode newMode) {
+  public Command setAlgaeModeCommand(boolean algaeActive) {
     return Commands.runOnce(
             () -> {
-              robot.setGamePieceMode(newMode);
+              robot.setAlgaeMode(algaeActive);
             })
-        .withName("SetGamepieceModeCommand");
+        .withName("SetAlgaeModeCommand");
   }
 
   public Command climbUpCommand() {
@@ -87,6 +87,11 @@ public class RobotCommands {
 
   public Command unjamCommand() {
     return Commands.runOnce(robot::unjamRequest, requirements).withName("UnjamCommand");
+  }
+
+  public Command unjamStationCommand() {
+    return Commands.runOnce(robot::unjamStationRequest, requirements)
+        .withName("UnjamStationCommand");
   }
 
   public Command rehomeElevatorCommand() {

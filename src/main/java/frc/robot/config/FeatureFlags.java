@@ -13,21 +13,10 @@ public class FeatureFlags {
   public static final BooleanSupplier COLLISION_AVOIDANCE_BOX_SHORTCUTS =
       FeatureFlag.of("CollisionAvoidance/BoxShortcuts", true);
 
-  public static final BooleanSupplier REEF_ALIGN_FINE_ADJUSTMENTS =
-      FeatureFlag.of("ReefAlignment/FineAdjustments", true);
-  public static final BooleanSupplier REEF_ALIGN_LOOKAHEAD_DISTANCE_COST_FN =
-      FeatureFlag.of("ReefAlignment/LookaheadDistanceCostFn", false);
-
-  // TODO: Only enable this with adult supervision or else the climber will genuinely destroy itself
-  // again
-  public static final BooleanSupplier CLIMBER_ENABLED =
-      FeatureFlag.of("Climber/Enabled", RobotConfig.IS_PRACTICE_BOT);
-
   public static final BooleanSupplier INTAKE_VELOCITY_CORAL_DETECTION =
       FeatureFlag.of("Intake/CoralVelocityDetection", true);
 
-  public static final BooleanSupplier LIVE_WINDOW_TELEMETRY_ENABLED =
-      FeatureFlag.of("LiveWindow/TelemetryEnabled", true);
+  public static final BooleanSupplier FIELD_CALIBRATION = FeatureFlag.of("FieldCalibration", false);
 
   private FeatureFlags() {}
 }

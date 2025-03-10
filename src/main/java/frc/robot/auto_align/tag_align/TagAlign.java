@@ -24,7 +24,7 @@ public class TagAlign {
 
   private final AlignmentCostUtil alignmentCostUtil;
   private final LocalizationSubsystem localization;
-  private ReefPipeLevel level = ReefPipeLevel.L1;
+  private ReefPipeLevel level = ReefPipeLevel.BASE;
   private ChassisSpeeds rawTeleopSpeeds = new ChassisSpeeds();
   private Translation2d driverPoseOffset = Translation2d.kZero;
   private Optional<ReefPipe> reefPipeOverride = Optional.empty();
@@ -92,6 +92,26 @@ public class TagAlign {
         .orElseThrow();
   }
 
+  public ChassisSpeeds getAlgaeAlignmentSpeeds(Pose2d usedScoringPose) {
+    var robotPose = localization.getPose();
+    var scoringTranslationRobotRelative =
+        usedScoringPose
+            .getTranslation()
+            .minus(robotPose.getTranslation())
+            .rotateBy(Rotation2d.fromDegrees(360 - robotPose.getRotation().getDegrees()));
+
+    var goalTranslationUnrotated = new Translation2d();
+    goalTranslationUnrotated = new Translation2d(0.0, scoringTranslationRobotRelative.getY());
+    var goalTranslation = goalTranslationUnrotated.rotateBy(robotPose.getRotation());
+
+    var xEffort = TAG_PID.calculate(-goalTranslation.getX());
+    var yEffort = TAG_PID.calculate(-goalTranslation.getY());
+
+    var goalSpeeds = new ChassisSpeeds(xEffort, yEffort, 0.0);
+    DogLog.log("AutoAlign/AlgaeAlign/GoalSpeeds", goalSpeeds);
+    return goalSpeeds;
+  }
+
   public ChassisSpeeds getPoseAlignmentChassisSpeeds(Pose2d usedScoringPose, boolean forwardOnly) {
     var robotPose = localization.getPose();
 
@@ -102,21 +122,16 @@ public class TagAlign {
             .rotateBy(Rotation2d.fromDegrees(360 - robotPose.getRotation().getDegrees()));
 
     var goalTranslationUnrotated = new Translation2d();
-    if (forwardOnly) {
-      goalTranslationUnrotated = new Translation2d(scoringTranslationRobotRelative.getX(), 0.0);
-    } else {
-      goalTranslationUnrotated = scoringTranslationRobotRelative;
-    }
+
+    goalTranslationUnrotated = scoringTranslationRobotRelative;
 
     var goalTranslation = goalTranslationUnrotated.rotateBy(robotPose.getRotation());
 
     var xEffort = TAG_PID.calculate(-goalTranslation.getX());
     var yEffort = TAG_PID.calculate(-goalTranslation.getY());
 
-    DogLog.log("PurpleAlignment/Tag/XEffort", xEffort);
-    DogLog.log("PurpleAlignment/Tag/YEffort", yEffort);
-    DogLog.log("PurpleAlignment/Tag/ForwardOnly", forwardOnly);
-
-    return new ChassisSpeeds(xEffort, yEffort, 0.0);
+    var goalSpeeds = new ChassisSpeeds(xEffort, yEffort, 0.0);
+    DogLog.log("AutoAlign/GoalSpeeds", goalSpeeds);
+    return goalSpeeds;
   }
 }

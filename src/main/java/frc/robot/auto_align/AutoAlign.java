@@ -7,8 +7,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.auto_align.purple_align.PurpleAlign;
-import frc.robot.auto_align.purple_align.PurpleAlignState;
 import frc.robot.auto_align.tag_align.TagAlign;
 import frc.robot.autos.constraints.AutoConstraintCalculator;
 import frc.robot.autos.constraints.AutoConstraintOptions;
@@ -88,38 +86,32 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
             + LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KP * linearVelocity);
   }
 
-  private final Debouncer isAlignedDebouncer = new Debouncer(0.75, DebounceType.kRising);
-  private final PurpleAlign purple;
-  private final Limelight purpleLimelight;
-  private final Limelight frontLimelight;
-  private final Limelight baseLimelight;
+  private final Debouncer isAlignedDebouncer = new Debouncer(0.4, DebounceType.kRising);
+  private final Limelight frontLeftLimelight;
+  private final Limelight frontRightLimelight;
   private final LocalizationSubsystem localization;
   private final TagAlign tagAlign;
   private final SwerveSubsystem swerve;
 
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds tagAlignSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds tagAlignSpeedsForwardForPurple = new ChassisSpeeds();
-  private boolean seenPurple = false;
+  private ChassisSpeeds algaeAlignSpeeds = new ChassisSpeeds();
   private boolean isAligned = false;
   private boolean isAlignedDebounced = false;
   private ReefPipe bestReefPipe = ReefPipe.PIPE_A;
   private Pose2d usedScoringPose = Pose2d.kZero;
 
   public AutoAlign(
-      Limelight purpleLimelight,
-      Limelight frontLimelight,
-      Limelight baseLimelight,
+      Limelight frontLeftLimelight,
+      Limelight frontRightLimelight,
       LocalizationSubsystem localization,
       SwerveSubsystem swerve) {
     super(SubsystemPriority.AUTO_ALIGN, AutoAlignState.DEFAULT_STATE);
 
     this.tagAlign = new TagAlign(swerve, localization);
-    this.purple = new PurpleAlign(purpleLimelight);
 
-    this.purpleLimelight = purpleLimelight;
-    this.frontLimelight = frontLimelight;
-    this.baseLimelight = baseLimelight;
+    this.frontLeftLimelight = frontLeftLimelight;
+    this.frontRightLimelight = frontRightLimelight;
     this.localization = localization;
     this.swerve = swerve;
   }
@@ -139,7 +131,6 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
   private ChassisSpeeds constrainLinearVelocity(ChassisSpeeds speeds, double maxSpeed) {
     var options =
         new AutoConstraintOptions()
-            .withCollisionAvoidance(false)
             .withMaxAngularAcceleration(0)
             .withMaxAngularVelocity(0)
             .withMaxLinearAcceleration(0)
@@ -173,46 +164,34 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     return newConstrainedSpeeds;
   }
 
-  public ChassisSpeeds getCombinedTagAndPurpleChassisSpeeds() {
-    var purpleState = purple.getPurpleState();
-    DogLog.log("PurpleAlignment/SeenPurple", seenPurple);
-    DogLog.log("PurpleAlignment/PurpleState", purpleState);
-    if (!seenPurple && !isAligned) {
-      DogLog.log("PurpleAlignment/TagAligned", false);
-      return tagAlignSpeedsForwardForPurple;
-    }
-    DogLog.log("PurpleAlignment/TagAligned", true);
-
-    var speeds =
-        switch (purpleState) {
-          case NO_PURPLE, CENTERED -> tagAlignSpeedsForwardForPurple;
-          case VISIBLE_NOT_CENTERED ->
-              tagAlignSpeedsForwardForPurple.plus(
-                  purple.getPurpleAlignChassisSpeeds(
-                      localization.getPose().getRotation().getDegrees()));
-        };
-    DogLog.log("PurpleAlignment/CombinedSpeeds", speeds);
-    return speeds;
-  }
-
   @Override
   protected void collectInputs() {
-    seenPurple = purple.seenPurple();
     bestReefPipe = tagAlign.getBestPipe();
     usedScoringPose = tagAlign.getUsedScoringPose(bestReefPipe);
     isAligned = tagAlign.isAligned(bestReefPipe);
     isAlignedDebounced = isAlignedDebouncer.calculate(isAligned);
     tagAlignSpeeds = tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, false);
-    tagAlignSpeedsForwardForPurple =
-        tagAlign.getPoseAlignmentChassisSpeeds(usedScoringPose, seenPurple);
+    algaeAlignSpeeds = tagAlign.getAlgaeAlignmentSpeeds(ReefSide.fromPipe(bestReefPipe).getPose());
   }
 
   public ChassisSpeeds getTagAlignSpeeds() {
     return tagAlignSpeeds;
   }
 
+  public ChassisSpeeds getAlgaeAlignSpeeds() {
+    return algaeAlignSpeeds;
+  }
+
+  /**
+   * @deprecated Use {@link #isTagAlignedDebounced()} instead.
+   */
+  @Deprecated
   public boolean isTagAligned() {
     return isAligned;
+  }
+
+  public ReefPipe getBestReefPipe() {
+    return bestReefPipe;
   }
 
   public void markPipeScored() {
@@ -235,37 +214,29 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     return usedScoringPose;
   }
 
+  public Pose2d getUsedScoringPose(ReefPipe pipe) {
+    return tagAlign.getUsedScoringPose(pipe);
+  }
+
+  public Pose2d getUsedScoringPose(ReefPipe pipe, ReefPipeLevel level) {
+    setScoringLevel(level);
+    return getUsedScoringPose(pipe);
+  }
+
   public void setDriverPoseOffset(Translation2d offset) {
     tagAlign.setDriverPoseOffset(offset);
   }
 
   public ReefAlignState getReefAlignState() {
 
-    var tagResult = frontLimelight.getTagResult().or(baseLimelight::getTagResult);
-    var purpleState = purple.getPurpleState();
-    var purpleHealth = purpleLimelight.getCameraHealth();
+    var tagResult = frontLeftLimelight.getTagResult().or(frontRightLimelight::getTagResult);
+
     var combinedTagHealth =
-        CameraHealth.combine(frontLimelight.getCameraHealth(), baseLimelight.getCameraHealth());
+        CameraHealth.combine(
+            frontLeftLimelight.getCameraHealth(), frontRightLimelight.getCameraHealth());
 
     if (combinedTagHealth == CameraHealth.OFFLINE) {
-      if (purpleHealth == CameraHealth.OFFLINE) {
-        return ReefAlignState.ALL_CAMERAS_DEAD;
-      }
-      return ReefAlignState.TAG_CAMERAS_DEAD;
-    }
-
-    if (purpleHealth == CameraHealth.OFFLINE) {
-      return ReefAlignState.PURPLE_CAMERA_DEAD;
-    }
-
-    if (purple.canUsePurple()) {
-      // We can't trust purple unless we are near the reef, to avoid false positives
-      if (purpleState == PurpleAlignState.CENTERED) {
-        return ReefAlignState.HAS_PURPLE_ALIGNED;
-      }
-      if (purpleState == PurpleAlignState.VISIBLE_NOT_CENTERED) {
-        return ReefAlignState.HAS_PURPLE_NOT_ALIGNED;
-      }
+      return ReefAlignState.ALL_CAMERAS_DEAD;
     }
 
     if (tagResult.isEmpty()) {

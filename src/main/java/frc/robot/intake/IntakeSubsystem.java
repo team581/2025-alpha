@@ -33,12 +33,13 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   private double topMotorVelocity = 0.0;
   private double bottomMotorVelocity = 0.0;
 
-  private final VelocityDetector topMotorAlgaeDetection = new VelocityDetector(32, 0.2);
-  private final VelocityDetector bottomMotorAlgaeDetection = new VelocityDetector(30, 0.2);
+  private final VelocityDetector topMotorAlgaeDetection = new VelocityDetector(32, 0.2, 0.0);
+  private final VelocityDetector bottomMotorAlgaeDetection = new VelocityDetector(30, 0.2, 0.0);
   private boolean topMotorAlgaeVelocityGp = false;
   private boolean bottomMotorAlgaeVelocityGp = false;
-  private final VelocityDetector topMotorCoralDetection = new VelocityDetector(78, 0.2);
-  private final VelocityDetector bottomMotorCoralDetection = new VelocityDetector(78, 0.2);
+
+  private final VelocityDetector topMotorCoralDetection = new VelocityDetector(78, 0.2, 0.1);
+  private final VelocityDetector bottomMotorCoralDetection = new VelocityDetector(70, 0.2, 0.1);
   private boolean topMotorCoralVelocityGp = false;
   private boolean bottomMotorCoralVelocityGp = false;
 
@@ -114,32 +115,32 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
         bottomMotor.disable();
       }
       case IDLE_W_ALGAE -> {
-        topMotor.setControl(algaeHoldRequest);
-        bottomMotor.setControl(algaeHoldRequest);
+        topMotor.setVoltage(10.0);
+        bottomMotor.setVoltage(10.0);
       }
       case IDLE_W_CORAL -> {
-        topMotor.setVoltage(0.25);
-        bottomMotor.setVoltage(0.25);
+        topMotor.setVoltage(1);
+        bottomMotor.setVoltage(1);
       }
       case INTAKING_ALGAE -> {
-        topMotor.setVoltage(6.0);
-        bottomMotor.setVoltage(6.0);
+        topMotor.setVoltage(10.0);
+        bottomMotor.setVoltage(10.0);
         topMotorAlgaeDetection.reset();
         bottomMotorAlgaeDetection.reset();
       }
       case INTAKING_CORAL -> {
         topMotor.setVoltage(10.0);
-        bottomMotor.setVoltage(10.0);
+        bottomMotor.setVoltage(9.0);
         topMotorCoralDetection.reset();
         bottomMotorCoralDetection.reset();
       }
       case SCORE_ALGAE_NET_FORWARD -> {
-        topMotor.setVoltage(-10.0);
-        bottomMotor.setVoltage(-10.0);
+        topMotor.setVoltage(-3.0);
+        bottomMotor.setVoltage(-3.0);
       }
       case SCORE_ALGAE_NET_BACK -> {
-        topMotor.setVoltage(-10.0);
-        bottomMotor.setVoltage(-10.0);
+        topMotor.setVoltage(-3.0);
+        bottomMotor.setVoltage(-3.0);
       }
       case SCORE_ALGAE_PROCESSOR -> {
         topMotor.setVoltage(-1.0);

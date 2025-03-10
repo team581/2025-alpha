@@ -8,17 +8,18 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.config.FeatureFlags;
 import frc.robot.config.RobotConfig;
 import frc.robot.fms.FmsSubsystem;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.swerve.SwerveSubsystem;
+import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
-import frc.robot.vision.DistanceAngle;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.results.TagResult;
 import java.util.ArrayList;
@@ -40,6 +41,13 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     this.swerve = swerve;
     this.imu = imu;
     this.vision = vision;
+
+    if (FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
+      SmartDashboard.putData(
+          "Debug/ResetGyroTo180", Commands.runOnce(() -> resetGyro(180)).ignoringDisable(true));
+      SmartDashboard.putData(
+          "Debug/ResetGyroTo0", Commands.runOnce(() -> resetGyro(0)).ignoringDisable(true));
+    }
   }
 
   @Override
@@ -49,6 +57,10 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
 
   public Pose2d getPose() {
     return swerve.getDrivetrainState().Pose;
+  }
+
+  public Pose2d getLookaheadPose(double lookahead) {
+    return MathHelpers.poseLookahead(getPose(), swerve.getFieldRelativeSpeeds(), lookahead);
   }
 
   public Pose2d getPose(double timestamp) {
@@ -90,24 +102,5 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
 
   public Command getZeroCommand() {
     return Commands.runOnce(() -> resetGyro(FmsSubsystem.isRedAlliance() ? 180 : 0));
-  }
-
-  /**
-   * Get the field relative angle the robot should face in order to be looking directly at the
-   * target pose.
-   */
-  public DistanceAngle getFieldRelativeDistanceAngleToPose(Pose2d target) {
-    DistanceAngle distanceAngleToSpeaker = distanceAngleToTarget(target, getPose());
-
-    return distanceAngleToSpeaker;
-  }
-
-  public static DistanceAngle distanceAngleToTarget(Pose2d target, Pose2d current) {
-    double distance = target.getTranslation().getDistance(current.getTranslation());
-    double angle =
-        Units.radiansToDegrees(
-            Math.atan2(target.getY() - current.getY(), target.getX() - current.getX()));
-
-    return new DistanceAngle(distance, angle, false);
   }
 }

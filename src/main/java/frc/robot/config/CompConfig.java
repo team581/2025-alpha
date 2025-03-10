@@ -14,6 +14,7 @@ import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.config.RobotConfig.ClimberConfig;
@@ -54,7 +55,7 @@ class CompConfig {
                           .withGravityType(GravityTypeValue.Elevator_Static))
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicAcceleration(250.0)
+                          .withMotionMagicAcceleration(275.0)
                           .withMotionMagicCruiseVelocity(275.0))
                   .withFeedback(
                       new FeedbackConfigs()
@@ -122,7 +123,7 @@ class CompConfig {
                       new TorqueCurrentConfigs()
                           .withPeakForwardTorqueCurrent(70.0)
                           .withPeakReverseTorqueCurrent(70.0)),
-              65,
+              90,
               0.66),
           new SwerveConfig(
               new ProfiledPhoenixPIDController(5.75, 0, 0, Double.MAX_VALUE),
@@ -200,34 +201,40 @@ class CompConfig {
                   .withFeedback(
                       new FeedbackConfigs()
                           .withSensorToMechanismRatio((60.0 / 8.0) * (60.0 / 15.0)))
-                  .withSlot0(new Slot0Configs().withKP(50).withKV(0))
+                  .withSlot0(new Slot0Configs().withKP(50.0).withKV(0.0))
                   .withVoltage(
-                      new VoltageConfigs().withPeakForwardVoltage(4).withPeakReverseVoltage(-4))
+                      new VoltageConfigs().withPeakForwardVoltage(6.0).withPeakReverseVoltage(-6.0))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
-                          .withStatorCurrentLimit(10)
+                          .withStatorCurrentLimit(20)
                           .withSupplyCurrentLimitEnable(true)
-                          .withSupplyCurrentLimit(10)),
+                          .withSupplyCurrentLimit(20)),
+              -94.31,
+              97.91,
               9,
-              92.4),
+              97.91),
           new ClimberConfig(
               CANIVORE_NAME,
               24,
               25,
-              -17.0,
-              170.0,
+              -55.0,
+              215.0,
               new TalonFXConfiguration()
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
                   .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(75.0))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
                           .withStatorCurrentLimitEnable(true)
-                          .withStatorCurrentLimit(10)
+                          .withStatorCurrentLimit(60)
                           .withSupplyCurrentLimitEnable(true)
-                          .withSupplyCurrentLimit(10)),
+                          .withSupplyCurrentLimit(60)),
               new CANcoderConfiguration()
-                  .withMagnetSensor(new MagnetSensorConfigs().withMagnetOffset(0.425537109375))),
+                  .withMagnetSensor(
+                      new MagnetSensorConfigs()
+                          .withMagnetOffset(0.120849609375)
+                          .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                          .withAbsoluteSensorDiscontinuityPoint(0.7))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private CompConfig() {}

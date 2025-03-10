@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto_align.AutoAlign;
+import frc.robot.auto_align.field_calibration.FieldCalibrationUtil;
 import frc.robot.autos.Autos;
 import frc.robot.autos.Trailblazer;
 import frc.robot.climber.ClimberSubsystem;
@@ -24,7 +24,6 @@ import frc.robot.imu.ImuSubsystem;
 import frc.robot.intake.IntakeSubsystem;
 import frc.robot.lights.LightsSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
-import frc.robot.robot_manager.GamePieceMode;
 import frc.robot.robot_manager.RobotCommands;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.robot_manager.collision_avoidance.CollisionBox;
@@ -34,30 +33,31 @@ import frc.robot.util.ElasticLayoutUtil;
 import frc.robot.util.Stopwatch;
 import frc.robot.util.scheduling.LifecycleSubsystemManager;
 import frc.robot.vision.VisionSubsystem;
+import frc.robot.vision.game_piece_detection.CoralMap;
 import frc.robot.vision.limelight.Limelight;
 import frc.robot.vision.limelight.LimelightModel;
 import frc.robot.vision.limelight.LimelightState;
 import frc.robot.wrist.WristSubsystem;
 
 public class Robot extends TimedRobot {
-  private Command autonomousCommand;
+  private Command autonomousCommand = Commands.none();
   private final FmsSubsystem fms = new FmsSubsystem();
   private final Hardware hardware = new Hardware();
 
   private final SwerveSubsystem swerve = new SwerveSubsystem();
   private final ImuSubsystem imu = new ImuSubsystem(swerve.drivetrainPigeon);
-  private final Limelight elevatorPurpleLimelight =
-      new Limelight("elev", LimelightState.PURPLE, LimelightModel.THREE);
   private final Limelight frontCoralLimelight =
-      new Limelight("front", LimelightState.TAGS, LimelightModel.FOUR);
+      new Limelight("coral", LimelightState.TAGS, LimelightModel.FOUR);
   private final Limelight backTagLimelight =
       new Limelight("back", LimelightState.TAGS, LimelightModel.THREEG);
-  private final Limelight baseTagLimelight =
-      new Limelight("base", LimelightState.TAGS, LimelightModel.THREEG);
+  private final Limelight frontRightLimelight =
+      new Limelight("right", LimelightState.TAGS, LimelightModel.THREEG);
+  private final Limelight frontLeftLimelight =
+      new Limelight("left", LimelightState.TAGS, LimelightModel.THREEG);
 
   private final VisionSubsystem vision =
       new VisionSubsystem(
-          imu, elevatorPurpleLimelight, frontCoralLimelight, backTagLimelight, baseTagLimelight);
+          imu, frontCoralLimelight, backTagLimelight, frontRightLimelight, frontLeftLimelight);
   private final LocalizationSubsystem localization = new LocalizationSubsystem(imu, vision, swerve);
   private final ElevatorSubsystem elevator =
       new ElevatorSubsystem(hardware.elevatorLeftMotor, hardware.elevatorRightMotor, localization);
@@ -70,13 +70,12 @@ public class Robot extends TimedRobot {
 
   private final WristSubsystem wrist = new WristSubsystem(hardware.wristMotor);
   private final RollSubsystem roll = new RollSubsystem(hardware.rollMotor, intake);
-  private final LightsSubsystem lights =
-      new LightsSubsystem(hardware.candle, elevatorPurpleLimelight);
+  private final LightsSubsystem lights = new LightsSubsystem(hardware.candle);
   private final ClimberSubsystem climber =
       new ClimberSubsystem(hardware.climberMotor, hardware.climberCANcoder);
   private final AutoAlign autoAlign =
-      new AutoAlign(
-          elevatorPurpleLimelight, frontCoralLimelight, baseTagLimelight, localization, swerve);
+      new AutoAlign(frontLeftLimelight, frontRightLimelight, localization, swerve);
+  private final CoralMap coralMap = new CoralMap(localization, swerve);
   private final RobotManager robotManager =
       new RobotManager(
           intake,
@@ -87,13 +86,15 @@ public class Robot extends TimedRobot {
           imu,
           swerve,
           localization,
+          coralMap,
           lights,
           autoAlign,
           climber,
           rumbleController);
+  private final FieldCalibrationUtil fieldCalibrationUtil =
+      new FieldCalibrationUtil(elevator, wrist, lights, localization);
 
   private final RobotCommands robotCommands = new RobotCommands(robotManager);
-
   private final Autos autos = new Autos(robotManager, trailblazer);
 
   public Robot() {
@@ -126,10 +127,6 @@ public class Robot extends TimedRobot {
     CollisionBox.visualize();
 
     ElasticLayoutUtil.onBoot();
-
-    if (!FeatureFlags.LIVE_WINDOW_TELEMETRY_ENABLED.getAsBoolean()) {
-      LiveWindow.disableAllTelemetry();
-    }
   }
 
   @Override
@@ -137,15 +134,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    Stopwatch.getInstance().start("Scheduler/CommandSchedulerPeriodic");
+    Stopwatch.start("Scheduler/CommandSchedulerPeriodic");
     CommandScheduler.getInstance().run();
-    Stopwatch.getInstance().stop("Scheduler/CommandSchedulerPeriodic");
+    Stopwatch.stop("Scheduler/CommandSchedulerPeriodic");
     LifecycleSubsystemManager.log();
 
     if (RobotController.getBatteryVoltage() < 12.5) {
       DogLog.logFault("Battery voltage low", AlertType.kWarning);
     } else {
       DogLog.clearFault("Battery voltage low");
+    }
+
+    if (FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
+      fieldCalibrationUtil.log();
     }
   }
 
@@ -163,9 +164,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = autos.getAutoCommand();
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
-    }
+    autonomousCommand.schedule();
 
     ElasticLayoutUtil.onEnable();
     autoAlign.clearReefState();
@@ -179,9 +178,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-    }
+    autonomousCommand.cancel();
+
     ElasticLayoutUtil.onEnable();
     if (RobotConfig.IS_DEVELOPMENT) {
       autoAlign.clearReefState();
@@ -244,20 +242,18 @@ public class Robot extends TimedRobot {
     hardware.driverController.a().onTrue(robotCommands.lowLineupCommand());
     hardware.driverController.povUp().onTrue(robotCommands.climbUpCommand());
     hardware.driverController.povDown().onTrue(robotCommands.climbDownCommand());
-    hardware
-        .driverController
-        .povLeft()
-        .onTrue(robotCommands.setGamepieceModeCommand(GamePieceMode.CORAL));
+    hardware.driverController.povLeft().onTrue(robotCommands.setAlgaeModeCommand(false));
     hardware
         .driverController
         .povRight()
-        .onTrue(robotCommands.setGamepieceModeCommand(GamePieceMode.ALGAE));
-    hardware.driverController.start().onTrue(robotCommands.rehomeRollCommand());
+        .onTrue(robotCommands.setAlgaeModeCommand(true))
+        .onFalse(robotCommands.setAlgaeModeCommand(false));
+    hardware.driverController.start().onTrue(robotCommands.unjamCommand());
     hardware.driverController.back().onTrue(localization.getZeroCommand());
 
     hardware.operatorController.a().onTrue(robotCommands.rehomeElevatorCommand());
     hardware.operatorController.b().onTrue(robotCommands.rehomeWristCommand());
     hardware.operatorController.y().onTrue(robotCommands.rehomeRollCommand());
-    hardware.operatorController.x().onTrue(robotCommands.unjamCommand());
+    hardware.operatorController.x().onTrue(robotCommands.unjamStationCommand());
   }
 }

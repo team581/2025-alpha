@@ -6,8 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class AutoConstraintCalculator {
-
-  private static AutoConstraintOptions lastUsedConstraints = new AutoConstraintOptions(0, 0, 0, 0);
+  private static AutoConstraintOptions lastUsedConstraints = new AutoConstraintOptions();
 
   public static ChassisSpeeds constrainVelocityGoal(
       ChassisSpeeds inputSpeeds,

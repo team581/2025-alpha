@@ -59,6 +59,7 @@ public class Trailblazer {
   }
 
   public Command followSegment(AutoSegment segment, boolean shouldEnd) {
+    TrailblazerPathLogger.logSegment(segment);
     var command =
         Commands.runOnce(
                 () -> {

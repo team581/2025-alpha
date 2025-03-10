@@ -8,7 +8,6 @@ import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.CameraHealth;
 import frc.robot.vision.results.GamePieceResult;
-import frc.robot.vision.results.PurpleResult;
 import frc.robot.vision.results.TagResult;
 import java.util.Optional;
 
@@ -36,7 +35,6 @@ public class Limelight extends StateMachine<LimelightState> {
 
   private final int[] closestScoringReefTag = {0};
 
-  private Optional<PurpleResult> purpleResult = Optional.empty();
   private double robotHeading = 0.0;
 
   public Limelight(String name, LimelightState initialState, LimelightModel limelightModel) {
@@ -71,10 +69,6 @@ public class Limelight extends StateMachine<LimelightState> {
 
   public Optional<GamePieceResult> getAlgaeResult() {
     return getState() == LimelightState.ALGAE ? algaeResult : Optional.empty();
-  }
-
-  public Optional<PurpleResult> getPurpleResult() {
-    return getState() == LimelightState.PURPLE ? purpleResult : Optional.empty();
   }
 
   public Optional<TagResult> getTagResult() {
@@ -118,15 +112,16 @@ public class Limelight extends StateMachine<LimelightState> {
     }
     var coralTX = t2d[4];
     var coralTY = t2d[5];
-    var latency = t2d[2] + t2d[3];
-    var latencySeconds = latency / 1000.0;
-    var timestamp = Timer.getFPGATimestamp() - latencySeconds;
     if (coralTX == 0.0 || coralTY == 0.0) {
       return Optional.empty();
     }
 
     DogLog.log("Vision/" + name + "/Coral/tx", coralTX);
     DogLog.log("Vision/" + name + "/Coral/ty", coralTY);
+
+    var latency = t2d[2] + t2d[3];
+    var latencySeconds = latency / 1000.0;
+    var timestamp = Timer.getFPGATimestamp() - latencySeconds;
 
     return Optional.of(new GamePieceResult(coralTX, coralTY, timestamp));
   }
@@ -141,9 +136,6 @@ public class Limelight extends StateMachine<LimelightState> {
     }
     var coralTX = t2d[4];
     var coralTY = t2d[5];
-    var latency = t2d[2] + t2d[3];
-    var latencySeconds = latency / 1000.0;
-    var timestamp = Timer.getFPGATimestamp() - latencySeconds;
     if (coralTX == 0.0 || coralTY == 0.0) {
       return Optional.empty();
     }
@@ -151,30 +143,11 @@ public class Limelight extends StateMachine<LimelightState> {
     DogLog.log("Vision/" + name + "/Coral/tx", coralTX);
     DogLog.log("Vision/" + name + "/Coral/ty", coralTY);
 
-    return Optional.of(new GamePieceResult(coralTX, coralTY, timestamp));
-  }
-
-  private Optional<PurpleResult> getRawPurpleResult() {
-    if (getState() != LimelightState.PURPLE) {
-      return Optional.empty();
-    }
-    var t2d = LimelightHelpers.getT2DArray(limelightTableName);
-    if (t2d.length == 0) {
-      return Optional.empty();
-    }
-    var purpleTX = t2d[4];
-    var purpleTY = t2d[5];
     var latency = t2d[2] + t2d[3];
     var latencySeconds = latency / 1000.0;
     var timestamp = Timer.getFPGATimestamp() - latencySeconds;
-    if (purpleTX == 0.0 || purpleTY == 0.0) {
-      return Optional.empty();
-    }
 
-    DogLog.log("Vision/" + name + "/Purple/tx", purpleTX);
-    DogLog.log("Vision/" + name + "/Purple/ty", purpleTY);
-
-    return Optional.of(new PurpleResult(purpleTX, purpleTY, timestamp));
+    return Optional.of(new GamePieceResult(coralTX, coralTY, timestamp));
   }
 
   public void setClosestScoringReefTag(int tagID) {
@@ -186,7 +159,6 @@ public class Limelight extends StateMachine<LimelightState> {
     tagResult = getTagResult();
     coralResult = getRawCoralResult();
     algaeResult = getRawAlgaeResult();
-    purpleResult = getRawPurpleResult();
   }
 
   @Override
@@ -201,7 +173,6 @@ public class Limelight extends StateMachine<LimelightState> {
       }
       case CORAL -> updateHealth(coralResult);
       case ALGAE -> updateHealth(algaeResult);
-      case PURPLE -> updateHealth(purpleResult);
       case CLOSEST_REEF_TAG -> {
         LimelightHelpers.SetFiducialIDFiltersOverride(limelightTableName, closestScoringReefTag);
         updateHealth(tagResult);
