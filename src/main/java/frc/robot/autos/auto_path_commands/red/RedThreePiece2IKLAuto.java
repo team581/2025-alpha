@@ -12,7 +12,6 @@ import frc.robot.autos.BaseAuto;
 import frc.robot.autos.Points;
 import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
-import frc.robot.elevator.CoralStation;
 import frc.robot.robot_manager.RobotManager;
 
 public class RedThreePiece2IKLAuto extends BaseAuto {
@@ -56,15 +55,94 @@ public class RedThreePiece2IKLAuto extends BaseAuto {
         autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
-        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_RED),
+        trailblazer
+            .followSegment(
+                new AutoSegment(
+                    INTAKING_CONSTRAINTS,
+                    new AutoPoint(
+                        new Pose2d(12.132, 2.243, Rotation2d.fromDegrees(135.88)),
+                        Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
+                    //        new AutoConstraintOptions(4, 57, 4, 30)),
+                    new AutoPoint(new Pose2d(13.636, 1.439, Rotation2d.fromDegrees(135.88))),
+                    new AutoPoint(
+                        new Pose2d(15.241, 1.107, Rotation2d.fromDegrees(135.88)),
+                        autoCommands.intakeStationWarmupCommand(),
+                        new AutoConstraintOptions(3, 57, 4, 30)),
+                    new AutoPoint(Points.LEFT_CORAL_STATION.redPose)),
+                false)
+            .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON K
-        blocks.scoreL4(ReefPipe.PIPE_K),
+        autoCommands
+            .l4WarmupCommand(ReefPipe.PIPE_K)
+            .alongWith(
+                trailblazer
+                    .followSegment(
+                        new AutoSegment(
+                            SCORING_CONSTRAINTS,
+                            new AutoPoint(
+                                new Pose2d(14.914, 1.553, Rotation2d.fromDegrees(133.277)),
+                                new AutoConstraintOptions(2.3, 57, 4, 30)),
+                            new AutoPoint(
+                                new Pose2d(14.284, 2.087, Rotation2d.fromDegrees(133.277)),
+                                new AutoConstraintOptions(1.5, 57, 4, 30)),
+                            // REEF PIPE K
+                            new AutoPoint(
+                                () ->
+                                    robotManager.autoAlign.getUsedScoringPose(
+                                        ReefPipe.PIPE_K, ReefPipeLevel.L4),
+                                new AutoConstraintOptions(1.5, 57, 4, 30))),
+                        false)
+                    .until(autoCommands::alignedForScore)),
+        autoCommands.l4ScoreAndReleaseCommand(),
 
         // INTAKE STATION
-        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_RED),
+        trailblazer
+            .followSegment(
+                new AutoSegment(
+                    INTAKING_CONSTRAINTS,
+                    new AutoPoint(
+                        new Pose2d(14.284, 2.087, Rotation2d.fromDegrees(133.277)),
+                        Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
+                    new AutoPoint(
+                        new Pose2d(15.083, 1.439, Rotation2d.fromDegrees(133.277)),
+                        autoCommands.intakeStationWarmupCommand(),
+                        new AutoConstraintOptions(3, 57, 4, 30)),
+                    new AutoPoint(Points.LEFT_CORAL_STATION.redPose)),
+                false)
+            .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON L
-        blocks.scoreL4(ReefPipe.PIPE_L));
+        autoCommands
+            .l4WarmupCommand(ReefPipe.PIPE_L)
+            .alongWith(
+                trailblazer
+                    .followSegment(
+                        new AutoSegment(
+                            SCORING_CONSTRAINTS,
+                            new AutoPoint(
+                                new Pose2d(14.914, 1.801, Rotation2d.fromDegrees(133.277)),
+                                new AutoConstraintOptions(2.3, 57, 4, 30)),
+                            new AutoPoint(
+                                new Pose2d(14.284, 2.435, Rotation2d.fromDegrees(134.931)),
+                                new AutoConstraintOptions(1.5, 57, 4, 30)),
+                            // REEF PIPE L
+                            new AutoPoint(
+                                () ->
+                                    robotManager.autoAlign.getUsedScoringPose(
+                                        ReefPipe.PIPE_L, ReefPipeLevel.L4),
+                                new AutoConstraintOptions(1.5, 57, 4, 30))),
+                        false)
+                    .until(autoCommands::alignedForScore)),
+        autoCommands.l4ScoreAndReleaseCommand(),
+
+        // DRIVE BACK & STOW
+        trailblazer.followSegment(
+            new AutoSegment(
+                INTAKING_CONSTRAINTS,
+                new AutoPoint(new Pose2d(13.998, 2.812, Rotation2d.fromDegrees(134.931))),
+                new AutoPoint(
+                    new Pose2d(14.284, 2.435, Rotation2d.fromDegrees(134.931)),
+                    autoCommands.stowRequest()))));
   }
 }
