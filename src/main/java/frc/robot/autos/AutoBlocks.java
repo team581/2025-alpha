@@ -9,7 +9,6 @@ import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.elevator.CoralStation;
 import frc.robot.robot_manager.RobotManager;
-import frc.robot.robot_manager.RobotState;
 
 public class AutoBlocks {
   /**
@@ -64,12 +63,6 @@ public class AutoBlocks {
                     () -> pipe.getPose(ReefPipeLevel.L4).transformBy(PIPE_APPROACH_OFFSET)))));
   }
 
-  public Command waitForFrontIntakeDone() {
-    return robotManager
-        .waitForState(RobotState.INTAKE_CORAL_STATION_FRONT)
-        .andThen(robotManager.waitForState(RobotState.IDLE_CORAL));
-  }
-
   public Command intakeStationFront(CoralStation station) {
     return trailblazer
         .followSegment(
@@ -80,7 +73,7 @@ public class AutoBlocks {
                     Commands.runOnce(robotManager::intakeStationFrontRequest)),
                 new AutoPoint(station.frontLoadPose)),
             false)
-        .raceWith(waitForFrontIntakeDone());
+        .withDeadline(autoCommands.waitForFrontIntakeDone());
   }
 
   public Command intakeStationBack(CoralStation station) {
