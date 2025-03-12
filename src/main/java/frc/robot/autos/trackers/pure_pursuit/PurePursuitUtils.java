@@ -142,6 +142,8 @@ public class PurePursuitUtils {
         lookaheadPoint.getTranslation().getDistance(lastTargetWaypoint.getTranslation());
     var lookaheadToEndDistance =
         lookaheadPoint.getTranslation().getDistance(currentTargetWaypoint.getTranslation());
+
+    var pointToPointDistance = lastTargetWaypoint.getTranslation().getDistance(currentTargetWaypoint.getTranslation());
     if (!lookaheadInside) {
       if (lookaheadToEndDistance > lookaheadToStartDistance) {
         return new Pose2d(
@@ -149,7 +151,8 @@ public class PurePursuitUtils {
             getPointToPointInterpolatedRotation(
                 lastTargetWaypoint,
                 currentTargetWaypoint,
-                getPerpendicularPoint(lastTargetWaypoint, currentTargetWaypoint, currentPose)));
+                getPerpendicularPoint(lastTargetWaypoint, currentTargetWaypoint, currentPose),
+                pointToPointDistance));
       }
       if (currentPointIndex < points.size() - 1) {
         var futurePoint = points.get(currentPointIndex + 1).poseSupplier.get();
@@ -162,6 +165,8 @@ public class PurePursuitUtils {
                 currentTargetWaypoint,
                 lookaheadDistance - perpendicularToCurrentEndDistance);
 
+
+        pointToPointDistance = currentPose.getTranslation().getDistance(futurePoint.getTranslation());
         currentPointIndex++;
         var newLookaheadInside = isBetween(currentTargetWaypoint, futurePoint, newLookaheadPoint);
         if (!newLookaheadInside) {
@@ -170,7 +175,8 @@ public class PurePursuitUtils {
               getPointToPointInterpolatedRotation(
                   currentPose,
                   futurePoint,
-                  getPerpendicularPoint(currentTargetWaypoint, futurePoint, currentPose)));
+                  getPerpendicularPoint(currentTargetWaypoint, futurePoint, currentPose),
+                  pointToPointDistance));
         }
         return newLookaheadPoint;
       } else {
@@ -179,16 +185,16 @@ public class PurePursuitUtils {
             getPointToPointInterpolatedRotation(
                 lastTargetWaypoint,
                 currentTargetWaypoint,
-                getPerpendicularPoint(lastTargetWaypoint, currentTargetWaypoint, currentPose)));
+                getPerpendicularPoint(lastTargetWaypoint, currentTargetWaypoint, currentPose),
+                pointToPointDistance));
       }
     }
     return lookaheadPoint;
   }
 
   public static Rotation2d getPointToPointInterpolatedRotation(
-      Pose2d startPoint, Pose2d endPoint, Pose2d pointOnPath) {
-    var totalDistance = startPoint.getTranslation().getDistance(endPoint.getTranslation());
-    if (totalDistance < 0.0001) {
+      Pose2d startPoint, Pose2d endPoint, Pose2d pointOnPath, double curvatureDistance) {
+    if (curvatureDistance < 0.0001) {
       return endPoint.getRotation();
     }
     var pointToStart = pointOnPath.getTranslation().getDistance(startPoint.getTranslation());
@@ -203,10 +209,20 @@ public class PurePursuitUtils {
         return endPoint.getRotation();
       }
     }
-    var progressPercent = Math.abs((pointToStart / totalDistance));
-    if (progressPercent > 0.9) {
+
+    if (Double.isNaN(curvatureDistance)) {
+      curvatureDistance = pointToStart;
+    }
+    var progressPercent = Math.abs((pointToStart / (curvatureDistance)));
+    var roundProgress = progressPercent > 0.9;
+    if (roundProgress) {
       progressPercent = 1.0;
     }
+
+    DogLog.log("Debug/PurePursuit/RoundProgress", roundProgress);
+    DogLog.log("Debug/PurePursuit/PointToStart", pointToStart);
+    DogLog.log("Debug/PurePursuit/TotalDistance", curvatureDistance);
+    DogLog.log("Debug/PurePursuit/ProgressPercent", progressPercent);
 
     var interpolatedRotation =
         startPoint.getRotation().interpolate(endPoint.getRotation(), progressPercent);

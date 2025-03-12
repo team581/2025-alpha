@@ -149,7 +149,7 @@ public class PurePursuitPathTracker implements PathTracker {
     } else {
       currentInterpolatedRotation =
           PurePursuitUtils.getPointToPointInterpolatedRotation(
-              lastTargetWaypoint, currentTargetPoint, perpendicularPoint);
+              lastTargetWaypoint, currentTargetPoint, perpendicularPoint, lastRequestedLookaheadDistance);
     }
   }
 
@@ -209,7 +209,7 @@ public class PurePursuitPathTracker implements PathTracker {
     }
   }
 
-  public void requestNewLookaheadDistance(double targetLookahead, boolean immediateChnage) {
+  public void requestNewLookaheadDistance(double targetLookahead, boolean immediateChange) {
     double currentTime = Timer.getFPGATimestamp();
     if (lastRequestedLookaheadDistance != targetLookahead) {
       transitionStartTime = currentTime;
@@ -217,7 +217,7 @@ public class PurePursuitPathTracker implements PathTracker {
       transitionStartTime = lastStartTime;
     }
     if ((currentTime < transitionStartTime + DYNAMIC_LOOKAHEAD_TRANSITION_TIME)
-        && !immediateChnage) {
+        && !immediateChange) {
       // Calculate the progress of the transition
       double progress = (currentTime - transitionStartTime) / DYNAMIC_LOOKAHEAD_TRANSITION_TIME;
 
