@@ -176,7 +176,12 @@ public class Robot extends TimedRobot {
                       0,
                       0);
                 })
-            .withTimeout(5.0);
+            .withTimeout(5.0)
+            .andThen(
+                swerve.run(
+                    () -> {
+                      swerve.driveTeleop(0, 0, 0);
+                    }));
     autonomousCommand.schedule();
     swerve.driveTeleop(0, 0, 0);
     ElasticLayoutUtil.onEnable();
