@@ -167,9 +167,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    autonomousCommand = autos.getAutoCommand();
+    autonomousCommand =
+        swerve
+            .run(
+                () -> {
+                  swerve.driveTeleop(
+                      (4.75) * 0.3, // In SwerveSubsystem it says public static final double MaxSpeed = 4.75;
+                      0,
+                      0);
+                })
+            .withTimeout(5.0);
     autonomousCommand.schedule();
-
+    swerve.driveTeleop(0, 0, 0);
     ElasticLayoutUtil.onEnable();
     autoAlign.clearReefState();
   }
