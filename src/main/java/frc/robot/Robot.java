@@ -183,7 +183,6 @@ public class Robot extends TimedRobot {
                       swerve.driveTeleop(0, 0, 0);
                     }));
     autonomousCommand.schedule();
-    swerve.driveTeleop(0, 0, 0);
     ElasticLayoutUtil.onEnable();
     autoAlign.clearReefState();
   }
