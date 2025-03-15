@@ -154,10 +154,10 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
 
   @Override
   public void teleopInit() {
-      super.teleopInit();
-      autoLineup = false;
-      lineupTimer.reset();
-      lineupTimer.start();
+    super.teleopInit();
+    autoLineup = false;
+    lineupTimer.reset();
+    lineupTimer.start();
   }
 
   public boolean atGoal() {
