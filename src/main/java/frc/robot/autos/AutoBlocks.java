@@ -80,20 +80,24 @@ public class AutoBlocks {
             .withDeadline(
                 autoCommands
                     .waitForAlignedForScore()
-                    .andThen(autoCommands.l4ScoreAndReleaseCommand())),
-        trailblazer.followSegment(
-            new AutoSegment(
-                BASE_CONSTRAINTS,
-                AFTER_SCORE_POSITION_TOLERANCE,
-                new AutoPoint(
-                    () -> robotManager.autoAlign.getUsedScoringPose(pipe, ReefPipeLevel.L4),
-                    Commands.waitSeconds(0.15).andThen(robotManager::stowRequest)),
-                new AutoPoint(
-                    () ->
-                        robotManager
-                            .autoAlign
-                            .getUsedScoringPose(pipe, ReefPipeLevel.L4)
-                            .transformBy(PIPE_LINEUP_OFFSET)))));
+                    .andThen(autoCommands.l4ScoreAndReleaseCommand())));
+  }
+
+  public Command finishScoreAndStop(ReefPipe pipe) {
+    return trailblazer.followSegment(
+        new AutoSegment(
+            BASE_CONSTRAINTS,
+            // Start at the scoring position
+            new AutoPoint(
+                () -> robotManager.autoAlign.getUsedScoringPose(pipe, ReefPipeLevel.L4),
+                Commands.waitSeconds(0.15).andThen(robotManager::stowRequest)),
+            // Scoot back to the lineup position to finish the score
+            new AutoPoint(
+                () ->
+                    robotManager
+                        .autoAlign
+                        .getUsedScoringPose(pipe, ReefPipeLevel.L4)
+                        .transformBy(PIPE_LINEUP_OFFSET))));
   }
 
   public Command scorePreloadL4(Pose2d startingPose, ReefPipe pipe) {
@@ -136,11 +140,14 @@ public class AutoBlocks {
             .withDeadline(
                 autoCommands
                     .waitForAlignedForScore()
-                    .andThen(autoCommands.l4ScoreAndReleaseCommand())),
-        trailblazer.followSegment(
+                    .andThen(autoCommands.l4ScoreAndReleaseCommand())));
+  }
+
+  public Command finishScoreThenIntakeStationFront(ReefPipe pipe, CoralStation station) {
+    return trailblazer
+        .followSegment(
             new AutoSegment(
                 BASE_CONSTRAINTS,
-                AFTER_SCORE_POSITION_TOLERANCE,
                 // Start at the scoring position
                 new AutoPoint(
                     () -> robotManager.autoAlign.getUsedScoringPose(pipe, ReefPipeLevel.L4),
@@ -151,14 +158,7 @@ public class AutoBlocks {
                         robotManager
                             .autoAlign
                             .getUsedScoringPose(pipe, ReefPipeLevel.L4)
-                            .transformBy(PIPE_LINEUP_OFFSET)))));
-  }
-
-  public Command intakeStationFront(CoralStation station) {
-    return trailblazer
-        .followSegment(
-            new AutoSegment(
-                BASE_CONSTRAINTS,
+                            .transformBy(PIPE_LINEUP_OFFSET)),
                 new AutoPoint(
                     station.frontLoadPose.transformBy(FRONT_STATION_APPROACH_OFFSET),
                     Commands.runOnce(robotManager::intakeStationFrontRequest)),
@@ -167,11 +167,22 @@ public class AutoBlocks {
         .withDeadline(autoCommands.waitForFrontIntakeDone());
   }
 
-  public Command intakeStationBack(CoralStation station) {
+  public Command finishScoreThenIntakeStationBack(ReefPipe pipe, CoralStation station) {
     return trailblazer
         .followSegment(
             new AutoSegment(
                 BASE_CONSTRAINTS,
+                // Start at the scoring position
+                new AutoPoint(
+                    () -> robotManager.autoAlign.getUsedScoringPose(pipe, ReefPipeLevel.L4),
+                    Commands.waitSeconds(0.15).andThen(robotManager::stowRequest)),
+                // Scoot back to the lineup position to finish the score
+                new AutoPoint(
+                    () ->
+                        robotManager
+                            .autoAlign
+                            .getUsedScoringPose(pipe, ReefPipeLevel.L4)
+                            .transformBy(PIPE_LINEUP_OFFSET)),
                 new AutoPoint(
                     station.backLoadPose.transformBy(BACK_STATION_APPROACH_OFFSET),
                     Commands.runOnce(robotManager::intakeStationBackRequest)),
