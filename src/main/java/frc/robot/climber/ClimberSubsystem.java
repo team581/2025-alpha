@@ -106,18 +106,22 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
       }
     }
 
-    if (getState() != ClimberState.STOWED) {
-      autoLineup = true;
-    }
     if (!autoLineup && lineupTimer.hasElapsed(105.0)) {
-      setState(ClimberState.AUTO_LINEUP);
+      if (getState() == ClimberState.STOWED) {
+        setState(ClimberState.AUTO_LINEUP);
+      }
       autoLineup = true;
     }
   }
 
   public void setState(ClimberState newState) {
-    if (autoLineup) {
-      if (newState == ClimberState.STOWED || newState == ClimberState.AUTO_LINEUP) {
+    if (getState() == ClimberState.AUTO_LINEUP) {
+      if (newState == ClimberState.LINEUP
+          || newState == ClimberState.HANGING
+          || newState == ClimberState.HANGING_2
+          || newState == ClimberState.HANGING_3) {
+        setStateFromRequest(newState);
+      } else {
         return;
       }
     }
