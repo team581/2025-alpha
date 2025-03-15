@@ -889,9 +889,9 @@ public class RobotManager extends StateMachine<RobotState> {
 
   @Override
   public void teleopInit() {
-      super.teleopInit();
-      autoClimbLineupTimer.reset();
-      autoClimbLineupTimer.start();
+    super.teleopInit();
+    autoClimbLineupTimer.reset();
+    autoClimbLineupTimer.start();
   }
 
   @Override
