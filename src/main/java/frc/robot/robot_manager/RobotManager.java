@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.auto_align.AutoAlign;
@@ -96,6 +97,7 @@ public class RobotManager extends StateMachine<RobotState> {
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
   private boolean isRollHomed = false;
   private boolean confirmScoreActive = false;
+  private Timer autoClimbLineupTimer = new Timer();
 
   @Override
   protected RobotState getNextState(RobotState currentState) {
@@ -886,6 +888,13 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   @Override
+  public void teleopInit() {
+      super.teleopInit();
+      autoClimbLineupTimer.reset();
+      autoClimbLineupTimer.start();
+  }
+
+  @Override
   public void robotPeriodic() {
     super.robotPeriodic();
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
@@ -1010,6 +1019,10 @@ public class RobotManager extends StateMachine<RobotState> {
         }
       }
       default -> {}
+    }
+
+    if (autoClimbLineupTimer.hasElapsed(105)) {
+      climber.setState(ClimberState.AUTO_LINEUP);
     }
   }
 

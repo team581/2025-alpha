@@ -104,6 +104,23 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   }
 
   public void setState(ClimberState newState) {
+    if (newState == ClimberState.AUTO_LINEUP) {
+      if (getState()==ClimberState.STOWED) {
+        setStateFromRequest(newState);
+      } else {
+        return;
+      }
+    }
+
+
+    switch (getState()) {
+      case AUTO_LINEUP -> {
+        if (newState == ClimberState.STOWED) {
+          return;
+        }
+      }
+    }
+
     setStateFromRequest(newState);
   }
 
