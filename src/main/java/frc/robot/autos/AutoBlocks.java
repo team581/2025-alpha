@@ -40,6 +40,8 @@ public class AutoBlocks {
       new AutoConstraintOptions(4.7, 57, 4, 30);
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
       BASE_CONSTRAINTS.withMaxLinearAcceleration(2.0);
+      private static final AutoConstraintOptions LOLLIPOP_CONSTRAINTS =
+      BASE_CONSTRAINTS.withMaxLinearAcceleration(2.0).withMaxLinearVelocity(1.5);
 
   private final Trailblazer trailblazer;
   private final RobotManager robotManager;
@@ -201,12 +203,10 @@ public class AutoBlocks {
                 BASE_CONSTRAINTS,
                 new AutoPoint(approachPoint),
                 new AutoPoint(
-                    () ->
-                        IntakeAssistUtil.getLollipopIntakePoseFromVisionResult(
-                                robotManager.vision.getLollipopVisionResult(),
-                                robotManager.localization.getPose())
-                            .orElse(defaultIntakingPose),
-                    Commands.runOnce(robotManager::intakeAssistFloorCoralHorizontalRequest))),
+                  () -> IntakeAssistUtil.getLollipopIntakePoseFromVisionResult(robotManager.vision.getLollipopVisionResult(), robotManager.localization.getPose()).orElse(defaultIntakingPose),
+                  Commands.runOnce(robotManager::intakeFloorCoralUprightRequest),
+                  LOLLIPOP_CONSTRAINTS
+                    )),
             false)
         .withDeadline(autoCommands.waitForGroundIntakeDone());
   }

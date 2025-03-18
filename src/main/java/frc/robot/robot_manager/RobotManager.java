@@ -1233,6 +1233,20 @@ public class RobotManager extends StateMachine<RobotState> {
     }
   }
 
+  public void intakeFloorCoralUprightRequest() {
+    algaeMode = false;
+    switch (getState()) {
+      case CLIMBING_1_LINEUP,
+          CLIMBING_2_HANGING,
+          CLIMBING_3_HANGING_2,
+          CLIMBING_4_HANGING_3,
+          REHOME_ELEVATOR,
+          REHOME_ROLL,
+          REHOME_WRIST -> {}
+      default -> setStateFromRequest(RobotState.INTAKE_CORAL_FLOOR_UPRIGHT);
+    }
+  }
+
   public void intakeStationRequest() {
     if (algaeMode) {
       intakeReefAlgaeRequest();
