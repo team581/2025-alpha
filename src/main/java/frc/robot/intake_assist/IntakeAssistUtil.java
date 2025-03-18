@@ -2,6 +2,7 @@ package frc.robot.intake_assist;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -41,11 +42,15 @@ public class IntakeAssistUtil {
     var translation =
         GamePieceDetectionUtil.calculateRobotRelativeLollipopTranslationFromCamera(
             robotPose, result.get());
-    var offset = new Translation2d(translation.getX() - INTAKE_OFFSET, translation.getY());
-    var fieldRelativeOffsetTranslation =
-        GamePieceDetectionUtil.robotRelativeToFieldRelativeGamePiecePose(robotPose, offset);
-    var rotation = getIntakeAssistAngle(fieldRelativeOffsetTranslation, robotPose);
-    return Optional.of(
-        new Pose2d(fieldRelativeOffsetTranslation, Rotation2d.fromDegrees(rotation)));
+    var robotRelativeRotation =
+        Rotation2d.fromDegrees(getIntakeAssistAngle(translation, Pose2d.kZero));
+    var withRotation = new Pose2d(translation.getX(), translation.getY(), robotRelativeRotation);
+    var offset = withRotation.transformBy(new Transform2d(-INTAKE_OFFSET, 0.0, Rotation2d.kZero));
+    var fieldRelativeIntakePose =
+        new Pose2d(
+            GamePieceDetectionUtil.robotRelativeToFieldRelativeGamePiecePose(
+                robotPose, offset.getTranslation()),
+            robotRelativeRotation.plus(robotPose.getRotation()));
+    return Optional.of(fieldRelativeIntakePose);
   }
 }

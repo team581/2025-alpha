@@ -433,7 +433,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
         swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_UPRIGHT);
-        vision.setState(VisionState.CORAL_DETECTION);
+        vision.setState(VisionState.ALGAE_DETECTION);
         lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
         climber.setState(ClimberState.STOWED);
       }
