@@ -29,7 +29,7 @@ public class BlueLollipopAuto extends BaseAuto {
 
   @Override
   protected Pose2d getStartingPose() {
-    return Points.START_3_AND_4.bluePose;
+    return Points.START_R3_AND_B3.bluePose;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class BlueLollipopAuto extends BaseAuto {
             .followSegment(
                 new AutoSegment(
                     BEFORE_SCORING_CONSTRAINTS,
-                    new AutoPoint(Points.START_3_AND_4.bluePose, INTAKING_CONSTRAINTS),
+                    new AutoPoint(Points.START_R3_AND_B3.bluePose, INTAKING_CONSTRAINTS),
                     new AutoPoint(
                         new Pose2d(6.259, 2.952, Rotation2d.fromDegrees(120)),
                         autoCommands
