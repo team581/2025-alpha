@@ -3,7 +3,7 @@ package frc.robot.autos;
 import frc.robot.autos.auto_path_commands.blue.BlueBackThreePiece3JKLAuto;
 import frc.robot.autos.auto_path_commands.blue.BlueBackThreePiece4EDCAuto;
 import frc.robot.autos.auto_path_commands.blue.BlueDoNothingAuto;
-import frc.robot.autos.auto_path_commands.blue.BlueLollipopAuto;
+import frc.robot.autos.auto_path_commands.blue.BlueOldLollipopAuto;
 import frc.robot.autos.auto_path_commands.blue.BlueOldPushPartnerAuto;
 import frc.robot.autos.auto_path_commands.blue.BluePushPartnerAuto;
 import frc.robot.autos.auto_path_commands.blue.BlueThreePiece3JKLAuto;
@@ -11,7 +11,7 @@ import frc.robot.autos.auto_path_commands.blue.BlueThreePiece4EDCAuto;
 import frc.robot.autos.auto_path_commands.red.RedBackThreePiece3JKLAuto;
 import frc.robot.autos.auto_path_commands.red.RedBackThreePiece4EDCAuto;
 import frc.robot.autos.auto_path_commands.red.RedDoNothingAuto;
-import frc.robot.autos.auto_path_commands.red.RedLollipopAuto;
+import frc.robot.autos.auto_path_commands.red.RedOldLollipopAuto;
 import frc.robot.autos.auto_path_commands.red.RedOldPushPartnerAuto;
 import frc.robot.autos.auto_path_commands.red.RedPushPartnerAuto;
 import frc.robot.autos.auto_path_commands.red.RedThreePiece3JKLAuto;
@@ -29,7 +29,7 @@ public enum AutoSelection {
 
   // STRAIGHT_LINE(RedStraightLineAuto::new, BlueDoNothingAuto::new),
 
-  LOLLIPOP_THREE_PIECE(RedLollipopAuto::new, BlueLollipopAuto::new),
+  LOLLIPOP_THREE_PIECE(RedOldLollipopAuto::new, BlueOldLollipopAuto::new),
 
   THREE_PIECE_3JKL(RedThreePiece3JKLAuto::new, BlueThreePiece3JKLAuto::new),
   THREE_PIECE_4EDC(RedThreePiece4EDCAuto::new, BlueThreePiece4EDCAuto::new),

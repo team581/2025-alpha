@@ -13,7 +13,7 @@ import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
 
-public class BlueLollipopAuto extends BaseAuto {
+public class BlueOldLollipopAuto extends BaseAuto {
   private static final AutoConstraintOptions INTAKING_CONSTRAINTS =
       new AutoConstraintOptions(4.75, 57, 4, 30);
   private static final AutoConstraintOptions BEFORE_INTAKING_CONSTRAINTS =
@@ -23,7 +23,7 @@ public class BlueLollipopAuto extends BaseAuto {
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
       new AutoConstraintOptions(1.5, 57, 4, 30);
 
-  public BlueLollipopAuto(RobotManager robotManager, Trailblazer trailblazer) {
+  public BlueOldLollipopAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
   }
 
