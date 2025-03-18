@@ -201,7 +201,11 @@ public class AutoBlocks {
                 BASE_CONSTRAINTS,
                 new AutoPoint(approachPoint),
                 new AutoPoint(
-                    () -> IntakeAssistUtil.getLollipopIntakePoseFromVisionResult(robotManager.vision.getLollipopVisionResult(), robotManager.localization.getPose()).orElse(defaultIntakingPose),
+                    () ->
+                        IntakeAssistUtil.getLollipopIntakePoseFromVisionResult(
+                                robotManager.vision.getLollipopVisionResult(),
+                                robotManager.localization.getPose())
+                            .orElse(defaultIntakingPose),
                     Commands.runOnce(robotManager::intakeAssistFloorCoralHorizontalRequest))),
             false)
         .withDeadline(autoCommands.waitForGroundIntakeDone());
