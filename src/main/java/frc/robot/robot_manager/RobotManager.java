@@ -41,7 +41,7 @@ import java.util.Optional;
 public class RobotManager extends StateMachine<RobotState> {
   public final LocalizationSubsystem localization;
 
-  public final VisionSubsystem vision;
+  private final VisionSubsystem vision;
   public final ImuSubsystem imu;
 
   public final CoralMap coralMap;
@@ -154,19 +154,68 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case PREPARE_UNJAM_CORAL_STATION ->
           elevator.atGoal() && wrist.atGoal() ? RobotState.UNJAM_CORAL_STATION : currentState;
-      case CORAL_CENTERED_L2_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L2_3_PLACE : currentState;
-      case CORAL_CENTERED_L3_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L3_3_PLACE : currentState;
-      case CORAL_CENTERED_L4_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L4_3_PLACE : currentState;
 
-      case CORAL_DISPLACED_L2_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L2_3_PLACE : currentState;
-      case CORAL_DISPLACED_L3_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L3_3_PLACE : currentState;
-      case CORAL_DISPLACED_L4_2_LINEUP ->
-          shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L4_3_PLACE : currentState;
+      case CORAL_CENTERED_L2_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_CENTERED_L2_3_PLACE;
+      }
+      // case CORAL_CENTERED_L2_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L2_3_PLACE : currentState;
+      case CORAL_CENTERED_L3_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_CENTERED_L3_3_PLACE;
+      }
+      // case CORAL_CENTERED_L3_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L3_3_PLACE : currentState;
+      case CORAL_CENTERED_L4_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_CENTERED_L4_3_PLACE;
+      }
+      // case CORAL_CENTERED_L4_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_CENTERED_L4_3_PLACE : currentState;
+
+      case CORAL_DISPLACED_L2_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_DISPLACED_L2_3_PLACE;
+      }
+      // case CORAL_DISPLACED_L2_2_LINEUP ->
+          // shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L2_3_PLACE : currentState;
+      case CORAL_DISPLACED_L3_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_DISPLACED_L3_3_PLACE;
+      }
+      // case CORAL_DISPLACED_L3_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L3_3_PLACE : currentState;
+      case CORAL_DISPLACED_L4_2_LINEUP -> {
+        var isAligned = autoAlign.getReefAlignState().getInPosition();
+
+        if (!isAligned) {
+          yield currentState;
+        }
+        yield RobotState.CORAL_DISPLACED_L4_3_PLACE;
+      }
+      // case CORAL_DISPLACED_L4_2_LINEUP ->
+      //     shouldProgressTeleopScore() ? RobotState.CORAL_DISPLACED_L4_3_PLACE : currentState;
 
       case CORAL_L3_1_APPROACH -> {
         var isClose =
@@ -888,6 +937,7 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
+
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(
         "RobotManager/ShouldIntakeForward",
@@ -1084,7 +1134,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     var isFarEnoughFromReefSide =
-        !AutoAlign.isCloseToReefSide(localization.getPose(), nearestReefSide.getPose(), 0.75);
+        !AutoAlign.isCloseToPose(localization.getPose(), nearestReefSide.getPose(), 0.75);
 
     return isFarEnoughFromReefSide;
   }
@@ -1687,7 +1737,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private LightsState getLightStateForScoring() {
     return switch (autoAlign.getReefAlignState()) {
-      case ALL_CAMERAS_DEAD -> LightsState.ERROR;
+      case ALL_CAMERAS_DEAD-> LightsState.ERROR;
       case HAS_TAGS_IN_POSITION -> LightsState.SCORE_ALIGN_READY;
       default -> LightsState.SCORE_ALIGN_NOT_READY;
     };

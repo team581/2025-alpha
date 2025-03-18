@@ -32,7 +32,7 @@ public class AutoCommands {
                 .waitForStates(
                     RobotState.CORAL_DISPLACED_L4_4_RELEASE, RobotState.CORAL_CENTERED_L4_4_RELEASE)
                 .withTimeout(1))
-        .withName("L4ScoreAndReleaseCommand");
+        .withName("L4PlaceAndReleaseCommand");
   }
 
   public Command waitThenStow() {

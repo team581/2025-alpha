@@ -66,7 +66,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
     }
   }
 
-  public static boolean isCloseToReefSide(
+  public static boolean isCloseToPose(
       Pose2d robotPose, Pose2d nearestReefSide, double thresholdMeters) {
     return robotPose.getTranslation().getDistance(nearestReefSide.getTranslation())
         < thresholdMeters;
@@ -79,7 +79,7 @@ public class AutoAlign extends StateMachine<AutoAlignState> {
       Pose2d robotPose, Pose2d nearestReefSide, ChassisSpeeds robotSpeeds) {
     var linearVelocity = Math.hypot(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
     DogLog.log("Swerve/LinearVelocity", linearVelocity);
-    return isCloseToReefSide(
+    return isCloseToPose(
         robotPose,
         nearestReefSide,
         LINEAR_VELOCITY_TO_REEF_SIDE_DISTANCE_KS
