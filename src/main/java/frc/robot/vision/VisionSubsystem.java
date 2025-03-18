@@ -1,17 +1,16 @@
 package frc.robot.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
-import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.vision.limelight.Limelight;
 import frc.robot.vision.limelight.LimelightState;
 import frc.robot.vision.results.TagResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class VisionSubsystem extends StateMachine<VisionState> {
   private final ImuSubsystem imu;
@@ -168,21 +167,23 @@ public class VisionSubsystem extends StateMachine<VisionState> {
   }
 
   public Optional<Pose2d> getLollipopPose(LocalizationSubsystem localization) {
-    var maybeAlgaeResult = frontCoralLimelight.getAlgaeResult();
+    // TODO: Update for new camera setup
+    return Optional.empty();
+    // var maybeAlgaeResult = frontCoralLimelight.getAlgaeResult();
 
-    if (maybeAlgaeResult.isEmpty()) {
-      return Optional.empty();
-    }
+    // if (maybeAlgaeResult.isEmpty()) {
+    //   return Optional.empty();
+    // }
 
-    var algaeResult = maybeAlgaeResult.orElseThrow();
-    var angleToCoral =
-        GamePieceDetectionUtil.getFieldRelativeAngleToGamePiece(
-            localization.getPose(algaeResult.timestamp()), algaeResult);
+    // var algaeResult = maybeAlgaeResult.orElseThrow();
+    // var angleToCoral =
+    //     GamePieceDetectionUtil.getFieldRelativeAngleToGamePiece(
+    //         localization.getPose(algaeResult.timestamp()), algaeResult);
 
-    return Optional.of(
-        new Pose2d(
-            GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
-                localization.getPose(algaeResult.timestamp()), algaeResult),
-            Rotation2d.fromDegrees(angleToCoral)));
+    // return Optional.of(
+    //     new Pose2d(
+    //         GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
+    //             localization.getPose(algaeResult.timestamp()), algaeResult),
+    //         Rotation2d.fromDegrees(angleToCoral)));
   }
 }
