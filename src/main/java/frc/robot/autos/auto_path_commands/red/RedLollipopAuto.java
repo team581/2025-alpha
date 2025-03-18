@@ -8,7 +8,6 @@ import frc.robot.auto_align.ReefPipe;
 import frc.robot.autos.BaseAuto;
 import frc.robot.autos.Points;
 import frc.robot.autos.Trailblazer;
-import frc.robot.elevator.CoralStation;
 import frc.robot.robot_manager.RobotManager;
 
 public class RedLollipopAuto extends BaseAuto {
@@ -25,9 +24,13 @@ public class RedLollipopAuto extends BaseAuto {
   protected Command createAutoCommand() {
     return Commands.sequence(
         blocks.scorePreloadL4(Points.START_R3_AND_B3.redPose, ReefPipe.PIPE_I),
-        blocks.intakeLollipop( new Pose2d(14.431, 2.168, Rotation2d.fromDegrees(0.0)), new Pose2d(15.700, 2.168, Rotation2d.fromDegrees(0))),
+        blocks.intakeLollipop(
+            new Pose2d(14.431, 2.168, Rotation2d.fromDegrees(0.0)),
+            new Pose2d(15.700, 2.168, Rotation2d.fromDegrees(0))),
         blocks.scoreL4(ReefPipe.PIPE_A),
-        blocks.intakeLollipop(   new Pose2d(15.006, 3.996, Rotation2d.fromDegrees(0.0)),new Pose2d(15.734, 3.996, Rotation2d.fromDegrees(0))),
+        blocks.intakeLollipop(
+            new Pose2d(15.006, 3.996, Rotation2d.fromDegrees(0.0)),
+            new Pose2d(15.734, 3.996, Rotation2d.fromDegrees(0))),
         blocks.scoreL4(ReefPipe.PIPE_B));
   }
 }
