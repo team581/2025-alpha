@@ -1,9 +1,10 @@
 package frc.robot.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
-import frc.robot.util.ProfiledPhoenixPIDController;
 
 public record RobotConfig(
     String robotName,
@@ -41,7 +42,7 @@ public record RobotConfig(
       double algaeHoldMaxDutyCycle) {}
 
   public record SwerveConfig(
-      ProfiledPhoenixPIDController snapController,
+      PhoenixPIDController snapController,
       boolean invertRotation,
       boolean invertX,
       boolean invertY,
@@ -62,12 +63,16 @@ public record RobotConfig(
 
   public record ClimberConfig(
       String canBusName,
-      int motorID,
+      int climbMotorID,
       int cancoderID,
+      int grabMotorID,
+      int canrangeID,
       double minAngle,
       double maxAngle,
-      TalonFXConfiguration motorConfig,
-      CANcoderConfiguration cancoderConfig) {}
+      TalonFXConfiguration climbMotorConfig,
+      CANcoderConfiguration cancoderConfig,
+      TalonFXConfiguration grabMotorConfig,
+      CANrangeConfiguration canRangeConfig) {}
 
   public record RollConfig(
       String canBusName,

@@ -14,76 +14,49 @@ import frc.robot.autos.Trailblazer;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.robot_manager.RobotManager;
 
-public class BlueFourPiece5FEDC extends BaseAuto {
+public class BlueOldPushPartnerAuto extends BaseAuto {
   private static final AutoConstraintOptions INTAKING_CONSTRAINTS =
-      new AutoConstraintOptions(4, 57, 4, 30);
+      new AutoConstraintOptions(4.75, 57, 4, 30);
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
-      new AutoConstraintOptions(2, 57, 4, 30);
+      new AutoConstraintOptions(2.3, 57, 4, 30);
 
-  public BlueFourPiece5FEDC(RobotManager robotManager, Trailblazer trailblazer) {
+  public BlueOldPushPartnerAuto(RobotManager robotManager, Trailblazer trailblazer) {
     super(robotManager, trailblazer);
   }
 
   @Override
   protected Pose2d getStartingPose() {
-    return Points.START_5_AND_2.bluePose;
+    return Points.START_R2_AND_B2.bluePose;
   }
 
   @Override
   protected Command createAutoCommand() {
     return Commands.sequence(
         Commands.runOnce(robotManager::rehomeRollRequest),
-        // SCORE L4 ON F
+        // SCORE L4 ON I
+        trailblazer.followSegment(
+            // PUSH PARTNER
+            new AutoSegment(
+                INTAKING_CONSTRAINTS,
+                new AutoPoint(Points.START_R2_AND_B2.bluePose),
+                new AutoPoint(new Pose2d(7.587, 6.147, Rotation2d.fromDegrees(180))))),
+        // SCORE L4 ON I
         trailblazer
             .followSegment(
                 new AutoSegment(
                     SCORING_CONSTRAINTS,
-                    new AutoPoint(Points.START_5_AND_2.bluePose, INTAKING_CONSTRAINTS),
+                    new AutoPoint(Points.START_R2_AND_B2.bluePose, INTAKING_CONSTRAINTS),
                     new AutoPoint(
-                        new Pose2d(5.765, 5.428, Rotation2d.fromDegrees(-60)),
+                        new Pose2d(5.765, 2, Rotation2d.fromDegrees(-120)),
                         autoCommands
                             .preloadCoralAfterRollHomed()
-                            .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_F))),
+                            .andThen(autoCommands.l4WarmupCommand(ReefPipe.PIPE_I)),
+                        new AutoConstraintOptions(1.5, 57, 4, 30)),
                     new AutoPoint(
                         () ->
                             robotManager.autoAlign.getUsedScoringPose(
-                                ReefPipe.PIPE_F, ReefPipeLevel.L4))),
-                false)
-            .until(autoCommands::alignedForScore),
-        autoCommands.l4ScoreAndReleaseCommand(),
-
-        // INTAKE STATION
-        trailblazer
-            .followSegment(
-                new AutoSegment(
-                    new AutoPoint(
-                        new Pose2d(5.418, 5.807, Rotation2d.fromDegrees(-60)),
-                        Commands.waitSeconds(0.25).andThen(robotManager::stowRequest),
-                        new AutoConstraintOptions(4, 57, 4, 30)),
-                    new AutoPoint(
-                        new Pose2d(3.708, 6.393, Rotation2d.fromDegrees(-135.878)),
-                        new AutoConstraintOptions(2, 57, 4, 30)),
-                    new AutoPoint(
-                        Points.RIGHT_CORAL_STATION.bluePose,
-                        autoCommands.intakeStationWarmupCommand(),
-                        new AutoConstraintOptions(1, 57, 4, 30))),
-                false)
-            .until(autoCommands::isSmartStowing),
-
-        // SCORE L4 ON E
-        trailblazer
-            .followSegment(
-                new AutoSegment(
-                    SCORING_CONSTRAINTS,
-                    new AutoPoint(
-                        new Pose2d(3.431, 6.943, Rotation2d.fromDegrees(-90.5)),
-                        autoCommands.l4WarmupCommand(ReefPipe.PIPE_E),
-                        INTAKING_CONSTRAINTS),
-                    new AutoPoint(new Pose2d(5.304, 6.497, Rotation2d.fromDegrees(-60.0))),
-                    new AutoPoint(
-                        () ->
-                            robotManager.autoAlign.getUsedScoringPose(
-                                ReefPipe.PIPE_E, ReefPipeLevel.L4))),
+                                ReefPipe.PIPE_I, ReefPipeLevel.L4),
+                        new AutoConstraintOptions(1.5, 57, 4, 30))),
                 false)
             .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
@@ -94,30 +67,38 @@ public class BlueFourPiece5FEDC extends BaseAuto {
                 new AutoSegment(
                     INTAKING_CONSTRAINTS,
                     new AutoPoint(
-                        new Pose2d(5.304, 5.807, Rotation2d.fromDegrees(-60)),
+                        new Pose2d(5.418, 5.807, Rotation2d.fromDegrees(-45)),
                         Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
-                    new AutoPoint(new Pose2d(3.552, 6.393, Rotation2d.fromDegrees(-135.88))),
+                    //        new AutoConstraintOptions(4, 57, 4, 30)),
+                    new AutoPoint(new Pose2d(3.914, 6.611, Rotation2d.fromDegrees(-45))),
                     new AutoPoint(
-                        Points.RIGHT_CORAL_STATION.bluePose,
-                        autoCommands.intakeStationWarmupCommand())),
+                        new Pose2d(2.309, 6.943, Rotation2d.fromDegrees(-45)),
+                        autoCommands.intakeStationWarmupCommand(),
+                        new AutoConstraintOptions(3, 57, 4, 30)),
+                    new AutoPoint(Points.LEFT_CORAL_STATION.bluePose)),
                 false)
             .until(autoCommands::isSmartStowing),
 
-        // SCORE L4 ON D
+        // SCORE L4 ON K
         autoCommands
-            .l4WarmupCommand(ReefPipe.PIPE_D)
+            .l4WarmupCommand(ReefPipe.PIPE_K)
             .alongWith(
                 trailblazer
                     .followSegment(
                         new AutoSegment(
                             SCORING_CONSTRAINTS,
                             new AutoPoint(
-                                new Pose2d(3.044, 6.147, Rotation2d.fromDegrees(-133.277))),
+                                new Pose2d(2.636, 6.497, Rotation2d.fromDegrees(-47)),
+                                new AutoConstraintOptions(2.3, 57, 4, 30)),
+                            new AutoPoint(
+                                new Pose2d(3.266, 5.963, Rotation2d.fromDegrees(-47)),
+                                new AutoConstraintOptions(1.5, 57, 4, 30)),
                             // REEF PIPE K
                             new AutoPoint(
                                 () ->
                                     robotManager.autoAlign.getUsedScoringPose(
-                                        ReefPipe.PIPE_D, ReefPipeLevel.L4))),
+                                        ReefPipe.PIPE_K, ReefPipeLevel.L4),
+                                new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
@@ -128,30 +109,36 @@ public class BlueFourPiece5FEDC extends BaseAuto {
                 new AutoSegment(
                     INTAKING_CONSTRAINTS,
                     new AutoPoint(
-                        new Pose2d(3.266, 5.963, Rotation2d.fromDegrees(-133.277)),
+                        new Pose2d(3.266, 5.963, Rotation2d.fromDegrees(-47)),
                         Commands.waitSeconds(0.25).andThen(robotManager::stowRequest)),
-                    new AutoPoint(new Pose2d(2.467, 6.611, Rotation2d.fromDegrees(-133.277))),
                     new AutoPoint(
-                        Points.RIGHT_CORAL_STATION.bluePose,
-                        autoCommands.intakeStationWarmupCommand())),
+                        new Pose2d(2.467, 6.611, Rotation2d.fromDegrees(-47)),
+                        autoCommands.intakeStationWarmupCommand(),
+                        new AutoConstraintOptions(3, 57, 4, 30)),
+                    new AutoPoint(Points.LEFT_CORAL_STATION.bluePose)),
                 false)
             .until(autoCommands::isSmartStowing),
 
-        // SCORE L4 ON C
+        // SCORE L4 ON L
         autoCommands
-            .l4WarmupCommand(ReefPipe.PIPE_C)
+            .l4WarmupCommand(ReefPipe.PIPE_L)
             .alongWith(
                 trailblazer
                     .followSegment(
                         new AutoSegment(
                             SCORING_CONSTRAINTS,
                             new AutoPoint(
-                                new Pose2d(2.596, 6.079, Rotation2d.fromDegrees(-134.931))),
+                                new Pose2d(2.636, 6.249, Rotation2d.fromDegrees(-47)),
+                                new AutoConstraintOptions(2.3, 57, 4, 30)),
+                            new AutoPoint(
+                                new Pose2d(3.266, 5.615, Rotation2d.fromDegrees(-46)),
+                                new AutoConstraintOptions(1.5, 57, 4, 30)),
                             // REEF PIPE L
                             new AutoPoint(
                                 () ->
                                     robotManager.autoAlign.getUsedScoringPose(
-                                        ReefPipe.PIPE_C, ReefPipeLevel.L4))),
+                                        ReefPipe.PIPE_L, ReefPipeLevel.L4),
+                                new AutoConstraintOptions(1.5, 57, 4, 30))),
                         false)
                     .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
@@ -159,10 +146,10 @@ public class BlueFourPiece5FEDC extends BaseAuto {
         // DRIVE BACK & STOW
         trailblazer.followSegment(
             new AutoSegment(
-                SCORING_CONSTRAINTS,
-                new AutoPoint(new Pose2d(3.552, 5.328, Rotation2d.fromDegrees(-134.931))),
+                INTAKING_CONSTRAINTS,
+                new AutoPoint(new Pose2d(3.552, 5.238, Rotation2d.fromDegrees(-46))),
                 new AutoPoint(
-                    new Pose2d(3.266, 5.615, Rotation2d.fromDegrees(-134.931)),
+                    new Pose2d(3.266, 5.615, Rotation2d.fromDegrees(-46)),
                     autoCommands.stowRequest()))));
   }
 }

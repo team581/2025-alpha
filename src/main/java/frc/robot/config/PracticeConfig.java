@@ -1,12 +1,14 @@
 package frc.robot.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.ProximityParamsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
@@ -15,6 +17,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.config.RobotConfig.ClimberConfig;
@@ -26,7 +29,6 @@ import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
 import frc.robot.config.RobotConfig.WristConfig;
 import frc.robot.generated.PracticeBotTunerConstants;
-import frc.robot.util.ProfiledPhoenixPIDController;
 
 class PracticeConfig {
   private static final String CANIVORE_NAME = PracticeBotTunerConstants.kCANBus.getName();
@@ -97,8 +99,10 @@ class PracticeConfig {
               new Debouncer(0.1, DebounceType.kBoth),
               new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
-                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimit(15)
+                          .withSupplyCurrentLimit(20))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.CounterClockwise_Positive)
@@ -108,8 +112,10 @@ class PracticeConfig {
                           .withPeakForwardTorqueCurrent(70.0)
                           .withPeakReverseTorqueCurrent(70.0)),
               new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
-                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimit(15)
+                          .withSupplyCurrentLimit(20))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
@@ -121,7 +127,7 @@ class PracticeConfig {
               68,
               0.66),
           new SwerveConfig(
-              new ProfiledPhoenixPIDController(10, 0, 1, Double.MAX_VALUE),
+              new PhoenixPIDController(5.75, 0, 0),
               true,
               true,
               true,
@@ -213,6 +219,8 @@ class PracticeConfig {
               CANIVORE_NAME,
               24,
               25,
+              27,
+              28,
               -55.0,
               215.0,
               new TalonFXConfiguration()
@@ -227,9 +235,18 @@ class PracticeConfig {
               new CANcoderConfiguration()
                   .withMagnetSensor(
                       new MagnetSensorConfigs()
-                          .withMagnetOffset(-0.311279296875)
+                          .withMagnetOffset(-0.73583984375)
                           .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
-                          .withAbsoluteSensorDiscontinuityPoint(0.75))),
+                          .withAbsoluteSensorDiscontinuityPoint(0.5)),
+              new TalonFXConfiguration()
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimitEnable(true)
+                          .withStatorCurrentLimit(35)
+                          .withSupplyCurrentLimitEnable(true)
+                          .withSupplyCurrentLimit(35)),
+              new CANrangeConfiguration()
+                  .withProximityParams(new ProximityParamsConfigs().withProximityThreshold(0.06))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private PracticeConfig() {}

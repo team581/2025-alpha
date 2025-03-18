@@ -12,8 +12,6 @@ public enum ElevatorState {
   GROUND_CORAL_INTAKE(0),
   GROUND_ALGAE_INTAKE(10.2),
 
-  ALGAE_DISLODGE_L2(UNTUNED),
-  ALGAE_DISLODGE_L3(UNTUNED),
   ALGAE_INTAKE_L2(10.0),
   ALGAE_INTAKE_L3(25.0),
 
@@ -51,8 +49,8 @@ public enum ElevatorState {
   CORAL_DISPLACED_L3_PLACE(19.0),
   CORAL_DISPLACED_L3_RELEASE(8.0),
 
-  CORAL_DISPLACED_L4_RAISE_WRIST(52.5),
-  CORAL_DISPLACED_L4_LINEUP(52.5),
+  CORAL_DISPLACED_L4_RAISE_WRIST(52.75),
+  CORAL_DISPLACED_L4_LINEUP(52.75),
   CORAL_DISPLACED_L4_PLACE(42.5),
   CORAL_DISPLACED_L4_RELEASE(40.0),
 
@@ -65,9 +63,5 @@ public enum ElevatorState {
 
   private ElevatorState(double height) {
     this.height = height;
-  }
-
-  private ElevatorState(ElevatorState other) {
-    this(other.height);
   }
 }

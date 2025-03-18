@@ -1,12 +1,14 @@
 package frc.robot.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.ProximityParamsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
@@ -15,6 +17,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.config.RobotConfig.ClimberConfig;
@@ -26,7 +29,6 @@ import frc.robot.config.RobotConfig.SwerveConfig;
 import frc.robot.config.RobotConfig.VisionConfig;
 import frc.robot.config.RobotConfig.WristConfig;
 import frc.robot.generated.CompBotTunerConstants;
-import frc.robot.util.ProfiledPhoenixPIDController;
 
 class CompConfig {
   private static final String CANIVORE_NAME = CompBotTunerConstants.kCANBus.getName();
@@ -41,8 +43,10 @@ class CompConfig {
               16,
               // Sensor to mechanism ratio is the gear ratio multiplied by the sprocket circumfrence
               new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(60))
-                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(40))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimit(60)
+                          .withSupplyCurrentLimit(40))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
@@ -66,6 +70,10 @@ class CompConfig {
                                       * (2.0 / 1.0)
                                       * (Math.PI * 1.274)))),
               new TalonFXConfiguration()
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimit(60)
+                          .withSupplyCurrentLimit(40))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.CounterClockwise_Positive)
@@ -99,34 +107,38 @@ class CompConfig {
               21,
               26,
               true,
-              new Debouncer(0.1, DebounceType.kFalling),
-              new Debouncer(0.1, DebounceType.kFalling),
+              new Debouncer(0.1, DebounceType.kBoth),
+              new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
-                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimit(80)
+                          .withSupplyCurrentLimit(80))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
                           .withNeutralMode(NeutralModeValue.Coast))
                   .withTorqueCurrent(
                       new TorqueCurrentConfigs()
-                          .withPeakForwardTorqueCurrent(70.0)
-                          .withPeakReverseTorqueCurrent(70.0)),
+                          .withPeakForwardTorqueCurrent(80.0)
+                          .withPeakReverseTorqueCurrent(80.0)),
               new TalonFXConfiguration()
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(15))
-                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20))
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimit(80)
+                          .withSupplyCurrentLimit(80))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.CounterClockwise_Positive)
                           .withNeutralMode(NeutralModeValue.Coast))
                   .withTorqueCurrent(
                       new TorqueCurrentConfigs()
-                          .withPeakForwardTorqueCurrent(70.0)
-                          .withPeakReverseTorqueCurrent(70.0)),
+                          .withPeakForwardTorqueCurrent(80.0)
+                          .withPeakReverseTorqueCurrent(80.0)),
               90,
               0.66),
           new SwerveConfig(
-              new ProfiledPhoenixPIDController(5.75, 0, 0, Double.MAX_VALUE),
+              new PhoenixPIDController(5.75, 0, 0),
               true,
               true,
               true,
@@ -218,8 +230,10 @@ class CompConfig {
               CANIVORE_NAME,
               24,
               25,
+              27,
+              28,
               -55.0,
-              215.0,
+              100.0,
               new TalonFXConfiguration()
                   .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
                   .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(75.0))
@@ -232,9 +246,18 @@ class CompConfig {
               new CANcoderConfiguration()
                   .withMagnetSensor(
                       new MagnetSensorConfigs()
-                          .withMagnetOffset(0.120849609375)
+                          .withMagnetOffset(-0.444580078125)
                           .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
-                          .withAbsoluteSensorDiscontinuityPoint(0.7))),
+                          .withAbsoluteSensorDiscontinuityPoint(0.5)),
+              new TalonFXConfiguration()
+                  .withCurrentLimits(
+                      new CurrentLimitsConfigs()
+                          .withStatorCurrentLimitEnable(true)
+                          .withStatorCurrentLimit(35)
+                          .withSupplyCurrentLimitEnable(true)
+                          .withSupplyCurrentLimit(35)),
+              new CANrangeConfiguration()
+                  .withProximityParams(new ProximityParamsConfigs().withProximityThreshold(0.06))),
           new LightsConfig(RIO_CAN_NAME, 18));
 
   private CompConfig() {}

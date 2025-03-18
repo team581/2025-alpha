@@ -1,6 +1,6 @@
 package frc.robot.autos.trackers.pure_pursuit;
 
-import edu.wpi.first.math.MathUtil;
+import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -142,10 +142,18 @@ public class PurePursuitPathTracker implements PathTracker {
       currentRobotFollowedPointIndex++;
       currentTargetWaypoint = points.get(currentRobotFollowedPointIndex).poseSupplier.get();
       lastTargetWaypoint = points.get(currentRobotFollowedPointIndex - 1).poseSupplier.get();
+    } else if (currentRobotFollowedPointIndex + 1 < currentLookaheadPointIndex) {
+      DogLog.logFault("Trailblazer followed index lagging behind");
+      currentRobotFollowedPointIndex = currentLookaheadPointIndex - 1;
     }
-    currentInterpolatedRotation =
-        PurePursuitUtils.getPointToPointInterpolatedRotation(
-            lastTargetWaypoint, currentTargetPoint, perpendicularPoint);
+
+    if (FeatureFlags.PURE_PURSUIT_ROTATE_IMMEDIATELY.getAsBoolean()) {
+      currentInterpolatedRotation = currentTargetPoint.getRotation();
+    } else {
+      currentInterpolatedRotation =
+          PurePursuitUtils.getPointToPointInterpolatedRotation(
+              lastTargetWaypoint, currentTargetPoint, perpendicularPoint);
+    }
   }
 
   private int getCurrentLookaheadPointIndex() {
@@ -155,24 +163,6 @@ public class PurePursuitPathTracker implements PathTracker {
   @Override
   public int getCurrentPointIndex() {
     return currentRobotFollowedPointIndex;
-  }
-
-  @Override
-  public boolean isFinished() {
-    if (points.isEmpty()) {
-      return true;
-    }
-    if ((currentRobotPose
-                .getTranslation()
-                .getDistance(points.get(points.size() - 1).poseSupplier.get().getTranslation())
-            < AT_END_OF_SEGMENT_DISTANCE_THRESHOLD)
-        && MathUtil.isNear(
-            points.get(points.size() - 1).poseSupplier.get().getRotation().getDegrees(),
-            currentRobotPose.getRotation().getDegrees(),
-            AT_END_OF_SEGMENT_ROTATION_THRESHOLD)) {
-      return true;
-    }
-    return false;
   }
 
   private void updateLookahead() {

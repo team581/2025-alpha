@@ -2,6 +2,7 @@ package frc.robot.vision.limelight;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.scheduling.SubsystemPriority;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 public class Limelight extends StateMachine<LimelightState> {
   private static final int[] VALID_APRILTAGS =
-      new int[] {1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 21, 22};
+      new int[] {1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 20, 21, 22};
 
   private static final int[] STATION_TAGS = new int[] {1, 2, 12, 13};
 
@@ -83,22 +84,27 @@ public class Limelight extends StateMachine<LimelightState> {
     if (estimatePose == null) {
       return Optional.empty();
     }
-    if (!MathUtil.isNear(
-        robotHeading, estimatePose.pose.getRotation().getDegrees(), 10, -180, 180)) {
+    var newPose = estimatePose.pose;
+
+    if (!MathUtil.isNear(robotHeading, newPose.getRotation().getDegrees(), 10, -180, 180)) {
+      DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", Pose2d.kZero);
 
       return Optional.empty();
     }
 
-    DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", estimatePose.pose);
-
     if (estimatePose.tagCount == 0) {
+      DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", Pose2d.kZero);
+
       return Optional.empty();
     }
     // This prevents pose estimator from having crazy poses if the Limelight loses power
-    if (estimatePose.pose.getX() == 0.0 && estimatePose.pose.getY() == 0.0) {
+    if (newPose.getX() == 0.0 && newPose.getY() == 0.0) {
+      DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", Pose2d.kZero);
+
       return Optional.empty();
     }
 
+    DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", newPose);
     return Optional.of(new TagResult(estimatePose.pose, estimatePose.timestampSeconds));
   }
 
