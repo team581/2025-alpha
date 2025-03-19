@@ -23,7 +23,7 @@ public class RedLollipopAuto extends BaseAuto {
   @Override
   protected Command createAutoCommand() {
     return Commands.sequence(
-  Commands.runOnce(robotManager::rehomeRollRequest),
+        Commands.runOnce(robotManager::rehomeRollRequest),
         blocks.intakeLollipop(
             new Pose2d(13.9, 2.168, Rotation2d.fromDegrees(0)),
             new Pose2d(15.2, 2.168, Rotation2d.fromDegrees(0)),

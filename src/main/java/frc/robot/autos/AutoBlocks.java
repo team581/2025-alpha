@@ -196,7 +196,8 @@ public class AutoBlocks {
         .withDeadline(autoCommands.waitForGroundIntakeDone());
   }
 
-  public Command intakeLollipop(Pose2d approachPoint, Pose2d defaultIntakingPose, Pose2d backAwayPoint) {
+  public Command intakeLollipop(
+      Pose2d approachPoint, Pose2d defaultIntakingPose, Pose2d backAwayPoint) {
     return trailblazer
         .followSegment(
             new AutoSegment(
@@ -210,9 +211,9 @@ public class AutoBlocks {
                             .orElse(defaultIntakingPose),
                     Commands.runOnce(robotManager::intakeFloorCoralUprightRequest),
                     LOLLIPOP_CONSTRAINTS)),
-            false).withTimeout(5.0)
-        .withDeadline(autoCommands.waitForGroundIntakeDone()).andThen(trailblazer.followSegment(new AutoSegment(
-          new AutoPoint(backAwayPoint)
-        )));
+            false)
+        .withTimeout(5.0)
+        .withDeadline(autoCommands.waitForGroundIntakeDone())
+        .andThen(trailblazer.followSegment(new AutoSegment(new AutoPoint(backAwayPoint))));
   }
 }
