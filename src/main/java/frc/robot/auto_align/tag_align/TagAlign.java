@@ -19,7 +19,7 @@ public class TagAlign {
   private static final List<ReefPipe> ALL_REEF_PIPES = List.of(ReefPipe.values());
 
   private static final PIDController TAG_SIDEWAYS_PID = new PIDController(2.5, 0.0, 0.0);
-  private static final PIDController TAG_FORWARD_PID = new PIDController(0.8, 0.0, 0.0);
+  private static final PIDController TAG_FORWARD_PID = new PIDController(1.2, 0.0, 0.0);
 
   private static final double BEFORE_RAISED_INITIAL_DISTANCE_OFFSET = 0.35;
   private static final double TAG_ALIGNMENT_FINISHED_DISTANCE_THRESHOLD = 0.05;
