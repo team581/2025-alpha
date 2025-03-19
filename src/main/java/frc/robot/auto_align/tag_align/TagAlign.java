@@ -122,7 +122,10 @@ public class TagAlign {
             .minus(robotPose.getTranslation())
             .rotateBy(Rotation2d.fromDegrees(360 - robotPose.getRotation().getDegrees()));
 
-    var goalTranslationWithP = new Translation2d(TAG_FORWARD_PID.calculate(scoringTranslationRobotRelative.getX()), TAG_SIDEWAYS_PID.calculate(scoringTranslationRobotRelative.getY()) );
+    var goalTranslationWithP =
+        new Translation2d(
+            TAG_FORWARD_PID.calculate(scoringTranslationRobotRelative.getX()),
+            TAG_SIDEWAYS_PID.calculate(scoringTranslationRobotRelative.getY()));
     var goalTranslation = goalTranslationWithP.rotateBy(robotPose.getRotation());
 
     var xEffort = TAG_SIDEWAYS_PID.calculate(goalTranslation.getX());
