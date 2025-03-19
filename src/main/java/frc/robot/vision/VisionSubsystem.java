@@ -97,14 +97,14 @@ public class VisionSubsystem extends StateMachine<VisionState> {
       }
       case ALGAE_DETECTION -> {
         backTagLimelight.setState(LimelightState.TAGS);
-        frontRightLimelight.setState(LimelightState.TAGS);
-        frontLeftLimelight.setState(LimelightState.ALGAE);
+        frontRightLimelight.setState(LimelightState.ALGAE);
+        frontLeftLimelight.setState(LimelightState.TAGS);
       }
     }
   }
 
   public Optional<GamePieceResult> getLollipopVisionResult() {
-    return frontLeftLimelight.getAlgaeResult();
+    return frontRightLimelight.getAlgaeResult();
   }
 
   @Override
