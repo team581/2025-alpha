@@ -106,12 +106,14 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
       }
     }
 
-    if (!autoLineup && lineupTimer.hasElapsed(105.0)) {
-      if (getState() == ClimberState.STOWED) {
-        setState(ClimberState.AUTO_LINEUP);
-      }
-      autoLineup = true;
-    }
+
+    //TODO: UNCOMMENT FOR AUTO LINEUP
+    // if (!autoLineup && lineupTimer.hasElapsed(105.0)) {
+    //   if (getState() == ClimberState.STOWED) {
+    //     setState(ClimberState.AUTO_LINEUP);
+    //   }
+    //   autoLineup = true;
+    // }
   }
 
   public void setState(ClimberState newState) {
