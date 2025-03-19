@@ -21,9 +21,7 @@ public class GamePieceDetectionUtil {
           // Positive-Up
           Units.inchesToMeters(9.851),
           new Rotation3d(
-              Units.degreesToRadians(0),
-              Units.degreesToRadians(-5.0),
-              Units.degreesToRadians(20)));
+              Units.degreesToRadians(0), Units.degreesToRadians(-5.0), Units.degreesToRadians(20)));
 
   private static final double CORAL_LENGTH = 11.875;
   private static final double CORAL_RADIUS = 2.25;
