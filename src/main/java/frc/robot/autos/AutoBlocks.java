@@ -28,7 +28,7 @@ public class AutoBlocks {
   private static final Transform2d PIPE_LINEUP_OFFSET = new Transform2d(-0.6, 0, Rotation2d.kZero);
 
   private static final Transform2d PIPE_APPROACH_OFFSET =
-      new Transform2d(-1.3, 0, Rotation2d.kZero);
+      new Transform2d(-1.1, 0, Rotation2d.kZero);
 
   private static final Transform2d FRONT_STATION_APPROACH_OFFSET =
       new Transform2d(-0.8, 0, Rotation2d.kZero);
@@ -41,7 +41,7 @@ public class AutoBlocks {
   private static final AutoConstraintOptions SCORING_CONSTRAINTS =
       BASE_CONSTRAINTS.withMaxLinearAcceleration(2.0);
   private static final AutoConstraintOptions LOLLIPOP_CONSTRAINTS =
-      BASE_CONSTRAINTS.withMaxLinearAcceleration(2.0).withMaxLinearVelocity(1.5);
+      BASE_CONSTRAINTS.withMaxLinearAcceleration(2.0).withMaxLinearVelocity(1.0);
 
   private final Trailblazer trailblazer;
   private final RobotManager robotManager;
@@ -196,7 +196,7 @@ public class AutoBlocks {
         .withDeadline(autoCommands.waitForGroundIntakeDone());
   }
 
-  public Command intakeLollipop(Pose2d approachPoint, Pose2d defaultIntakingPose) {
+  public Command intakeLollipop(Pose2d approachPoint, Pose2d defaultIntakingPose, Pose2d backAwayPoint) {
     return trailblazer
         .followSegment(
             new AutoSegment(
@@ -210,7 +210,9 @@ public class AutoBlocks {
                             .orElse(defaultIntakingPose),
                     Commands.runOnce(robotManager::intakeFloorCoralUprightRequest),
                     LOLLIPOP_CONSTRAINTS)),
-            false)
-        .withDeadline(autoCommands.waitForGroundIntakeDone());
+            false).withTimeout(5.0)
+        .withDeadline(autoCommands.waitForGroundIntakeDone()).andThen(trailblazer.followSegment(new AutoSegment(
+          new AutoPoint(backAwayPoint)
+        )));
   }
 }
