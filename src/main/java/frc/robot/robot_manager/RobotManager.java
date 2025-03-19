@@ -892,7 +892,12 @@ public class RobotManager extends StateMachine<RobotState> {
     super.robotPeriodic();
     var maybeLollipop = vision.getLollipopVisionResult();
     if (maybeLollipop.isPresent()) {
-      DogLog.log("Debug/AlgaePose", new Pose2d(GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(localization.getPose(), maybeLollipop.get()), Rotation2d.kZero));
+      DogLog.log(
+          "Debug/AlgaePose",
+          new Pose2d(
+              GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
+                  localization.getPose(), maybeLollipop.get()),
+              Rotation2d.kZero));
     }
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(
