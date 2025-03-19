@@ -1,6 +1,5 @@
 package frc.robot.autos.trackers.pure_pursuit;
 
-import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -62,12 +61,12 @@ public class PurePursuitPathTracker implements PathTracker {
     }
     currentTargetWaypoint = points.get(getCurrentLookaheadPointIndex()).poseSupplier.get();
     var perpendicularPoint =
-    PurePursuitUtils.getPerpendicularPoint(
-      lastTargetWaypoint, currentTargetWaypoint, currentRobotPose);
-      if (PurePursuitUtils.isBetween(lastTargetWaypoint, currentTargetWaypoint, perpendicularPoint)) {
-        currentRobotFollowedPointIndex = getCurrentLookaheadPointIndex();
-      }
-      updateRotation();
+        PurePursuitUtils.getPerpendicularPoint(
+            lastTargetWaypoint, currentTargetWaypoint, currentRobotPose);
+    if (PurePursuitUtils.isBetween(lastTargetWaypoint, currentTargetWaypoint, perpendicularPoint)) {
+      currentRobotFollowedPointIndex = getCurrentLookaheadPointIndex();
+    }
+    updateRotation();
     var lookaheadPoint =
         new Pose2d(
             PurePursuitUtils.getLookaheadPoint(
@@ -133,7 +132,6 @@ public class PurePursuitPathTracker implements PathTracker {
         PurePursuitUtils.getPerpendicularPoint(
             lastTargetPoint, currentTargetPoint, currentRobotPose);
 
-
     if (FeatureFlags.PURE_PURSUIT_ROTATE_IMMEDIATELY.getAsBoolean()) {
       currentInterpolatedRotation = currentTargetPoint.getRotation();
     } else {
@@ -156,7 +154,10 @@ public class PurePursuitPathTracker implements PathTracker {
     if (FeatureFlags.PURE_PURSUIT_USE_DYNAMIC_LOOKAHEAD.getAsBoolean() && points.size() > 1) {
 
       if (points.size() == 2) {
-        if (startingRobotPose.getTranslation().getDistance(points.get(0).poseSupplier.get().getTranslation())>STARTING_ROBOT_POSE_FAR_FROM_PATH_THRESHOLD) {
+        if (startingRobotPose
+                .getTranslation()
+                .getDistance(points.get(0).poseSupplier.get().getTranslation())
+            > STARTING_ROBOT_POSE_FAR_FROM_PATH_THRESHOLD) {
 
           requestNewLookaheadDistance(
               PurePursuitUtils.getDynamicLookaheadDistance(
