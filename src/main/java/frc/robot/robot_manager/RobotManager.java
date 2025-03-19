@@ -2,6 +2,7 @@ package frc.robot.robot_manager;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -34,6 +35,7 @@ import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionState;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.game_piece_detection.CoralMap;
+import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.wrist.WristState;
 import frc.robot.wrist.WristSubsystem;
 import java.util.Optional;
@@ -430,10 +432,10 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_CORAL_FLOOR_UPRIGHT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
-        moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
+        moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.UPRIGHT_CORAL_INTAKE);
         swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_UPRIGHT);
-        vision.setState(VisionState.CORAL_DETECTION);
+        vision.setState(VisionState.ALGAE_DETECTION);
         lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
         climber.setState(ClimberState.STOWED);
       }
@@ -888,6 +890,15 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
+    var maybeLollipop = vision.getLollipopVisionResult();
+    if (maybeLollipop.isPresent()) {
+      DogLog.log(
+          "Debug/AlgaePose",
+          new Pose2d(
+              GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
+                  localization.getPose(), maybeLollipop.get()),
+              Rotation2d.kZero));
+    }
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(
         "RobotManager/ShouldIntakeForward",
@@ -1230,6 +1241,20 @@ public class RobotManager extends StateMachine<RobotState> {
           REHOME_ROLL,
           REHOME_WRIST -> {}
       default -> setStateFromRequest(RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL);
+    }
+  }
+
+  public void intakeFloorCoralUprightRequest() {
+    algaeMode = false;
+    switch (getState()) {
+      case CLIMBING_1_LINEUP,
+          CLIMBING_2_HANGING,
+          CLIMBING_3_HANGING_2,
+          CLIMBING_4_HANGING_3,
+          REHOME_ELEVATOR,
+          REHOME_ROLL,
+          REHOME_WRIST -> {}
+      default -> setStateFromRequest(RobotState.INTAKE_CORAL_FLOOR_UPRIGHT);
     }
   }
 

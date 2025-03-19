@@ -88,6 +88,7 @@ public class AutoCommands {
 
   /**
    * @deprecated Use {@link #hasCoral()} instead
+   * @deprecated Use {@link #hasCoral()} instead
    */
   @Deprecated
   public boolean isIdleCoral() {
@@ -172,5 +173,9 @@ public class AutoCommands {
             RobotState.INTAKE_CORAL_FLOOR_UPRIGHT,
             RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL)
         .andThen(robotManager.waitForState(RobotState.IDLE_CORAL));
+  }
+
+  public Command floorIntakeUprightCoral() {
+    return Commands.runOnce(robotManager::intakeFloorCoralUprightRequest);
   }
 }

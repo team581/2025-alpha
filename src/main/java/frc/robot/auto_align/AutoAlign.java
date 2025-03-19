@@ -22,7 +22,7 @@ import frc.robot.vision.limelight.Limelight;
 public class AutoAlign extends StateMachine<AutoAlignState> {
   private static final double REEF_FINAL_SPEEDS_DISTANCE_THRESHOLD = 1.5;
   private static final double LOWEST_TELEOP_SPEED_SCALAR = 0.5;
-  private static final double MAX_CONSTRAINT = 1.5;
+  private static final double MAX_CONSTRAINT = 2.3;
 
   public static boolean shouldNetScoreForwards(Pose2d robotPose) {
     double robotX = robotPose.getX();

@@ -1,13 +1,17 @@
 package frc.robot.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.imu.ImuSubsystem;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.limelight.Limelight;
 import frc.robot.vision.limelight.LimelightState;
+import frc.robot.vision.results.GamePieceResult;
 import frc.robot.vision.results.TagResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class VisionSubsystem extends StateMachine<VisionState> {
   private final ImuSubsystem imu;
@@ -95,10 +99,14 @@ public class VisionSubsystem extends StateMachine<VisionState> {
       }
       case ALGAE_DETECTION -> {
         backTagLimelight.setState(LimelightState.TAGS);
-        frontRightLimelight.setState(LimelightState.TAGS);
+        frontRightLimelight.setState(LimelightState.ALGAE);
         frontLeftLimelight.setState(LimelightState.TAGS);
       }
     }
+  }
+
+  public Optional<GamePieceResult> getLollipopVisionResult() {
+    return frontRightLimelight.getAlgaeResult();
   }
 
   @Override
@@ -161,5 +169,26 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     }
 
     return false;
+  }
+
+  public Optional<Pose2d> getLollipopPose(LocalizationSubsystem localization) {
+    // TODO: Update for new camera setup
+    return Optional.empty();
+    // var maybeAlgaeResult = frontCoralLimelight.getAlgaeResult();
+
+    // if (maybeAlgaeResult.isEmpty()) {
+    //   return Optional.empty();
+    // }
+
+    // var algaeResult = maybeAlgaeResult.orElseThrow();
+    // var angleToCoral =
+    //     GamePieceDetectionUtil.getFieldRelativeAngleToGamePiece(
+    //         localization.getPose(algaeResult.timestamp()), algaeResult);
+
+    // return Optional.of(
+    //     new Pose2d(
+    //         GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
+    //             localization.getPose(algaeResult.timestamp()), algaeResult),
+    //         Rotation2d.fromDegrees(angleToCoral)));
   }
 }
