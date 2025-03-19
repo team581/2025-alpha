@@ -1,6 +1,8 @@
 package frc.robot.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.imu.ImuSubsystem;
+import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.limelight.Limelight;
@@ -167,5 +169,26 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     }
 
     return false;
+  }
+
+  public Optional<Pose2d> getLollipopPose(LocalizationSubsystem localization) {
+    // TODO: Update for new camera setup
+    return Optional.empty();
+    // var maybeAlgaeResult = frontCoralLimelight.getAlgaeResult();
+
+    // if (maybeAlgaeResult.isEmpty()) {
+    //   return Optional.empty();
+    // }
+
+    // var algaeResult = maybeAlgaeResult.orElseThrow();
+    // var angleToCoral =
+    //     GamePieceDetectionUtil.getFieldRelativeAngleToGamePiece(
+    //         localization.getPose(algaeResult.timestamp()), algaeResult);
+
+    // return Optional.of(
+    //     new Pose2d(
+    //         GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
+    //             localization.getPose(algaeResult.timestamp()), algaeResult),
+    //         Rotation2d.fromDegrees(angleToCoral)));
   }
 }

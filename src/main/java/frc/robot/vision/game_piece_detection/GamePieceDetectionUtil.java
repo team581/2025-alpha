@@ -11,7 +11,7 @@ import frc.robot.intake_assist.IntakeAssistUtil;
 import frc.robot.vision.results.GamePieceResult;
 
 public class GamePieceDetectionUtil {
-  public static final Pose3d LIMELIGHT_POSE_TO_ROBOT =
+  private static final Pose3d LIMELIGHT_POSE_TO_ROBOT =
       new Pose3d(
           // Positive-Forward
           Units.inchesToMeters(10.564),

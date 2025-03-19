@@ -430,7 +430,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case INTAKE_CORAL_FLOOR_UPRIGHT -> {
         intake.setState(IntakeState.INTAKING_CORAL);
-        moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.GROUND_CORAL_INTAKE);
+        moveSuperstructure(ElevatorState.GROUND_CORAL_INTAKE, WristState.UPRIGHT_CORAL_INTAKE);
         swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_UPRIGHT);
         vision.setState(VisionState.ALGAE_DETECTION);
@@ -1216,6 +1216,20 @@ public class RobotManager extends StateMachine<RobotState> {
           REHOME_ROLL,
           REHOME_WRIST -> {}
       default -> setStateFromRequest(RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL);
+    }
+  }
+
+  public void intakeFloorCoralUprightRequest() {
+    algaeMode = false;
+    switch (getState()) {
+      case CLIMBING_1_LINEUP,
+          CLIMBING_2_HANGING,
+          CLIMBING_3_HANGING_2,
+          CLIMBING_4_HANGING_3,
+          REHOME_ELEVATOR,
+          REHOME_ROLL,
+          REHOME_WRIST -> {}
+      default -> setStateFromRequest(RobotState.INTAKE_CORAL_FLOOR_UPRIGHT);
     }
   }
 
