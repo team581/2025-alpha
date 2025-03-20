@@ -204,10 +204,7 @@ public class PurePursuitUtils {
       }
     }
     var progressPercent = Math.abs((pointToStart / totalDistance)*1.2);
-    // if (progressPercent > 0.975) {
-    //   progressPercent = 1.0;
-    // }
-
+ 
     var interpolatedRotation =
         startPoint.getRotation().interpolate(endPoint.getRotation(), progressPercent);
 
