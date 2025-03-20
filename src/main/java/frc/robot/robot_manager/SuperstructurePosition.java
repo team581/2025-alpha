@@ -23,11 +23,11 @@ public record SuperstructurePosition(double elevatorHeight, double wristAngle) {
       return true;
     }
 
-    if (!(other instanceof SuperstructurePosition)) {
+    if (!(other instanceof SuperstructurePosition otherPosition)) {
       return false;
     }
 
-    var otherPosition = (SuperstructurePosition) other;
+    
 
     return MathHelpers.roundTo(elevatorHeight, ELEVATOR_PRECISION)
             == MathHelpers.roundTo(otherPosition.elevatorHeight, ELEVATOR_PRECISION)

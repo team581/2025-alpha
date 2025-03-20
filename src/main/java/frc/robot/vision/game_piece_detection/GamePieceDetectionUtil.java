@@ -1,5 +1,6 @@
 package frc.robot.vision.game_piece_detection;
 
+import com.google.errorprone.annotations.Var;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.intake_assist.IntakeAssistUtil;
 import frc.robot.vision.results.GamePieceResult;
 
-public class GamePieceDetectionUtil {
+public final class GamePieceDetectionUtil {
   private static final Pose3d LIMELIGHT_POSE_TO_ROBOT =
       new Pose3d(
           // Positive-Forward
@@ -91,7 +92,7 @@ public class GamePieceDetectionUtil {
 
     double adjustedThetaY = limelightToRobotOffset.getRotation().getY() - newThetaY;
 
-    double forwardOffset = 0;
+    @Var double forwardOffset = 0;
     if (adjustedThetaY == 0) {
       forwardOffset = Math.abs(limelightToRobotOffset.getY());
     } else {
@@ -116,4 +117,7 @@ public class GamePieceDetectionUtil {
         .rotateBy(robotPose.getRotation())
         .plus(robotPose.getTranslation());
   }
+
+
+private GamePieceDetectionUtil() {}
 }

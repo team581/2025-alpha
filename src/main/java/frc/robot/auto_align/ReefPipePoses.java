@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 // Compute the offset poses for scoring on the reef once on boot to reduce GC pressure from dynamic
 // computation
-record ReefPipePoses(Pose2d base, Pose2d L1, Pose2d L2, Pose2d L3, Pose2d L4) {
+record ReefPipePoses(Pose2d base, static Pose2d L1, static Pose2d L2, static Pose2d L3, static Pose2d L4) {
   private static Pose2d offset(Pose2d base, ReefPipeLevel level) {
     return base.transformBy(level.offset);
   }

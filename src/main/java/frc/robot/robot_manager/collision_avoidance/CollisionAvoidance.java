@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class CollisionAvoidance {
+public final class CollisionAvoidance {
   private static final List<CollisionBox> ALL_COLLISION_BOXES = List.of(CollisionBox.values());
   private static final double WRIST_LENGTH = 23.092038;
   private static final Rotation2d offsetAngle = Rotation2d.fromDegrees(-33.0);
@@ -80,4 +80,7 @@ public class CollisionAvoidance {
 
     return Optional.empty();
   }
+
+
+private CollisionAvoidance() {}
 }

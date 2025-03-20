@@ -79,7 +79,7 @@ public class AutoBlocks {
                         SCORING_CONSTRAINTS),
                     new AutoPoint(
                         () -> robotManager.autoAlign.getUsedScoringPose(pipe, ReefPipeLevel.L4))),
-                false)
+                /* shouldEnd= */false)
             .withDeadline(
                 autoCommands
                     .waitForAlignedForScore()
@@ -135,7 +135,7 @@ public class AutoBlocks {
                     new AutoPoint(
                         () -> robotManager.autoAlign.getUsedScoringPose(pipe, ReefPipeLevel.L4),
                         SCORING_CONSTRAINTS)),
-                false)
+                /* shouldEnd= */false)
             .withDeadline(
                 autoCommands
                     .waitForAlignedForScore()
@@ -166,7 +166,7 @@ public class AutoBlocks {
                     station.frontLoadPose.transformBy(FRONT_STATION_APPROACH_OFFSET),
                     Commands.runOnce(robotManager::intakeStationFrontRequest)),
                 new AutoPoint(station.frontLoadPose)),
-            false)
+            /* shouldEnd= */false)
         .withDeadline(autoCommands.waitForFrontIntakeDone());
   }
 
@@ -179,7 +179,7 @@ public class AutoBlocks {
                     station.backLoadPose.transformBy(BACK_STATION_APPROACH_OFFSET),
                     Commands.runOnce(robotManager::intakeStationBackRequest)),
                 new AutoPoint(station.backLoadPose)),
-            false)
+            /* shouldEnd= */false)
         .withDeadline(autoCommands.waitForBackIntakeDone());
   }
 
@@ -192,7 +192,7 @@ public class AutoBlocks {
                 new AutoPoint(
                     () -> robotManager.coralMap.getBestCoral().orElse(defaultIntakingPose),
                     Commands.runOnce(robotManager::intakeAssistFloorCoralHorizontalRequest))),
-            false)
+            /* shouldEnd= */false)
         .withDeadline(autoCommands.waitForGroundIntakeDone());
   }
 
@@ -211,7 +211,7 @@ public class AutoBlocks {
                             .orElse(defaultIntakingPose),
                     Commands.runOnce(robotManager::intakeFloorCoralUprightRequest),
                     LOLLIPOP_CONSTRAINTS)),
-            false)
+            /* shouldEnd= */false)
         .withTimeout(5.0)
         .withDeadline(autoCommands.waitForGroundIntakeDone())
         .andThen(trailblazer.followSegment(new AutoSegment(new AutoPoint(backAwayPoint))));

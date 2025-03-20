@@ -47,7 +47,7 @@ public class RedOldThreePiece2IKLAuto extends BaseAuto {
                     new AutoPoint(
                         robotManager.autoAlign::getUsedScoringPose,
                         new AutoConstraintOptions(1.5, 57, 4, 30))),
-                false)
+                /* shouldEnd= */false)
             .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
 
@@ -66,7 +66,7 @@ public class RedOldThreePiece2IKLAuto extends BaseAuto {
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
                     new AutoPoint(Points.LEFT_CORAL_STATION.redPose)),
-                false)
+                /* shouldEnd= */false)
             .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON K
@@ -87,7 +87,7 @@ public class RedOldThreePiece2IKLAuto extends BaseAuto {
                             new AutoPoint(
                                 robotManager.autoAlign::getUsedScoringPose,
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
-                        false)
+                        /* shouldEnd= */false)
                     .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 
@@ -104,7 +104,7 @@ public class RedOldThreePiece2IKLAuto extends BaseAuto {
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
                     new AutoPoint(Points.LEFT_CORAL_STATION.redPose)),
-                false)
+                /* shouldEnd= */false)
             .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON L
@@ -125,7 +125,7 @@ public class RedOldThreePiece2IKLAuto extends BaseAuto {
                             new AutoPoint(
                                 robotManager.autoAlign::getUsedScoringPose,
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
-                        false)
+                        /* shouldEnd= */false)
                     .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 

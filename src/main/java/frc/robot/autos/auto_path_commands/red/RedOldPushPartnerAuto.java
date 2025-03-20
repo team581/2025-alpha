@@ -57,7 +57,7 @@ public class RedOldPushPartnerAuto extends BaseAuto {
                             robotManager.autoAlign.getUsedScoringPose(
                                 ReefPipe.PIPE_I, ReefPipeLevel.L4),
                         new AutoConstraintOptions(1.5, 57, 4, 30))),
-                false)
+                /* shouldEnd= */false)
             .until(autoCommands::alignedForScore),
         autoCommands.l4ScoreAndReleaseCommand(),
 
@@ -76,7 +76,7 @@ public class RedOldPushPartnerAuto extends BaseAuto {
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
                     new AutoPoint(Points.LEFT_CORAL_STATION.redPose)),
-                false)
+                /* shouldEnd= */false)
             .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON K
@@ -99,7 +99,7 @@ public class RedOldPushPartnerAuto extends BaseAuto {
                                     robotManager.autoAlign.getUsedScoringPose(
                                         ReefPipe.PIPE_K, ReefPipeLevel.L4),
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
-                        false)
+                        /* shouldEnd= */false)
                     .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 
@@ -116,7 +116,7 @@ public class RedOldPushPartnerAuto extends BaseAuto {
                         autoCommands.intakeStationWarmupCommand(),
                         new AutoConstraintOptions(3, 57, 4, 30)),
                     new AutoPoint(Points.LEFT_CORAL_STATION.redPose)),
-                false)
+                /* shouldEnd= */false)
             .until(autoCommands::isSmartStowing),
 
         // SCORE L4 ON L
@@ -139,7 +139,7 @@ public class RedOldPushPartnerAuto extends BaseAuto {
                                     robotManager.autoAlign.getUsedScoringPose(
                                         ReefPipe.PIPE_L, ReefPipeLevel.L4),
                                 new AutoConstraintOptions(1.5, 57, 4, 30))),
-                        false)
+                        /* shouldEnd= */false)
                     .until(autoCommands::alignedForScore)),
         autoCommands.l4ScoreAndReleaseCommand(),
 

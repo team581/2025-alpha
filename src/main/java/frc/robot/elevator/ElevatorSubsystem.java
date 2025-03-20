@@ -29,7 +29,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState> {
   private double leftMotorCurrent;
   private double rightMotorCurrent;
 
-  private final double RAISE_WRIST_EARLY_THRESHOLD = 25.0;
+  private static final double RAISE_WRIST_EARLY_THRESHOLD = 25.0;
 
   private final LinearFilter currentFilter = LinearFilter.movingAverage(5);
 

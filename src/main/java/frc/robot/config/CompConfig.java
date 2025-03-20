@@ -106,7 +106,7 @@ class CompConfig {
               20,
               21,
               26,
-              true,
+              /* sensorFlipped= */true,
               new Debouncer(0.1, DebounceType.kBoth),
               new Debouncer(0.1, DebounceType.kBoth),
               new TalonFXConfiguration()
@@ -139,9 +139,9 @@ class CompConfig {
               0.66),
           new SwerveConfig(
               new PhoenixPIDController(5.75, 0, 0),
-              true,
-              true,
-              true,
+              /* invertRotation= */true,
+              /* invertX= */true,
+              /* invertY= */true,
               new TalonFXConfiguration()
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()

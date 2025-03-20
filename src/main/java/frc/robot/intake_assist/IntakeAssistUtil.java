@@ -10,7 +10,7 @@ import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.vision.results.GamePieceResult;
 import java.util.Optional;
 
-public class IntakeAssistUtil {
+public final class IntakeAssistUtil {
   private static final double CORAL_ASSIST_KP = 3.0;
   private static final double INTAKE_OFFSET = Units.inchesToMeters(18);
 
@@ -53,4 +53,7 @@ public class IntakeAssistUtil {
             robotRelativeRotation.plus(robotPose.getRotation()));
     return Optional.of(fieldRelativeIntakePose);
   }
+
+
+private IntakeAssistUtil() {}
 }

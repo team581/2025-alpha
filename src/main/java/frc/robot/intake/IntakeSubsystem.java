@@ -28,7 +28,7 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   private boolean leftSensorRaw = false;
   private boolean rightSensorDebounced = false;
   private boolean leftSensorDebounced = false;
-  private boolean sensorsHaveGP = false;
+  private boolean sensorsHaveGp = false;
 
   private double topMotorVelocity = 0.0;
   private double bottomMotorVelocity = 0.0;
@@ -77,7 +77,7 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     leftSensorDebounced = leftDebouncer.calculate(leftSensorRaw);
     rightSensorDebounced = rightDebouncer.calculate(rightSensorRaw);
 
-    sensorsHaveGP = rightSensorDebounced || leftSensorDebounced;
+    sensorsHaveGp = rightSensorDebounced || leftSensorDebounced;
   }
 
   public boolean isCoralCentered() {
@@ -96,10 +96,10 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     return switch (getState()) {
       case INTAKING_CORAL ->
           FeatureFlags.INTAKE_VELOCITY_CORAL_DETECTION.getAsBoolean()
-              ? topMotorCoralVelocityGp && bottomMotorCoralVelocityGp && sensorsHaveGP
-              : sensorsHaveGP;
+              ? topMotorCoralVelocityGp && bottomMotorCoralVelocityGp && sensorsHaveGp
+              : sensorsHaveGp;
       case INTAKING_ALGAE -> topMotorAlgaeVelocityGp && bottomMotorAlgaeVelocityGp;
-      default -> sensorsHaveGP;
+      default -> sensorsHaveGp;
     };
   }
 
@@ -168,6 +168,6 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
     DogLog.log("Intake/Sensors/LeftSensorRaw", leftSensorRaw);
     DogLog.log("Intake/Sensors/RightSensorDebounced", rightSensorDebounced);
     DogLog.log("Intake/Sensors/LeftSensorDebounced", leftSensorDebounced);
-    DogLog.log("Intake/SensorsHaveGP", sensorsHaveGP);
+    DogLog.log("Intake/SensorsHaveGP", sensorsHaveGp);
   }
 }

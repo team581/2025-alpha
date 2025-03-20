@@ -55,17 +55,19 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
     latestResult = vision.getTagResult();
   }
 
-  public Pose2d getPose() {
+  
+public Pose2d getPose() {
     return swerve.getDrivetrainState().Pose;
-  }
-
-  public Pose2d getLookaheadPose(double lookahead) {
-    return MathHelpers.poseLookahead(getPose(), swerve.getFieldRelativeSpeeds(), lookahead);
   }
 
   public Pose2d getPose(double timestamp) {
     var newTimestamp = Utils.fpgaToCurrentTime(timestamp);
     return swerve.drivetrain.samplePoseAt(newTimestamp).orElseGet(this::getPose);
+  }
+
+
+  public Pose2d getLookaheadPose(double lookahead) {
+    return MathHelpers.poseLookahead(getPose(), swerve.getFieldRelativeSpeeds(), lookahead);
   }
 
   @Override
@@ -83,7 +85,7 @@ public class LocalizationSubsystem extends StateMachine<LocalizationState> {
   }
 
   private void resetGyro(double gyroAngle) {
-    Pose2d estimatedPose =
+    var estimatedPose =
         new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(gyroAngle));
     resetPose(estimatedPose);
   }
