@@ -69,7 +69,10 @@ public class PurePursuitPathTracker implements PathTracker {
     }
 
     var robotToSegmentDistanceClamped =
-        MathUtil.clamp(perpendicularPoint.getTranslation().getDistance(currentRobotPose.getTranslation()), 0.0, lookaheadDistance);
+        MathUtil.clamp(
+            perpendicularPoint.getTranslation().getDistance(currentRobotPose.getTranslation()),
+            0.0,
+            lookaheadDistance);
     updateRotation();
     var lookaheadPoint =
         new Pose2d(
@@ -77,8 +80,7 @@ public class PurePursuitPathTracker implements PathTracker {
                     lastTargetWaypoint,
                     currentTargetWaypoint,
                     perpendicularPoint,
-                    lookaheadDistance
-                        - robotToSegmentDistanceClamped)
+                    lookaheadDistance - robotToSegmentDistanceClamped)
                 .getTranslation(),
             currentInterpolatedRotation);
 
