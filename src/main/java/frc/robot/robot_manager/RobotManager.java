@@ -436,7 +436,7 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_UPRIGHT);
         vision.setState(VisionState.ALGAE_DETECTION);
-        lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
+        lights.setState(getLightsStateForLollipop());
         climber.setState(ClimberState.STOWED);
       }
       case INTAKE_CORAL_FLOOR_HORIZONTAL -> {
@@ -1716,6 +1716,12 @@ public class RobotManager extends StateMachine<RobotState> {
       case HAS_TAGS_IN_POSITION -> LightsState.SCORE_ALIGN_READY;
       default -> LightsState.SCORE_ALIGN_NOT_READY;
     };
+  }
+
+  private LightsState getLightsStateForLollipop() {
+    return vision.getLollipopVisionResult().isPresent()
+        ? LightsState.IDLE_WITH_ALGAE
+        : LightsState.IDLE_WITH_CORAL;
   }
 
   public void setConfirmScoreActive(boolean newValue) {
