@@ -163,6 +163,10 @@ public class AutoCommands {
     //     .waitForStates(
     //         RobotState.CORAL_CENTERED_L4_2_LINEUP, RobotState.CORAL_DISPLACED_L4_2_LINEUP)
     //     .andThen(Commands.waitUntil(this::alignedForScore));
+    if (RobotBase.isSimulation()) {
+       return Commands.waitSeconds(1.0);
+
+    }
     return Commands.waitUntil(this::alignedForScore).withTimeout(5.0);
   }
 
