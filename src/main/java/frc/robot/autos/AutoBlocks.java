@@ -197,7 +197,7 @@ public class AutoBlocks {
   }
 
   public Command intakeLollipop(
-      Pose2d approachPoint, Pose2d defaultIntakingPose, Pose2d backAwayPoint) {
+      Pose2d approachPoint, Pose2d defaultIntakingPose) {
     return trailblazer
         .followSegment(
             new AutoSegment(
@@ -213,7 +213,8 @@ public class AutoBlocks {
                     LOLLIPOP_CONSTRAINTS)),
             false)
         .withTimeout(5.0)
-        .withDeadline(autoCommands.waitForGroundIntakeDone())
-        .andThen(trailblazer.followSegment(new AutoSegment(new AutoPoint(backAwayPoint))));
+        .withDeadline(autoCommands.waitForGroundIntakeDone());
+     //   .andThen(trailblazer.followSegment(new AutoSegment(new AutoPoint(backAwayPoint))
+     //   ));
   }
 }
