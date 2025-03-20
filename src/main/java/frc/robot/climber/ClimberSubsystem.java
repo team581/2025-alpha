@@ -27,7 +27,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   private final Debouncer canRangeDebouncer = new Debouncer(0.25, DebounceType.kBoth);
   private double climbMotorDirection = 0;
   private double cancoderDirection = 0;
-  private boolean climberDirectionBad = false;
+  private final boolean climberDirectionBad = false;
   private double currentAngle;
   private double cilmberMotorAngle;
   private final StaticBrake brakeNeutralRequest = new StaticBrake();
@@ -35,7 +35,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
   private boolean holdingCage = false;
   private boolean autoLineup = false;
 
-  private Timer lineupTimer = new Timer();
+  private final Timer lineupTimer = new Timer();
 
   public ClimberSubsystem(
       TalonFX climbMotor, CANcoder encoder, TalonFX grabMotor, CANrange canrange) {
@@ -177,7 +177,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState> {
     return true;
   }
 
-  private double clamp(double angle) {
+  private static double clamp(double angle) {
     return MathUtil.clamp(
         angle, RobotConfig.get().climber().minAngle(), RobotConfig.get().climber().maxAngle());
   }

@@ -20,7 +20,7 @@ public class RollSubsystem extends StateMachine<RollState> {
   private double smartStowAngle;
   private double coralScoreDirection;
 
-  private LinearFilter linearFilter = LinearFilter.movingAverage(5);
+  private final LinearFilter linearFilter = LinearFilter.movingAverage(5);
 
   private final IntakeSubsystem intake;
 
@@ -97,7 +97,7 @@ public class RollSubsystem extends StateMachine<RollState> {
   }
 
   public void setState(RollState newState) {
-    setState(newState, false);
+    setState(newState, /* recheckSensors= */false);
   }
 
   public void setState(RollState newState, boolean recheckSensors) {

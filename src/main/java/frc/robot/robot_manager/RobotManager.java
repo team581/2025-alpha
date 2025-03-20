@@ -92,7 +92,7 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   private double reefSnapAngle = 0.0;
-  private double coralIntakeAssistAngle = 0.0;
+  private final double coralIntakeAssistAngle = 0.0;
   private Optional<Pose2d> maybeBestCoralMapTranslation = Optional.empty();
   private ReefSide nearestReefSide = ReefSide.SIDE_GH;
   private ReefPipeLevel scoringLevel = ReefPipeLevel.BASE;
@@ -396,7 +396,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.INTAKING_CORAL_STATION_BACK, WristState.INTAKING_CORAL_STATION_BACK);
         roll.setState(RollState.CORAL_HORIZONTAL);
-        swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()), true);
+        swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()), /* teleopOnly= */true);
         vision.setState(VisionState.STATION_TAGS);
         lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
         climber.setState(ClimberState.STOWED);
@@ -407,7 +407,7 @@ public class RobotManager extends StateMachine<RobotState> {
             ElevatorState.INTAKING_CORAL_STATION_FRONT, WristState.INTAKING_CORAL_STATION_FRONT);
         roll.setState(RollState.CORAL_HORIZONTAL);
         swerve.snapsDriveRequest(
-            SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0, true);
+            SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0, /* teleopOnly= */true);
         vision.setState(VisionState.STATION_TAGS);
         lights.setState(LightsState.IDLE_NO_GP_CORAL_MODE);
         climber.setState(ClimberState.STOWED);
@@ -487,7 +487,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case CORAL_L1_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
-        moveSuperstructure(ElevatorState.CORAL_L1_PLACE, WristState.CORAL_SCORE_PLACING_L1, true);
+        moveSuperstructure(ElevatorState.CORAL_L1_PLACE, WristState.CORAL_SCORE_PLACING_L1, /* unsafe= */true);
         swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_SCORE_L1);
         vision.setState(VisionState.TAGS);
@@ -496,7 +496,7 @@ public class RobotManager extends StateMachine<RobotState> {
       }
       case CORAL_L1_4_RELEASE -> {
         intake.setState(IntakeState.SCORE_CORAL);
-        moveSuperstructure(ElevatorState.CORAL_L1_RELEASE, WristState.CORAL_SCORE_PLACING_L1, true);
+        moveSuperstructure(ElevatorState.CORAL_L1_RELEASE, WristState.CORAL_SCORE_PLACING_L1, /* unsafe= */true);
         swerve.normalDriveRequest();
         roll.setState(RollState.CORAL_SCORE_L1);
         vision.setState(VisionState.TAGS);
@@ -508,7 +508,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L2_LINEUP, WristState.CORAL_SCORE_CENTERED_LINEUP_L2);
         swerve.scoringAlignmentRequest(reefSnapAngle);
-        roll.setState(RollState.CORAL_SCORE, true);
+        roll.setState(RollState.CORAL_SCORE, /* recheckSensors= */true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOWED);
@@ -518,7 +518,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L2_PLACE,
             WristState.CORAL_SCORE_CENTERED_PLACING_L2,
-            true);
+            /* unsafe= */true);
         swerve.scoringAlignmentRequest(reefSnapAngle);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
@@ -530,9 +530,9 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L2_RELEASE,
             WristState.CORAL_SCORE_CENTERED_PLACING_L2,
-            true);
+            /* unsafe= */true);
         autoAlign.markPipeScored();
-        swerve.snapsDriveRequest(reefSnapAngle, true);
+        swerve.snapsDriveRequest(reefSnapAngle, /* teleopOnly= */true);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING);
@@ -543,7 +543,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L3_LINEUP, WristState.CORAL_SCORE_CENTERED_LINEUP_L3);
         swerve.scoringAlignmentRequest(reefSnapAngle);
-        roll.setState(RollState.CORAL_SCORE, true);
+        roll.setState(RollState.CORAL_SCORE, /* recheckSensors= */true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOWED);
@@ -553,7 +553,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L3_PLACE,
             WristState.CORAL_SCORE_CENTERED_PLACING_L3,
-            true);
+            /* unsafe= */true);
         swerve.scoringAlignmentRequest(reefSnapAngle);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
@@ -565,9 +565,9 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L3_RELEASE,
             WristState.CORAL_SCORE_CENTERED_PLACING_L3,
-            true);
+            /* unsafe= */true);
         autoAlign.markPipeScored();
-        swerve.snapsDriveRequest(reefSnapAngle, true);
+        swerve.snapsDriveRequest(reefSnapAngle, /* teleopOnly= */true);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(LightsState.SCORING);
@@ -587,7 +587,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L4_LINEUP, WristState.CORAL_SCORE_CENTERED_LINEUP_L4);
         swerve.scoringAlignmentRequest(reefSnapAngle);
-        roll.setState(RollState.CORAL_SCORE, true);
+        roll.setState(RollState.CORAL_SCORE, /* recheckSensors= */true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOWED);
@@ -595,7 +595,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case CORAL_CENTERED_L4_3_PLACE_THEN_RELEASE, CORAL_CENTERED_L4_3_PLACE -> {
         intake.setState(IntakeState.IDLE_W_CORAL);
         moveSuperstructure(
-            ElevatorState.CORAL_CENTERED_L4_PLACE, WristState.CORAL_SCORE_CENTERED_LINEUP_L4, true);
+            ElevatorState.CORAL_CENTERED_L4_PLACE, WristState.CORAL_SCORE_CENTERED_LINEUP_L4, /* unsafe= */true);
         swerve.scoringAlignmentRequest(reefSnapAngle);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
@@ -607,8 +607,8 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_CENTERED_L4_RELEASE,
             WristState.CORAL_SCORE_CENTERED_PLACING_L4,
-            true);
-        swerve.snapsDriveRequest(reefSnapAngle, true);
+            /* unsafe= */true);
+        swerve.snapsDriveRequest(reefSnapAngle, /* teleopOnly= */true);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         autoAlign.markPipeScored();
@@ -620,7 +620,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L2_LINEUP, WristState.CORAL_SCORE_DISPLACED_LINEUP_L2);
         swerve.scoringAlignmentRequest(reefSnapAngle);
-        roll.setState(RollState.CORAL_SCORE, true);
+        roll.setState(RollState.CORAL_SCORE, /* recheckSensors= */true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOWED);
@@ -630,7 +630,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L2_PLACE,
             WristState.CORAL_SCORE_DISPLACED_PLACING_L2,
-            true);
+            /* unsafe= */true);
         swerve.scoringAlignmentRequest(reefSnapAngle);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
@@ -642,8 +642,8 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L2_RELEASE,
             WristState.CORAL_SCORE_DISPLACED_PLACING_L2,
-            true);
-        swerve.snapsDriveRequest(reefSnapAngle, true);
+            /* unsafe= */true);
+        swerve.snapsDriveRequest(reefSnapAngle, /* teleopOnly= */true);
         roll.setState(RollState.CORAL_SCORE);
         autoAlign.markPipeScored();
         vision.setState(VisionState.CLOSEST_REEF_TAG);
@@ -655,7 +655,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L3_LINEUP, WristState.CORAL_SCORE_DISPLACED_LINEUP_L3);
         swerve.scoringAlignmentRequest(reefSnapAngle);
-        roll.setState(RollState.CORAL_SCORE, true);
+        roll.setState(RollState.CORAL_SCORE, /* recheckSensors= */true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOWED);
@@ -665,7 +665,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L3_PLACE,
             WristState.CORAL_SCORE_DISPLACED_PLACING_L3,
-            true);
+            /* unsafe= */true);
         swerve.scoringAlignmentRequest(reefSnapAngle);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
@@ -677,8 +677,8 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L3_RELEASE,
             WristState.CORAL_SCORE_DISPLACED_PLACING_L3,
-            true);
-        swerve.snapsDriveRequest(reefSnapAngle, true);
+            /* unsafe= */true);
+        swerve.snapsDriveRequest(reefSnapAngle, /* teleopOnly= */true);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         autoAlign.markPipeScored();
@@ -699,7 +699,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L4_LINEUP, WristState.CORAL_SCORE_DISPLACED_LINEUP_L4);
         swerve.scoringAlignmentRequest(reefSnapAngle);
-        roll.setState(RollState.CORAL_SCORE, true);
+        roll.setState(RollState.CORAL_SCORE, /* recheckSensors= */true);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         lights.setState(getLightStateForScoring());
         climber.setState(ClimberState.STOWED);
@@ -709,7 +709,7 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L4_PLACE,
             WristState.CORAL_SCORE_DISPLACED_PLACING_L4,
-            true);
+            /* unsafe= */true);
         swerve.scoringAlignmentRequest(reefSnapAngle);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
@@ -721,8 +721,8 @@ public class RobotManager extends StateMachine<RobotState> {
         moveSuperstructure(
             ElevatorState.CORAL_DISPLACED_L4_RELEASE,
             WristState.CORAL_SCORE_DISPLACED_PLACING_L4,
-            true);
-        swerve.snapsDriveRequest(reefSnapAngle, true);
+            /* unsafe= */true);
+        swerve.snapsDriveRequest(reefSnapAngle, /* teleopOnly= */true);
         roll.setState(RollState.CORAL_SCORE);
         vision.setState(VisionState.CLOSEST_REEF_TAG);
         autoAlign.markPipeScored();
@@ -939,11 +939,11 @@ public class RobotManager extends StateMachine<RobotState> {
         swerve.scoringAlignmentRequest(reefSnapAngle);
       }
       case INTAKE_CORAL_STATION_BACK -> {
-        swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()), true);
+        swerve.snapsDriveRequest(SnapUtil.getCoralStationAngle(localization.getPose()), /* teleopOnly= */true);
       }
       case INTAKE_CORAL_STATION_FRONT -> {
         swerve.snapsDriveRequest(
-            SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0, true);
+            SnapUtil.getCoralStationAngle(localization.getPose()) - 180.0, /* teleopOnly= */true);
       }
       case INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL -> {
         if (FeatureFlags.CORAL_DETECTION.getAsBoolean()) {
@@ -1680,7 +1680,7 @@ public class RobotManager extends StateMachine<RobotState> {
   private boolean latestUnsafe = false;
 
   private void moveSuperstructure(ElevatorState elevatorGoal, WristState wristGoal) {
-    moveSuperstructure(elevatorGoal, wristGoal, false);
+    moveSuperstructure(elevatorGoal, wristGoal, /* unsafe= */false);
   }
 
   private void moveSuperstructure(

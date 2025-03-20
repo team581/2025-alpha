@@ -18,8 +18,8 @@ public record RobotConfig(
     LightsConfig lights) {
   public record ElevatorConfig(
       String canBusName,
-      int leftMotorID,
-      int rightMotorID,
+      int leftMotorId,
+      int rightMotorId,
       TalonFXConfiguration leftMotorConfig,
       TalonFXConfiguration rightMotorConfig,
       double homingEndHeight,
@@ -30,9 +30,9 @@ public record RobotConfig(
 
   public record IntakeConfig(
       String canBusName,
-      int topMotorID,
-      int bottomMotorID,
-      int candiID,
+      int topMotorId,
+      int bottomMotorId,
+      int candiId,
       boolean sensorFlipped,
       Debouncer rightDebouncer,
       Debouncer leftDebouncer,
@@ -54,7 +54,7 @@ public record RobotConfig(
 
   public record WristConfig(
       String canBusName,
-      int motorID,
+      int motorId,
       TalonFXConfiguration motorConfig,
       double minAngle,
       double maxAngle,
@@ -63,10 +63,10 @@ public record RobotConfig(
 
   public record ClimberConfig(
       String canBusName,
-      int climbMotorID,
-      int cancoderID,
-      int grabMotorID,
-      int canrangeID,
+      int climbMotorId,
+      int cancoderId,
+      int grabMotorId,
+      int canrangeId,
       double minAngle,
       double maxAngle,
       TalonFXConfiguration climbMotorConfig,
@@ -76,14 +76,14 @@ public record RobotConfig(
 
   public record RollConfig(
       String canBusName,
-      int motorID,
+      int motorId,
       TalonFXConfiguration motorConfig,
       double minAngle,
       double maxAngle,
       double homingCurrentThreshold,
       double homingPosition) {}
 
-  public record LightsConfig(String canBusName, int candleID) {}
+  public record LightsConfig(String canBusName, int candleId) {}
 
   // TODO: Change this to false during events
   public static final boolean IS_DEVELOPMENT = true;
