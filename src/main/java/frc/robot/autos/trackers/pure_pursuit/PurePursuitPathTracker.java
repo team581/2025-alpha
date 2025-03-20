@@ -1,5 +1,6 @@
 package frc.robot.autos.trackers.pure_pursuit;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -66,6 +67,9 @@ public class PurePursuitPathTracker implements PathTracker {
     if (PurePursuitUtils.isBetween(lastTargetWaypoint, currentTargetWaypoint, perpendicularPoint)) {
       currentRobotFollowedPointIndex = getCurrentLookaheadPointIndex();
     }
+
+    var robotToSegmentDistanceClamped =
+        MathUtil.clamp(perpendicularPoint.getTranslation().getDistance(currentRobotPose.getTranslation()), 0.0, lookaheadDistance);
     updateRotation();
     var lookaheadPoint =
         new Pose2d(
@@ -74,9 +78,7 @@ public class PurePursuitPathTracker implements PathTracker {
                     currentTargetWaypoint,
                     perpendicularPoint,
                     lookaheadDistance
-                        - currentRobotPose
-                            .getTranslation()
-                            .getDistance(perpendicularPoint.getTranslation()))
+                        - robotToSegmentDistanceClamped)
                 .getTranslation(),
             currentInterpolatedRotation);
 
