@@ -9,7 +9,7 @@ public enum RollState {
   FLOOR_ALGAE(90.0),
   SMART_STOW(0.0),
   CORAL_SCORE(0.0),
-  CORAL_SCORE_L1(0.0),
+  CORAL_SCORE_L1(90.0),
   DEMO_1(-90),
   DEMO_2(90);
 

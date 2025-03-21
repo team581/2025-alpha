@@ -231,20 +231,16 @@ public class Robot extends TimedRobot {
                   robotManager.setConfirmScoreActive(false);
                 }));
     hardware.driverController.leftTrigger().onTrue(robotCommands.floorIntakeCommand());
-    hardware.driverController.rightBumper().onTrue(robotCommands.stowCommand());
-    hardware.driverController.leftBumper().onTrue(robotCommands.intakeStationCommand());
+    hardware.driverController.rightBumper().onTrue(robotCommands.intakeStationCommand());
+    hardware.driverController.leftBumper().onTrue(robotCommands.floorAlgaeIntakeCommand());
     hardware.driverController.y().onTrue(robotCommands.highLineupCommand());
     hardware.driverController.x().onTrue(robotCommands.l3LineupCommand());
     hardware.driverController.b().onTrue(robotCommands.l2LineupCommand());
     hardware.driverController.a().onTrue(robotCommands.lowLineupCommand());
     hardware.driverController.povUp().onTrue(robotCommands.climbUpCommand());
     hardware.driverController.povDown().onTrue(robotCommands.climbDownCommand());
-    hardware.driverController.povLeft().onTrue(robotCommands.setAlgaeModeCommand(false));
-    hardware
-        .driverController
-        .povRight()
-        .onTrue(robotCommands.setAlgaeModeCommand(true))
-        .onFalse(robotCommands.setAlgaeModeCommand(false));
+    hardware.driverController.povLeft().onTrue(robotCommands.stowCommand());
+
     hardware.driverController.start().onTrue(robotCommands.unjamCommand());
     hardware.driverController.back().onTrue(localization.getZeroCommand());
 

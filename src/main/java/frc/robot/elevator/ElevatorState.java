@@ -18,8 +18,8 @@ public enum ElevatorState {
   NET(58.0),
   PROCESSOR(0),
 
-  CORAL_L1_PLACE(2.0),
-  CORAL_L1_RELEASE(0.0),
+  CORAL_L1_PLACE(8.0),
+  CORAL_L1_RELEASE(6.0),
 
   // Approach coral positions (maximum height without tipping)
   CORAL_L2_APPROACH(7.5),

@@ -1182,12 +1182,11 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void intakeFloorRequest() {
-    if (algaeMode) {
-      intakeFloorAlgaeRequest();
-    } else if (!(intake.getLeftSensor() || intake.getRightSensor())) {
       intakeFloorCoralHorizontalRequest();
-    }
+
   }
+
+
 
   public void intakeAssistFloorRequest() {
     if (algaeMode) {
@@ -1256,20 +1255,20 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void intakeStationRequest() {
-    if (algaeMode) {
+    // if (algaeMode) {
       intakeReefAlgaeRequest();
-    } else {
-      switch (getState()) {
-        case CLIMBING_1_LINEUP,
-            CLIMBING_2_HANGING,
-            CLIMBING_3_HANGING_2,
-            CLIMBING_4_HANGING_3,
-            REHOME_ELEVATOR,
-            REHOME_ROLL,
-            REHOME_WRIST -> {}
-        default -> setStateFromRequest(RobotState.INTAKE_STATION_APPROACH);
-      }
-    }
+    // } else {
+    //   switch (getState()) {
+    //     case CLIMBING_1_LINEUP,
+    //         CLIMBING_2_HANGING,
+    //         CLIMBING_3_HANGING_2,
+    //         CLIMBING_4_HANGING_3,
+    //         REHOME_ELEVATOR,
+    //         REHOME_ROLL,
+    //         REHOME_WRIST -> {}
+    //     default -> setStateFromRequest(RobotState.INTAKE_STATION_APPROACH);
+    //   }
+    // }
   }
 
   public void intakeStationBackRequest() {
