@@ -999,6 +999,9 @@ public class RobotManager extends StateMachine<RobotState> {
           CORAL_DISPLACED_L4_4_RELEASE -> {
         lights.setState(getLightStateForScoring());
       }
+      case INTAKE_CORAL_FLOOR_UPRIGHT -> {
+        lights.setState(getLightsStateForLollipop());
+      }
       default -> {}
     }
 
@@ -1721,7 +1724,7 @@ public class RobotManager extends StateMachine<RobotState> {
   private LightsState getLightsStateForLollipop() {
     return vision.getLollipopVisionResult().isPresent()
         ? LightsState.IDLE_WITH_ALGAE
-        : LightsState.IDLE_WITH_CORAL;
+        : LightsState.SCORE_ALIGN_NOT_READY;
   }
 
   public void setConfirmScoreActive(boolean newValue) {
