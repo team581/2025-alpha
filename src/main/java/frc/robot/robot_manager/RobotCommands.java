@@ -19,8 +19,10 @@ public class RobotCommands {
   public Command floorIntakeCommand() {
     return Commands.runOnce(robot::intakeFloorRequest, requirements).withName("FloorIntakeCommand");
   }
+
   public Command floorAlgaeIntakeCommand() {
-    return Commands.runOnce(robot::intakeFloorAlgaeRequest, requirements).withName("FloorAlgaeIntakeCommand");
+    return Commands.runOnce(robot::intakeFloorAlgaeRequest, requirements)
+        .withName("FloorAlgaeIntakeCommand");
   }
 
   public Command floorAssistIntakeCommand() {

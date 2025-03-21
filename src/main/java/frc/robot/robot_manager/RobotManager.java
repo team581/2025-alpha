@@ -1182,11 +1182,8 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void intakeFloorRequest() {
-      intakeFloorCoralHorizontalRequest();
-
+    intakeFloorCoralHorizontalRequest();
   }
-
-
 
   public void intakeAssistFloorRequest() {
     if (algaeMode) {
@@ -1256,7 +1253,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   public void intakeStationRequest() {
     // if (algaeMode) {
-      intakeReefAlgaeRequest();
+    intakeReefAlgaeRequest();
     // } else {
     //   switch (getState()) {
     //     case CLIMBING_1_LINEUP,
