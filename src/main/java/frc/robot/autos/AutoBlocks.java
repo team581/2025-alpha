@@ -211,7 +211,5 @@ public class AutoBlocks {
             false)
         .withTimeout(5.0)
         .withDeadline(autoCommands.waitForGroundIntakeDone());
-    //   .andThen(trailblazer.followSegment(new AutoSegment(new AutoPoint(backAwayPoint))
-    //   ));
   }
 }
