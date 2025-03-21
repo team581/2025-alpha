@@ -57,18 +57,16 @@ public class AutoBlocks {
     return Commands.sequence(
         trailblazer
             .followSegment(
-
                 new AutoSegment(
                     SCORING_CONSTRAINTS,
                     new AutoPoint(
-                    () ->
-                        robotManager
-                            .autoAlign
-                            .getUsedScoringPose(pipe, ReefPipeLevel.L4)
-                            .transformBy(PIPE_APPROACH_OFFSET),
-                    autoCommands.l4WarmupCommand(pipe),
-                  BASE_CONSTRAINTS
-                    ),
+                        () ->
+                            robotManager
+                                .autoAlign
+                                .getUsedScoringPose(pipe, ReefPipeLevel.L4)
+                                .transformBy(PIPE_APPROACH_OFFSET),
+                        autoCommands.l4WarmupCommand(pipe),
+                        BASE_CONSTRAINTS),
                     new AutoPoint(
                         () ->
                             robotManager

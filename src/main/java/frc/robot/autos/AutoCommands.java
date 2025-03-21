@@ -175,7 +175,8 @@ public class AutoCommands {
             RobotState.INTAKE_CORAL_FLOOR_HORIZONTAL,
             RobotState.INTAKE_CORAL_FLOOR_UPRIGHT,
             RobotState.INTAKE_ASSIST_CORAL_FLOOR_HORIZONTAL)
-        .andThen(robotManager.waitForState(RobotState.IDLE_CORAL)).withTimeout(4.0);
+        .andThen(robotManager.waitForState(RobotState.IDLE_CORAL))
+        .withTimeout(4.0);
   }
 
   public Command floorIntakeUprightCoral() {
