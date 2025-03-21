@@ -33,8 +33,8 @@ public class RedLollipopAuto extends BaseAuto {
             new Pose2d(15.2, 3.996, Rotation2d.fromDegrees(0))),
         blocks.scoreL4(ReefPipe.PIPE_B),
         blocks.intakeLollipop(
-          new Pose2d(15.085, 5.106, Rotation2d.fromDegrees(30.5)),
-          new Pose2d(15.513, 5.473, Rotation2d.fromDegrees(30.5))),
-      blocks.scoreL4(ReefPipe.PIPE_C));
+            new Pose2d(15.085, 5.106, Rotation2d.fromDegrees(30.5)),
+            new Pose2d(15.513, 5.473, Rotation2d.fromDegrees(30.5))),
+        blocks.scoreL4(ReefPipe.PIPE_C));
   }
 }
