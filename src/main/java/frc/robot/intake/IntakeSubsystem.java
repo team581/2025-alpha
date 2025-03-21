@@ -33,8 +33,8 @@ public class IntakeSubsystem extends StateMachine<IntakeState> {
   private double topMotorVelocity = 0.0;
   private double bottomMotorVelocity = 0.0;
 
-  private final VelocityDetector topMotorAlgaeDetection = new VelocityDetector(32, 0.2, 0.0);
-  private final VelocityDetector bottomMotorAlgaeDetection = new VelocityDetector(30, 0.2, 0.0);
+  private final VelocityDetector topMotorAlgaeDetection = new VelocityDetector(32, 0.2, 0.5);
+  private final VelocityDetector bottomMotorAlgaeDetection = new VelocityDetector(30, 0.2, 0.5);
   private boolean topMotorAlgaeVelocityGp = false;
   private boolean bottomMotorAlgaeVelocityGp = false;
 
