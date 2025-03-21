@@ -890,14 +890,12 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void robotPeriodic() {
     super.robotPeriodic();
-    var maybeLollipop = vision.getLollipopVisionResult();
+    coralMap.updateLollipopResult(vision.getLollipopVisionResult());
+    var maybeLollipop = coralMap.getLollipopIntakePose();
     if (maybeLollipop.isPresent()) {
       DogLog.log(
-          "Debug/AlgaePose",
-          new Pose2d(
-              GamePieceDetectionUtil.calculateFieldRelativeLollipopTranslationFromCamera(
-                  localization.getPose(), maybeLollipop.get()),
-              Rotation2d.kZero));
+          "Debug/LollipopIntakePose",
+         maybeLollipop.get());
     }
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(

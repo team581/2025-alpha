@@ -202,9 +202,7 @@ public class AutoBlocks {
                 new AutoPoint(approachPoint),
                 new AutoPoint(
                     () ->
-                        IntakeAssistUtil.getLollipopIntakePoseFromVisionResult(
-                                robotManager.vision.getLollipopVisionResult(),
-                                robotManager.localization.getPose())
+                       robotManager.coralMap.getLollipopIntakePose()
                             .orElse(defaultIntakingPose),
                     Commands.runOnce(robotManager::intakeFloorCoralUprightRequest),
                     LOLLIPOP_CONSTRAINTS)),
