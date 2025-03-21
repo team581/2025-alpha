@@ -9,7 +9,6 @@ import frc.robot.auto_align.ReefPipe;
 import frc.robot.auto_align.ReefPipeLevel;
 import frc.robot.autos.constraints.AutoConstraintOptions;
 import frc.robot.elevator.CoralStation;
-import frc.robot.intake_assist.IntakeAssistUtil;
 import frc.robot.robot_manager.RobotManager;
 import frc.robot.util.PoseErrorTolerance;
 
@@ -201,9 +200,7 @@ public class AutoBlocks {
                 BASE_CONSTRAINTS,
                 new AutoPoint(approachPoint),
                 new AutoPoint(
-                    () ->
-                       robotManager.coralMap.getLollipopIntakePose()
-                            .orElse(defaultIntakingPose),
+                    () -> robotManager.coralMap.getLollipopIntakePose().orElse(defaultIntakingPose),
                     Commands.runOnce(robotManager::intakeFloorCoralUprightRequest),
                     LOLLIPOP_CONSTRAINTS)),
             false)

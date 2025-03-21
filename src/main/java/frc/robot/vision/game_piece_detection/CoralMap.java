@@ -56,9 +56,8 @@ public class CoralMap extends StateMachine<CoralMapState> {
               AlignmentCostUtil.getCoralAlignCost(
                   target, localization.getPose(), swerve.getFieldRelativeSpeeds()));
 
-  private Optional<Pose2d> lastLollipopPose =Optional.empty();
+  private Optional<Pose2d> lastLollipopPose = Optional.empty();
   private double lastLollipopTime = 0.0;
-
 
   public CoralMap(LocalizationSubsystem localization, SwerveSubsystem swerve) {
     super(SubsystemPriority.VISION, CoralMapState.DEFAULT_STATE);
@@ -67,7 +66,9 @@ public class CoralMap extends StateMachine<CoralMapState> {
   }
 
   public void updateLollipopResult(Optional<GamePieceResult> lollipopResult) {
-    var newPose = IntakeAssistUtil.getLollipopIntakePoseFromVisionResult(lollipopResult, localization.getPose());
+    var newPose =
+        IntakeAssistUtil.getLollipopIntakePoseFromVisionResult(
+            lollipopResult, localization.getPose());
     if (newPose.isPresent() && !newPose.equals(lastLollipopPose)) {
       lastLollipopPose = newPose;
       lastLollipopTime = Timer.getFPGATimestamp();

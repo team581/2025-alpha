@@ -2,7 +2,6 @@ package frc.robot.robot_manager;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -35,7 +34,6 @@ import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.VisionState;
 import frc.robot.vision.VisionSubsystem;
 import frc.robot.vision.game_piece_detection.CoralMap;
-import frc.robot.vision.game_piece_detection.GamePieceDetectionUtil;
 import frc.robot.wrist.WristState;
 import frc.robot.wrist.WristSubsystem;
 import java.util.Optional;
@@ -893,9 +891,7 @@ public class RobotManager extends StateMachine<RobotState> {
     coralMap.updateLollipopResult(vision.getLollipopVisionResult());
     var maybeLollipop = coralMap.getLollipopIntakePose();
     if (maybeLollipop.isPresent()) {
-      DogLog.log(
-          "Debug/LollipopIntakePose",
-         maybeLollipop.get());
+      DogLog.log("Debug/LollipopIntakePose", maybeLollipop.get());
     }
     DogLog.log("RobotManager/NearestReefSidePose", nearestReefSide.getPose());
     DogLog.log(
