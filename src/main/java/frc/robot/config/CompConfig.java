@@ -172,7 +172,7 @@ class CompConfig {
                       new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
                   .withMotorOutput(
                       new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))),
-          new VisionConfig(4, 0.05, 0.1 ),
+          new VisionConfig(4, 0.05, 0.1),
           new WristConfig(
               RIO_CAN_NAME,
               22,

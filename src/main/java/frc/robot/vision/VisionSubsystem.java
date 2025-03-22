@@ -1,10 +1,10 @@
 package frc.robot.vision;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.auto_align.ReefPipe;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
-import frc.robot.util.MathHelpers;
 import frc.robot.util.scheduling.SubsystemPriority;
 import frc.robot.util.state_machines.StateMachine;
 import frc.robot.vision.limelight.Limelight;
@@ -14,9 +14,6 @@ import frc.robot.vision.results.TagResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
-
-import dev.doglog.DogLog;
 
 public class VisionSubsystem extends StateMachine<VisionState> {
   private static final double REEF_CLOSEUP_DISTANCE = 1.0;
@@ -55,7 +52,7 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     roll = imu.getRoll();
     rollRate = imu.getRollRate();
 
-    if(getState() == VisionState.CLOSEST_REEF_TAG_CLOSEUP) {
+    if (getState() == VisionState.CLOSEST_REEF_TAG_CLOSEUP) {
       switch (reefPipe) {
         case PIPE_A, PIPE_C, PIPE_E, PIPE_G, PIPE_I, PIPE_K -> {
           if (frontLeftLimelight.getCameraHealth() != CameraHealth.OFFLINE) {
@@ -67,7 +64,6 @@ public class VisionSubsystem extends StateMachine<VisionState> {
           if (frontRightLimelight.getCameraHealth() != CameraHealth.OFFLINE) {
             frontRightLimelight.setState(LimelightState.OFF);
             frontLeftLimelight.setState(LimelightState.CLOSEST_REEF_TAG_CLOSEUP);
-
           }
         }
       }
@@ -176,8 +172,7 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     }
     if ((frontRightLimelight.getState() == LimelightState.TAGS
             || frontRightLimelight.getState() == LimelightState.CLOSEST_REEF_TAG
-            || frontRightLimelight.getState() == LimelightState.CLOSEST_REEF_TAG_CLOSEUP
-            )
+            || frontRightLimelight.getState() == LimelightState.CLOSEST_REEF_TAG_CLOSEUP)
         && (frontRightLimelight.getCameraHealth() == CameraHealth.NO_TARGETS
             || frontRightLimelight.getCameraHealth() == CameraHealth.GOOD)) {
       return true;
@@ -195,16 +190,15 @@ public class VisionSubsystem extends StateMachine<VisionState> {
       return true;
     }
     if ((frontLeftLimelight.getState() == LimelightState.TAGS
-    || frontLeftLimelight.getState() == LimelightState.CLOSEST_REEF_TAG
-    || frontLeftLimelight.getState() == LimelightState.CLOSEST_REEF_TAG_CLOSEUP)
+            || frontLeftLimelight.getState() == LimelightState.CLOSEST_REEF_TAG
+            || frontLeftLimelight.getState() == LimelightState.CLOSEST_REEF_TAG_CLOSEUP)
         && (frontLeftLimelight.getCameraHealth() == CameraHealth.NO_TARGETS
             || frontLeftLimelight.getCameraHealth() == CameraHealth.GOOD)) {
       return true;
     }
     if ((frontRightLimelight.getState() == LimelightState.TAGS
-    || frontRightLimelight.getState() == LimelightState.CLOSEST_REEF_TAG
-    || frontRightLimelight.getState() == LimelightState.CLOSEST_REEF_TAG_CLOSEUP
-    )
+            || frontRightLimelight.getState() == LimelightState.CLOSEST_REEF_TAG
+            || frontRightLimelight.getState() == LimelightState.CLOSEST_REEF_TAG_CLOSEUP)
         && (frontRightLimelight.getCameraHealth() == CameraHealth.NO_TARGETS
             || frontRightLimelight.getCameraHealth() == CameraHealth.GOOD)) {
       return true;
@@ -215,7 +209,7 @@ public class VisionSubsystem extends StateMachine<VisionState> {
 
   public void updateDistanceFromReef(double distanceFromReef) {
     DogLog.log("Vision/DistanceFromReef", distanceFromReef);
-    if (getState()==VisionState.CLOSEST_REEF_TAG) {
+    if (getState() == VisionState.CLOSEST_REEF_TAG) {
       if (distanceFromReef < REEF_CLOSEUP_DISTANCE) {
         setState(VisionState.CLOSEST_REEF_TAG_CLOSEUP);
       }
