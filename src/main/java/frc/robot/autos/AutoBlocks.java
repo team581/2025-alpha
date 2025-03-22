@@ -99,27 +99,24 @@ public class AutoBlocks {
   public Command scorePreloadL4(Pose2d startingPose, ReefPipe pipe) {
     return Commands.sequence(
         Commands.runOnce(robotManager::rehomeRollRequest),
-        trailblazer.followSegment(
-            new AutoSegment(
-                BASE_CONSTRAINTS,
-                // Start on auto line
-                new AutoPoint(
-                    startingPose,
-                    autoCommands
-                        .preloadCoralAfterRollHomed()
-                        .andThen(autoCommands.l4WarmupCommand(pipe)),
-                    BASE_CONSTRAINTS),
-                new AutoPoint(
-                    () ->
-                        robotManager
-                            .autoAlign
-                            .getUsedScoringPose(pipe, ReefPipeLevel.L4)
-                            .transformBy(PIPE_LINEUP_OFFSET),
-                    BASE_CONSTRAINTS))),
         trailblazer
             .followSegment(
                 new AutoSegment(
-                    SCORING_CONSTRAINTS,
+                    BASE_CONSTRAINTS,
+                    // Start on auto line
+                    new AutoPoint(
+                        startingPose,
+                        autoCommands
+                            .preloadCoralAfterRollHomed()
+                            .andThen(autoCommands.l4WarmupCommand(pipe)),
+                        BASE_CONSTRAINTS),
+                    new AutoPoint(
+                        () ->
+                            robotManager
+                                .autoAlign
+                                .getUsedScoringPose(pipe, ReefPipeLevel.L4)
+                                .transformBy(PIPE_LINEUP_OFFSET),
+                        BASE_CONSTRAINTS),
                     new AutoPoint(
                         () ->
                             robotManager
