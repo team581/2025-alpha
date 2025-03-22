@@ -105,7 +105,7 @@ public class AutoBlocks {
                     BASE_CONSTRAINTS,
                     // Start on auto line
                     new AutoPoint(
-                        startingPose,
+                        robotManager.autoAlign.getUsedScoringPose(pipe, ReefPipeLevel.L4).transformBy(PIPE_APPROACH_OFFSET),
                         autoCommands
                             .preloadCoralAfterRollHomed()
                             .andThen(autoCommands.l4WarmupCommand(pipe)),

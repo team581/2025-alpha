@@ -999,6 +999,8 @@ public class RobotManager extends StateMachine<RobotState> {
       default -> {}
     }
 
+    vision.updateDistanceFromReef(localization.getPose().getTranslation().getDistance(nearestReefSide.getPose().getTranslation()));
+  
     // Prevent this from interfering with the lights for field calibration
     if (!FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
       if (vision.isAnyCameraOffline()) {
