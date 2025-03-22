@@ -32,7 +32,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
   private static final Rotation2d TELEOP_MAX_ANGULAR_RATE = Rotation2d.fromRotations(2);
 
   /** Ratio from joystick percentage to scoring pose offset in meters. */
-  private static final double FINE_ADJUST_CONTROLLER_SCALAR = 0.3;
+  private static final double FINE_ADJUST_CONTROLLER_SCALAR = 0.1;
 
   private static final double LEFT_X_DEADBAND = 0.05;
   private static final double LEFT_Y_DEADBAND = 0.05;

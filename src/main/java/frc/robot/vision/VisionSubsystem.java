@@ -1,6 +1,7 @@
 package frc.robot.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.auto_align.ReefPipe;
 import frc.robot.imu.ImuSubsystem;
 import frc.robot.localization.LocalizationSubsystem;
 import frc.robot.util.MathHelpers;
@@ -31,6 +32,7 @@ public class VisionSubsystem extends StateMachine<VisionState> {
   private double pitchRate;
   private double roll;
   private double rollRate;
+  private ReefPipe reefPipe;
 
   public VisionSubsystem(
       ImuSubsystem imu,
@@ -52,6 +54,24 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     pitchRate = imu.getPitchRate();
     roll = imu.getRoll();
     rollRate = imu.getRollRate();
+
+    if(getState() == VisionState.CLOSEST_REEF_TAG_CLOSEUP) {
+      switch (reefPipe) {
+        case PIPE_A, PIPE_C, PIPE_E, PIPE_G, PIPE_I, PIPE_K -> {
+          if (frontLeftLimelight.getCameraHealth() != CameraHealth.OFFLINE) {
+            frontLeftLimelight.setState(LimelightState.OFF);
+            frontRightLimelight.setState(LimelightState.CLOSEST_REEF_TAG_CLOSEUP);
+          }
+        }
+        case PIPE_B, PIPE_D, PIPE_F, PIPE_H, PIPE_J, PIPE_L -> {
+          if (frontRightLimelight.getCameraHealth() != CameraHealth.OFFLINE) {
+            frontRightLimelight.setState(LimelightState.OFF);
+            frontLeftLimelight.setState(LimelightState.CLOSEST_REEF_TAG_CLOSEUP);
+
+          }
+        }
+      }
+    }
 
     tagResult.clear();
     var maybeBackResult = backTagLimelight.getTagResult();
@@ -77,6 +97,10 @@ public class VisionSubsystem extends StateMachine<VisionState> {
 
   public void setState(VisionState state) {
     setStateFromRequest(state);
+  }
+
+  public void setCurrentScoringPipe(ReefPipe reefPipe) {
+    this.reefPipe = reefPipe;
   }
 
   @Override
@@ -129,7 +153,8 @@ public class VisionSubsystem extends StateMachine<VisionState> {
     frontLeftLimelight.sendImuData(robotHeading, angularVelocity, pitch, pitchRate, roll, rollRate);
   }
 
-  public void setClosestScoringReefTag(int tagID) {
+  public void setClosestScoringReefAndPipe(int tagID, ReefPipe currentScoringPipe) {
+    reefPipe = currentScoringPipe;
     frontRightLimelight.setClosestScoringReefTag(tagID);
     frontLeftLimelight.setClosestScoringReefTag(tagID);
     backTagLimelight.setClosestScoringReefTag(tagID);

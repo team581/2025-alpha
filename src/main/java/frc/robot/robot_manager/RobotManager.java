@@ -1000,7 +1000,6 @@ public class RobotManager extends StateMachine<RobotState> {
     }
 
     vision.updateDistanceFromReef(localization.getPose().getTranslation().getDistance(nearestReefSide.getPose().getTranslation()));
-  
     // Prevent this from interfering with the lights for field calibration
     if (!FeatureFlags.FIELD_CALIBRATION.getAsBoolean()) {
       if (vision.isAnyCameraOffline()) {
@@ -1066,7 +1065,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
     DogLog.log("AutoAlign/UsedPose", autoAlign.getUsedScoringPose());
 
-    vision.setClosestScoringReefTag(nearestReefSide.getTagID());
+    vision.setClosestScoringReefAndPipe(nearestReefSide.getTagID(), autoAlign.getBestReefPipe());
 
     autoAlign.setScoringLevel(scoringLevel);
     autoAlign.setTeleopSpeeds(swerve.getTeleopSpeeds());

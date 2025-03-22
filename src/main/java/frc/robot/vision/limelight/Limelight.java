@@ -97,11 +97,6 @@ public class Limelight extends StateMachine<LimelightState> {
     }
     var newPose = estimatePose.pose;
 
-    if (DriverStation.isEnabled()&&!MathUtil.isNear(robotHeading, newPose.getRotation().getDegrees(), 30, -180, 180)) {
-      DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", Pose2d.kZero);
-
-      return Optional.empty();
-    }
 
     if (estimatePose.tagCount == 0) {
       DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", Pose2d.kZero);
