@@ -44,7 +44,6 @@ public class TagAlign {
     this.reefPipeOverride = Optional.of(pipe);
   }
 
-
   public void setDriverPoseOffset(Translation2d offset) {
     driverPoseOffset = offset;
   }
