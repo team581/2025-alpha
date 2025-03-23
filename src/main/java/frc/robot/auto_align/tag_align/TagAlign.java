@@ -18,16 +18,14 @@ import java.util.Optional;
 public class TagAlign {
   private static final List<ReefPipe> ALL_REEF_PIPES = List.of(ReefPipe.values());
 
-  private static final PIDController TAG_SIDEWAYS_PID = new PIDController(2.5, 0.0, 0.0);
-  private static final PIDController TAG_FORWARD_PID = new PIDController(1.2, 0.0, 0.0);
+  private static final PIDController TAG_SIDEWAYS_PID = new PIDController(6.0, 0.0, 0.0);
+  private static final PIDController TAG_FORWARD_PID = new PIDController(3.0, 0.0, 0.0);
 
-  private static final double BEFORE_RAISED_INITIAL_DISTANCE_OFFSET = 0.35;
   private static final double TAG_ALIGNMENT_FINISHED_DISTANCE_THRESHOLD = 0.05;
 
   private final AlignmentCostUtil alignmentCostUtil;
   private final LocalizationSubsystem localization;
   private ReefPipeLevel level = ReefPipeLevel.BASE;
-  private ChassisSpeeds rawTeleopSpeeds = new ChassisSpeeds();
   private Translation2d driverPoseOffset = Translation2d.kZero;
   private Optional<ReefPipe> reefPipeOverride = Optional.empty();
 
@@ -46,9 +44,6 @@ public class TagAlign {
     this.reefPipeOverride = Optional.of(pipe);
   }
 
-  public void setRawTeleopSpeeds(ChassisSpeeds speeds) {
-    rawTeleopSpeeds = speeds;
-  }
 
   public void setDriverPoseOffset(Translation2d offset) {
     driverPoseOffset = offset;
@@ -128,10 +123,7 @@ public class TagAlign {
             TAG_SIDEWAYS_PID.calculate(scoringTranslationRobotRelative.getY()));
     var goalTranslation = goalTranslationWithP.rotateBy(robotPose.getRotation());
 
-    var xEffort = TAG_SIDEWAYS_PID.calculate(goalTranslation.getX());
-    var yEffort = TAG_SIDEWAYS_PID.calculate(goalTranslation.getY());
-
-    var goalSpeeds = new ChassisSpeeds(xEffort, yEffort, 0.0);
+    var goalSpeeds = new ChassisSpeeds(goalTranslation.getX(), goalTranslation.getY(), 0.0);
     DogLog.log("AutoAlign/GoalSpeeds", goalSpeeds);
     return goalSpeeds;
   }
