@@ -39,7 +39,7 @@ public class Limelight extends StateMachine<LimelightState> {
 
   private double robotHeading = 0.0;
 
-  private double lastTimestamp  = 0.0;
+  private double lastTimestamp = 0.0;
 
   public Limelight(String name, LimelightState initialState, LimelightModel limelightModel) {
     // TODO(jonahsnider): Make Limelight state logging work with multiple instances, not just
@@ -90,7 +90,6 @@ public class Limelight extends StateMachine<LimelightState> {
       estimatePose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightTableName);
     }
 
-
     if (estimatePose == null) {
       return Optional.empty();
     }
@@ -112,7 +111,6 @@ public class Limelight extends StateMachine<LimelightState> {
 
       return Optional.empty();
     }
-
 
     lastTimestamp = newTimestamp;
     DogLog.log("Vision/" + name + "/Tags/RawLimelightPose", newPose);
