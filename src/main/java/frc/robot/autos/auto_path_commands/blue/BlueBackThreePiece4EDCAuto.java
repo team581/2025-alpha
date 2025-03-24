@@ -24,9 +24,10 @@ public class BlueBackThreePiece4EDCAuto extends BaseAuto {
   protected Command createAutoCommand() {
     return Commands.sequence(
         blocks.scorePreloadL4(Points.START_R4_AND_B4.bluePose, ReefPipe.PIPE_E),
-        blocks.intakeStationBack(CoralStation.PROCESSOR_SIDE_BLUE),
+        blocks.finishScoreThenIntakeStationBack(ReefPipe.PIPE_E, CoralStation.PROCESSOR_SIDE_BLUE),
         blocks.scoreL4(ReefPipe.PIPE_D),
-        blocks.intakeStationBack(CoralStation.PROCESSOR_SIDE_BLUE),
-        blocks.scoreL4(ReefPipe.PIPE_C));
+        blocks.finishScoreThenIntakeStationBack(ReefPipe.PIPE_D, CoralStation.PROCESSOR_SIDE_BLUE),
+        blocks.scoreL4(ReefPipe.PIPE_C),
+        blocks.finishScoreAndStop(ReefPipe.PIPE_C));
   }
 }

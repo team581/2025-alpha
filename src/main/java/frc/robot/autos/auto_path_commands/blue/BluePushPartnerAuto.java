@@ -34,9 +34,12 @@ public class BluePushPartnerAuto extends BaseAuto {
                 new AutoPoint(Points.START_R3_AND_B3.bluePose),
                 new AutoPoint(new Pose2d(7.587, 3.054, Rotation2d.kZero)))),
         blocks.scorePreloadL4(Points.START_R3_AND_B3.bluePose, ReefPipe.PIPE_J),
-        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_BLUE),
+        blocks.finishScoreThenIntakeStationBack(
+            ReefPipe.PIPE_J, CoralStation.NON_PROCESSOR_SIDE_BLUE),
         blocks.scoreL4(ReefPipe.PIPE_K),
-        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_BLUE),
-        blocks.scoreL4(ReefPipe.PIPE_L));
+        blocks.finishScoreThenIntakeStationBack(
+            ReefPipe.PIPE_K, CoralStation.NON_PROCESSOR_SIDE_BLUE),
+        blocks.scoreL4(ReefPipe.PIPE_L),
+        blocks.finishScoreAndStop(ReefPipe.PIPE_L));
   }
 }

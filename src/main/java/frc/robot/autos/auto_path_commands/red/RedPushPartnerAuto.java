@@ -34,9 +34,12 @@ public class RedPushPartnerAuto extends BaseAuto {
                 new AutoPoint(Points.START_R3_AND_B3.redPose),
                 new AutoPoint(new Pose2d(9.963, 3.054, Rotation2d.kZero)))),
         blocks.scorePreloadL4(Points.START_R3_AND_B3.redPose, ReefPipe.PIPE_J),
-        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_RED),
+        blocks.finishScoreThenIntakeStationBack(
+            ReefPipe.PIPE_J, CoralStation.NON_PROCESSOR_SIDE_RED),
         blocks.scoreL4(ReefPipe.PIPE_K),
-        blocks.intakeStationBack(CoralStation.NON_PROCESSOR_SIDE_RED),
-        blocks.scoreL4(ReefPipe.PIPE_L));
+        blocks.finishScoreThenIntakeStationBack(
+            ReefPipe.PIPE_K, CoralStation.NON_PROCESSOR_SIDE_RED),
+        blocks.scoreL4(ReefPipe.PIPE_L),
+        blocks.finishScoreAndStop(ReefPipe.PIPE_L));
   }
 }

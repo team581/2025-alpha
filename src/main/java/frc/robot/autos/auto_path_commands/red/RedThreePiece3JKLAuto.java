@@ -24,9 +24,12 @@ public class RedThreePiece3JKLAuto extends BaseAuto {
   protected Command createAutoCommand() {
     return Commands.sequence(
         blocks.scorePreloadL4(Points.START_R3_AND_B3.redPose, ReefPipe.PIPE_J),
-        blocks.intakeStationFront(CoralStation.NON_PROCESSOR_SIDE_RED),
+        blocks.finishScoreThenIntakeStationFront(
+            ReefPipe.PIPE_J, CoralStation.NON_PROCESSOR_SIDE_RED),
         blocks.scoreL4(ReefPipe.PIPE_K),
-        blocks.intakeStationFront(CoralStation.NON_PROCESSOR_SIDE_RED),
-        blocks.scoreL4(ReefPipe.PIPE_L));
+        blocks.finishScoreThenIntakeStationFront(
+            ReefPipe.PIPE_K, CoralStation.NON_PROCESSOR_SIDE_RED),
+        blocks.scoreL4(ReefPipe.PIPE_L),
+        blocks.finishScoreAndStop(ReefPipe.PIPE_L));
   }
 }
