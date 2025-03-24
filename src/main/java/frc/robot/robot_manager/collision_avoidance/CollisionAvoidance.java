@@ -4,6 +4,8 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.robot_manager.SuperstructurePosition;
+import frc.robot.util.motion.SyncFollower;
+import frc.robot.util.motion.SyncLeader;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -12,12 +14,26 @@ public class CollisionAvoidance {
   private static final List<CollisionBox> ALL_COLLISION_BOXES = List.of(CollisionBox.values());
   private static final double WRIST_LENGTH = 23.092038;
   private static final Rotation2d offsetAngle = Rotation2d.fromDegrees(-33.0);
+  private static final SyncLeader elevator = new SyncLeader();
+  private static final SyncFollower wrist = new SyncFollower(elevator);
 
   public static Optional<SuperstructurePosition> plan(
       SuperstructurePosition current, SuperstructurePosition goal) {
     var goalPoint = getGoalPoint(current, goal);
 
-    return goalPoint;
+    if (goalPoint.isEmpty()) {
+      return Optional.empty();
+    }
+
+    var midPoint = goalPoint.orElseThrow();
+
+    elevator.update(current.elevatorHeight(), midPoint.elevatorHeight());
+    var syncedWristSetpoint =
+        wrist.getSynchronizedSetpoint(current.wristAngle(), midPoint.wristAngle());
+
+    // TODO: Use Optional#map()
+    // TODO: This doesn't need to be in collision avoidance, could be in the regular wrist subsystem
+    return Optional.of(new SuperstructurePosition(midPoint.elevatorHeight(), syncedWristSetpoint));
   }
 
   static CollisionBox getZone(SuperstructurePosition current) {
