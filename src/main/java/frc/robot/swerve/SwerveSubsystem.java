@@ -167,15 +167,14 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
       case AUTO, TELEOP -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.TELEOP;
       case INTAKE_ASSIST_ALGAE_TELEOP, INTAKE_ASSIST_CORAL_TELEOP ->
           DriverStation.isAutonomous() ? SwerveState.AUTO : currentState;
-      case REEF_ALIGN_TELEOP ->
-          DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.REEF_ALIGN_TELEOP;
       case REEF_ALIGN_TELEOP_FINE_ADJUST ->
           DriverStation.isAutonomous()
               ? SwerveState.AUTO
               : SwerveState.REEF_ALIGN_TELEOP_FINE_ADJUST;
       case AUTO_SNAPS, TELEOP_SNAPS ->
           DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.TELEOP_SNAPS;
-      case CLIMBING -> DriverStation.isAutonomous() ? SwerveState.AUTO : SwerveState.CLIMBING;
+      case CLIMBING, TELEOP_TRAILBLAZER, REEF_ALIGN_TELEOP ->
+          DriverStation.isAutonomous() ? SwerveState.AUTO : currentState;
     };
   }
 
@@ -321,7 +320,7 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
-      case AUTO ->
+      case AUTO, TELEOP_TRAILBLAZER ->
           drivetrain.setControl(
               drive
                   .withVelocityX(autoSpeeds.vxMetersPerSecond)
@@ -469,5 +468,19 @@ public class SwerveSubsystem extends StateMachine<SwerveState> {
 
   public void setElevatorHeight(double height) {
     elevatorHeight = height;
+  }
+
+  public void finishTrailblazerRequest() {
+    if (getState() == SwerveState.TELEOP_TRAILBLAZER) {
+      setStateFromRequest(SwerveState.TELEOP);
+    }
+  }
+
+  public void startTrailblazerRequest() {
+    if (DriverStation.isAutonomous()) {
+      setStateFromRequest(SwerveState.AUTO);
+    } else {
+      setStateFromRequest(SwerveState.TELEOP_TRAILBLAZER);
+    }
   }
 }

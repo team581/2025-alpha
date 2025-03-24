@@ -62,6 +62,7 @@ public class Trailblazer {
             .alongWith(
                 Commands.run(
                     () -> {
+                      swerve.startTrailblazerRequest();
                       pathTracker.updateRobotState(
                           localization.getPose(), swerve.getFieldRelativeSpeeds());
                       var currentAutoPointIndex = pathTracker.getCurrentPointIndex();
@@ -93,6 +94,7 @@ public class Trailblazer {
                       }
                     },
                     swerve))
+            .finallyDo(swerve::finishTrailblazerRequest)
             .withName("FollowSegmentIndefinitely");
 
     if (shouldEnd) {
